@@ -25,6 +25,13 @@ The implementation map for the feature described in
   rules, the quiz format and the checklist format. Shared fixtures live in a
   separate module that publishes a test-jar, because a fixture cannot
   mention the domain. [Answer](issues/01-module-authoring-template-and-shared-test-support.md)
+- **2026-10-22 · ticket 02** — Two diagnostics commands, not one:
+  `-Pdiagnostics` is the learner's and runs the module you select, red on a
+  Start module; `-Pdiagnostics-solutions` is CI's and runs every Solution
+  module's diagnostics while skipping the Start modules. A Start module
+  declares that with `diagnostics.skip` in its own POM. This refines the
+  specification's acceptance criterion 3, which assumed a single command.
+  [Answer](issues/02-one-diagnostics-command-that-selects-solution-modules.md)
 
 ## Fog
 
