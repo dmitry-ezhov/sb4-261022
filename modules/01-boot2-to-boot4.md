@@ -33,7 +33,7 @@ HTTP client, or the resilience and API versioning that Framework 7 brings.
 | Jakarta EE | `javax.*` | `jakarta.*` | `jakarta.*` |
 | Jackson | 2.x, `com.fasterxml.jackson` | 2.x, `com.fasterxml.jackson` | 3.x for core and databind (`tools.jackson`); the annotations stay behind at `com.fasterxml.jackson.annotation` |
 | Web starter | `spring-boot-starter-web` | `spring-boot-starter-web` | `spring-boot-starter-webmvc` - the old name still resolves, but it is deprecated |
-| JSON starter | inside the web starter | inside the web starter | `spring-boot-starter-json`, on its own |
+| JSON starter | inside the web starter | `spring-boot-starter-json`, inside the web starter | `spring-boot-starter-jackson`, on its own |
 | Web test slice | inside `spring-boot-starter-test` | inside `spring-boot-starter-test` | `spring-boot-starter-webmvc-test` |
 | Mock bean annotation | `@MockBean` | `@MockBean`, deprecated in 3.4 | `@MockitoBean` |
 | Auto-configuration registration | `META-INF/spring.factories` | `META-INF/spring/…AutoConfiguration.imports` | same |
@@ -48,13 +48,15 @@ HTTP client, or the resilience and API versioning that Framework 7 brings.
 
 Boot 3 split the old monolithic starters into one artifact per technology, and
 Boot 4 finished the job. The web starter is now `spring-boot-starter-webmvc`,
-and the Jackson stack is `spring-boot-starter-json` rather than something the
-web starter happened to include.
+and the Jackson stack is `spring-boot-starter-jackson` - a rename of the Boot 3
+`spring-boot-starter-json` - rather than something the web starter happened to
+include.
 
-The old name still resolves - `spring-boot-starter-web` was **deprecated**, not
-removed - so a Boot 2 POM keeps building. That is the trap: a deprecated
-starter is a warning, not an error, and it will still be there when you next
-upgrade. Change it deliberately:
+The old names still resolve. `spring-boot-starter-web` was **deprecated**, not
+removed, so a Boot 2 POM keeps building; and `spring-boot-starter-json` is
+gone rather than deprecated. That is the trap: a deprecated starter is a
+warning, not an error, and it will still be there when you next upgrade.
+Change it deliberately:
 
 ```xml
 <dependency>
@@ -62,6 +64,10 @@ upgrade. Change it deliberately:
   <artifactId>spring-boot-starter-webmvc</artifactId>
 </dependency>
 ```
+
+Boot 4 also splits the web stack into smaller artifacts under the hood -
+`spring-boot-webmvc` and `spring-boot-http-converter` - which you do not
+depend on directly, but which you will meet in a dependency tree.
 
 The rule to take away: depend on the narrowest starter that gives you what you
 use. A JSON-only consumer does not need the web starter.
