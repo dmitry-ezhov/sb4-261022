@@ -36,3 +36,6 @@ freebuff-chat*
 
 # The local issue tracker (markdown tickets under .scratch/) is tracked on
 # purpose - it is the course's task backlog, not scratch space.
+
+
+!.scratch*
