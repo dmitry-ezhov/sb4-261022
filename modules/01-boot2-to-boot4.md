@@ -179,7 +179,7 @@ way Boot 4 wants it.
 
 Your job is the Start module. It compiles, it is formatted, it passes every
 Quality gate, and its tests pass. What it does not do is the thing the Lab is
-about. Three Diagnostic tests say what that is:
+about. Five Diagnostic tests say what that is:
 
 1. The titles endpoint must return a JSON **array** of typed records, not a
    wrapper object with an `items` key.
@@ -187,6 +187,11 @@ about. Three Diagnostic tests say what that is:
 3. An unknown title must be reported as an RFC 9457 **problem detail**, served
    as `application/problem+json`, with a `title` and a `status` in the body -
    not as an empty 404.
+4. A created [Reservation](../GLOSSARY.md) must come back as a **typed record**,
+   not wrapped in an envelope.
+5. A reservation request with a blank member must be rejected as a **problem
+   detail** that says the request was invalid - not as an empty 400, and not by
+   a hand-written check in the controller.
 
 Run them:
 
@@ -194,9 +199,10 @@ Run them:
 ./mvnw -f labs -pl lab-01-boot2-to-boot4-start verify -Pdiagnostics
 ```
 
-Three failures, and each one names what is missing. The Solution module
-shows what the answer looks like - a record payload, a domain exception, and a
-`@RestControllerAdvice` that turns the exception into a `ProblemDetail`:
+Five failures, and each one names what is missing. The Solution module shows
+what the answer looks like - record payloads, a domain exception, a
+`@RestControllerAdvice` that turns the exception into a `ProblemDetail`, and a
+request body validated by `jakarta.validation`:
 
 ```java
 import org.springframework.http.ProblemDetail;

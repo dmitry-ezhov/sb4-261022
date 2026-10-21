@@ -4,7 +4,7 @@
 
 **Blocked by:** 06
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [ ] the checklist names observable properties, not implementation steps
 - [ ] every item is verifiable by reading the change or running a command
@@ -13,3 +13,18 @@
 - [ ] it covers every starter is named the Boot 4 way
 - [ ] it covers errors are problem details with the right status and media type
 - [ ] no item restates a Quality gate that the build already enforces
+
+## Answer
+
+Built in commit `126a728`.
+
+Eight observable properties: typed payloads, the glossary's vocabulary,
+failures that say what happened, the Boot 4 starters, the Jakarta namespaces,
+Jackson 3 databind, the framework's validation, and the relocated test slice.
+
+Each is verifiable by reading the change. None repeats a gate the build
+already enforces - the build owns formatting, the static analysis rules, the
+coverage floor and the environment guard.
+
+The Jackson item is precise on purpose: the annotations are still Jackson 2's,
+and that is correct rather than an oversight.

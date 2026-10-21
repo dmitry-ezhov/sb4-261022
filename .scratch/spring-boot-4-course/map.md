@@ -33,6 +33,21 @@ The implementation map for the feature described in
   specification's acceptance criterion 3, which assumed a single command.
   [Answer](issues/02-one-diagnostics-command-that-selects-solution-modules.md)
 
+- **2026-10-22 · ticket 03** — The M01 delta table is checked, not
+  remembered: every cell was read off the published POMs and source trees of
+  Boot 2.7, 3.0, 3.5 and 4.1.1. Two claims changed as a result - Boot 4
+  renamed the JSON starter, and Jackson 3's annotations never moved.
+  [Answer](issues/03-m01-doc-boot-2-to-boot-4-what-changed.md)
+- **2026-10-22 · tickets 04-05** — The M01 Lab teaches the whole Boot 4
+  treatment, so the start module carries all four Boot 2 habits: the hand-
+  written validation check, the envelope around a created object, the empty
+  error body, and the deprecated starter. Five diagnostics, five named
+  failures.
+  [Answer](issues/04-m01-lab-start-boot-2-to-boot-4-what-changed.md)
+- **2026-10-22 · ticket 02 follow-up** — PMD's `OnlyOneReturn` was curated
+  out of the shared ruleset: it is a style rule that fights the guard clause
+  and catches no defects.
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
