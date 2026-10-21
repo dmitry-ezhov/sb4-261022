@@ -262,5 +262,32 @@ it - the answers explain why, not only what.
 
 ## Checklist
 
-What a reviewer applies to a solution of this Lab. Authored with the checklist
-ticket that follows this one.
+What a reviewer applies to a solution of this Lab to judge it production-shaped
+rather than merely working. Every item is observable - you can check it by
+reading the change or running a command - and none of them repeats a gate the
+build already enforces.
+
+- **The payloads are typed.** Every response body is a record or a collection
+  of records. No `Map<String, Object>` anywhere in the API layer.
+- **The vocabulary is the glossary's.** The code and the tests say
+  [Title](../GLOSSARY.md), [Copy](../GLOSSARY.md),
+  [Member](../GLOSSARY.md), [Reservation](../GLOSSARY.md). Not "book", not
+  "item", not "patron", not "hold".
+- **The failures say what happened.** Every error response is a problem detail
+  with the right status, the `application/problem+json` media type, and a
+  `title` that names the failure. A 404 with an empty body is not an answer.
+- **The starters are the Boot 4 ones.** No `spring-boot-starter-web`: it is
+  deprecated, and the replacement is `spring-boot-starter-webmvc`. The
+  validation starter is present, because the request body is validated by the
+  framework.
+- **The namespaces are the Jakarta ones.** No `javax.*` import survives
+  anywhere - a `javax.validation` constraint is inert, not an error.
+- **The JSON is Jackson 3.** No Jackson 2 databind or core type in the
+  application code. The annotations are still `com.fasterxml.jackson.annotation`
+  and that is correct, not an oversight.
+- **The validation is the framework's.** The request body is a typed record
+  with constraints on it, not a hand-rolled `if (x == null || x.isBlank())`
+  check in the controller.
+- **The test slice is the Boot 4 one.** The web test slice comes from
+  `spring-boot-starter-webmvc-test`, and the annotation is imported from
+  `org.springframework.boot.webmvc.test.autoconfigure`.
