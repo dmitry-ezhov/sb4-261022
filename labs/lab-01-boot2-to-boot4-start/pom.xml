@@ -36,9 +36,11 @@
 
   <dependencies>
     <dependency>
-      <!-- Boot 4 deprecated spring-boot-starter-web in favour of this name. -->
+      <!-- Deliberately the Boot 2 starter name. It still resolves in Boot 4,
+           but it is deprecated in favour of spring-boot-starter-webmvc, and a
+           deprecated starter is a warning nobody reads. Part of the Lab. -->
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-webmvc</artifactId>
+      <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
       <!-- The webmvc test slice (MockMvc, AutoConfigureMockMvc) is a separate

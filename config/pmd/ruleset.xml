@@ -36,6 +36,8 @@
     <exclude name="ForLoopShouldBeWhileLoop"/>
     <!-- The implicit no-arg constructor is fine for Spring components. -->
     <exclude name="AtLeastOneConstructor"/>
+    <!-- A guard clause is idiomatic; this rule fights it and catches no defects. -->
+    <exclude name="OnlyOneReturn"/>
   </rule>
 
   <rule ref="category/java/errorprone.xml">
