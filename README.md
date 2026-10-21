@@ -73,7 +73,8 @@ pom.xml                      parent + aggregator: dependency catalogue, plugin
 
 ```bash
 ./mvnw -f labs verify                  # build everything with every gate on
-./mvnw -f labs verify -Pdiagnostics    # run the diagnostic tests (red until you fix them)
+./mvnw -f labs -pl <module> verify -Pdiagnostics  # run that module's diagnostic tests
+./mvnw -f labs verify -Pdiagnostics-solutions     # every Solution module's diagnostics
 ./mvnw -f labs verify -Pquality-lenient  # same checks, warnings instead of failures
 ./mvnw -f labs -pl lab-01-boot2-to-boot4-solution verify   # one module
 ./mvnw -f labs spotless:apply          # format the code for you

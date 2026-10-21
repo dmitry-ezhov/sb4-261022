@@ -11,9 +11,14 @@ excluded from the default build, so the start module stays green while its
 behaviour is still wrong. Run them explicitly:
 
 ```bash
-./mvnw -f labs verify -Pdiagnostics                       # every module
 ./mvnw -f labs -pl lab-01-boot2-to-boot4-start verify -Pdiagnostics   # one module
+./mvnw -f labs verify -Pdiagnostics-solutions                       # every Solution module
 ```
+
+The first command is the learner's: it runs a Start module's diagnostics, which
+fail until the Lab is done. The second is CI's: it runs the diagnostics of every
+Solution module and skips the Start modules, so it is green when the reference
+implementations are correct.
 
 ## The lab index
 

@@ -29,6 +29,9 @@
       ones the lab asks you to fix, not accidental ones.
     -->
     <jacoco.skip>true</jacoco.skip>
+    <!-- This module's diagnostics fail by design, so the diagnostics-solutions
+         profile skips it. -->
+    <diagnostics.skip>true</diagnostics.skip>
   </properties>
 
   <dependencies>

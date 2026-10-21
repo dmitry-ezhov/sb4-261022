@@ -65,6 +65,9 @@
     <spotbugs.skip>false</spotbugs.skip>
     <checkstyle.skip>false</checkstyle.skip>
     <jacoco.skip>false</jacoco.skip>
+    <!-- Set to true in a Start module: the diagnostics-solutions profile skips
+         every module that sets it. -->
+    <diagnostics.skip>false</diagnostics.skip>
 
     <pmd.failOnViolation>true</pmd.failOnViolation>
     <pmd.printFailingErrors>true</pmd.printFailingErrors>
@@ -500,6 +503,10 @@
     <!--
       Runs only the diagnostic tests (src/test/java/.../diagnostics/*Test.java):
       mvn -f labs verify -Pdiagnostics
+
+      This is the learner's command: run it against a Start module to see what
+      the Lab still asks for. Start modules are NOT skipped here - the point of
+      a Start module's diagnostics is that they fail.
     -->
     <profile>
       <id>diagnostics</id>
@@ -515,6 +522,37 @@
               <includes>
                 <include>**/diagnostics/*Test.java</include>
               </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+      Runs the diagnostic tests of the Solution modules only:
+      mvn -f labs verify -Pdiagnostics-solutions
+
+      This is CI's command, and it replaces a hand-maintained list of module
+      names. A Start module sets <diagnostics.skip>true</diagnostics.skip> in
+      its own POM, and this profile skips every module that sets it - so the
+      reference implementations are all asserted, and the deliberately
+      imperfect modules are not built at all.
+    -->
+    <profile>
+      <id>diagnostics-solutions</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes combine.self="override">
+                <exclude>none</exclude>
+              </excludes>
+              <includes>
+                <include>**/diagnostics/*Test.java</include>
+              </includes>
+              <skipTests>${diagnostics.skip}</skipTests>
             </configuration>
           </plugin>
         </plugins>

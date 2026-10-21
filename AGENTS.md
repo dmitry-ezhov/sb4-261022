@@ -20,9 +20,10 @@ Conventions that are not obvious from the code:
   missing on purpose and is described by **diagnostic tests** in
   `src/test/java/.../diagnostics/`, which the default build excludes.
 - `./mvnw -f labs verify` runs every gate (Spotless/Palantir, PMD, SpotBugs,
-  Checkstyle, JaCoCo). `./mvnw -f labs verify -Pdiagnostics` runs the
-  diagnostics instead, and `-Pquality-lenient` downgrades the gates to
-  warnings.
+  Checkstyle, JaCoCo). `-Pdiagnostics` runs one module's diagnostic tests (red
+  on a Start module, green on a Solution module), `-Pdiagnostics-solutions`
+  runs the diagnostics of every Solution module and skips the Start modules,
+  and `-Pquality-lenient` downgrades the gates to warnings.
 - Packages are feature-first: `com.example.library.<feature>`.
 - Use the vocabulary in `GLOSSARY.md` in code, tests and prose. Do not
   introduce synonyms for `Title`, `Copy`, `Member`, `Loan` or `Reservation`.

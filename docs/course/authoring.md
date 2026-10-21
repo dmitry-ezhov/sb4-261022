@@ -141,7 +141,7 @@ by the ticket that authors it, and never pre-created.
 ./mvnw -f labs -pl lab-<NN>-<slug>-start verify -Pdiagnostics
 
 # Run the Diagnostic tests of every Solution module, and no Start module.
-./mvnw -f labs verify -Pdiagnostics
+./mvnw -f labs verify -Pdiagnostics-solutions
 
 # Gates as warnings, for when you are mid-task.
 ./mvnw -f labs verify -Pquality-lenient

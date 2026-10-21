@@ -25,5 +25,5 @@ jobs:
       - name: Build the reactor (diagnostics skipped)
         run: ./mvnw -f labs verify
 
-      - name: Diagnostics must pass in the solution modules
-        run: ./mvnw -f labs verify -Pdiagnostics -pl lab-01-boot2-to-boot4-solution
+      - name: The Diagnostic tests of every Solution module
+        run: ./mvnw -f labs verify -Pdiagnostics-solutions
