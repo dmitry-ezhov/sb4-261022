@@ -1,6 +1,7 @@
 package com.example.library.diagnostics;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -55,5 +56,25 @@ class Boot4ConventionsDiagnosticsTest {
         mockMvc.perform(get("/api/titles/t-001/copies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].barcode").value("9780441478125001"));
+    }
+
+    @Test
+    void createdReservationIsReturnedAsATypedRecord() throws Exception {
+        mockMvc.perform(post("/api/reservations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"memberId\":\"m-001\",\"titleId\":\"t-001\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.memberId").value("m-001"))
+                .andExpect(jsonPath("$.titleId").value("t-001"));
+    }
+
+    @Test
+    void invalidReservationIsReportedAsProblemDetail() throws Exception {
+        mockMvc.perform(post("/api/reservations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"memberId\":\"\",\"titleId\":\"t-001\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.title").value("Invalid reservation request"));
     }
 }
