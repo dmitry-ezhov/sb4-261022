@@ -22,6 +22,7 @@
   </description>
 
   <modules>
+    <module>labs-support</module>
     <module>lab-01-boot2-to-boot4-start</module>
     <module>lab-01-boot2-to-boot4-solution</module>
     <!-- Module entries are added by the task that authors the corresponding

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.example</groupId>
+    <artifactId>labs</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>labs-support</artifactId>
+
+  <name>labs-support</name>
+  <description>
+    Shared test fixtures for the labs, published as a test-jar. The fixtures
+    cannot mention the domain - every lab carries its own copy of the domain
+    classes - so this module holds only what is not about the domain, such as a
+    deterministic clock.
+  </description>
+
+  <properties>
+    <!-- A fixture module has no application code to cover. -->
+    <jacoco.skip>true</jacoco.skip>
+  </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- The fixtures live in src/test/java, so they are published as a
+                 test-jar and consumed with <type>test-jar</type>. -->
+            <id>test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
