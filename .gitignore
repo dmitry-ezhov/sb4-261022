@@ -1,0 +1,38 @@
+# Maven build output
+target/
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.code-workspace
+.classpath
+.project
+.settings/
+.factorypath
+.springBeans
+.sts4-cache
+
+# OS noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor swap/backup files
+*.swp
+*~
+*.orig
+
+# Logs
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# Tooling state
+.freebuff/
+freebuff-chat*
+
+# The local issue tracker (markdown tickets under .scratch/) is tracked on
+# purpose - it is the course's task backlog, not scratch space.

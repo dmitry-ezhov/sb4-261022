@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.example</groupId>
+    <artifactId>labs</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>lab-01-boot2-to-boot4-solution</artifactId>
+
+  <name>lab-01-boot2-to-boot4-solution</name>
+  <description>
+    M01 lab (solution): the same library catalog API brought up to Boot 4
+    conventions - typed record payloads, RFC 9457 ProblemDetail errors served as
+    application/problem+json.
+  </description>
+
+  <dependencies>
+    <dependency>
+      <!-- Boot 4 deprecated spring-boot-starter-web in favour of this name. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The webmvc test slice (MockMvc, AutoConfigureMockMvc) is a separate
+           starter in Boot 4; spring-boot-starter-test does not include it. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

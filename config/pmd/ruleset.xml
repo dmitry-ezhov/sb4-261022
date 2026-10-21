@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Curated PMD ruleset for the Spring Boot 4 course.
+
+  Deliberately NOT the full PMD catalogue: Spotless already owns formatting and
+  import order, and the default categories produce a wall of noise in Spring
+  code. What is left here are the rules that catch real mistakes and are worth
+  teaching. Add a rule deliberately, not by category sweep.
+
+  Rule names below were checked against PMD 7.17.0 - an exclude that matches no
+  rule is reported by PMD as a warning, so keep this list honest.
+-->
+<ruleset name="sb4-course"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+  <description>Curated PMD rules for the Spring Boot 4 course.</description>
+
+  <rule ref="category/java/bestpractices.xml">
+    <exclude name="ConstantsInInterface"/>
+  </rule>
+
+  <rule ref="category/java/codestyle.xml">
+    <!-- Naming rules worth keeping; length rules are not. -->
+    <exclude name="ShortVariable"/>
+    <exclude name="ShortClassName"/>
+    <exclude name="ShortMethodName"/>
+    <exclude name="LongVariable"/>
+    <!-- Finality suggestions, not defects. -->
+    <exclude name="LocalVariableCouldBeFinal"/>
+    <exclude name="MethodArgumentCouldBeFinal"/>
+    <!-- Requires a comment on every public member - too much ceremony. -->
+    <exclude name="CommentDefaultAccessModifier"/>
+    <!-- Counted-down loops are idiomatic in some places. -->
+    <exclude name="ForLoopShouldBeWhileLoop"/>
+    <!-- The implicit no-arg constructor is fine for Spring components. -->
+    <exclude name="AtLeastOneConstructor"/>
+  </rule>
+
+  <rule ref="category/java/errorprone.xml">
+    <exclude name="AvoidDuplicateLiterals"/>
+    <exclude name="CloseResource"/>
+    <exclude name="AvoidBranchingStatementAsLastInLoop"/>
+    <exclude name="AvoidFieldNameMatchingMethodName"/>
+    <exclude name="AvoidLiteralsInIfCondition"/>
+    <exclude name="MissingSerialVersionUID"/>
+  </rule>
+
+  <rule ref="category/java/design.xml">
+    <exclude name="LawOfDemeter"/>
+    <exclude name="ExceptionAsFlowControl"/>
+    <exclude name="SimplifiedTernary"/>
+    <exclude name="AvoidUncheckedExceptionsInSignatures"/>
+    <exclude name="UseObjectForClearerAPI"/>
+    <exclude name="ExcessiveParameterList"/>
+    <!-- Needs an explicit package/class list; it cannot be enabled as-is. -->
+    <exclude name="LoosePackageCoupling"/>
+    <!-- Every Spring Boot application class has only a static main method. -->
+    <exclude name="UseUtilityClass"/>
+  </rule>
+
+  <rule ref="category/java/multithreading.xml">
+    <exclude name="UseConcurrentHashMap"/>
+  </rule>
+
+  <rule ref="category/java/performance.xml">
+    <exclude name="AvoidInstantiatingObjectsInLoops"/>
+    <exclude name="ConsecutiveAppendsShouldReuse"/>
+    <exclude name="UseIndexOfChar"/>
+    <exclude name="RedundantFieldInitializer"/>
+  </rule>
+
+</ruleset>

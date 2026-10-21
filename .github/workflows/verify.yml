@@ -1,0 +1,29 @@
+# The course's guardrail: the reactor build with every quality gate enabled.
+#
+# `./mvnw verify` runs Spotless, PMD, SpotBugs, Checkstyle and the JaCoCo
+# coverage floor, so a red build here is a red build for the learner too.
+name: verify
+
+"on":
+  push:
+    branches: [main, master, "feature/**"]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Build the reactor (diagnostics skipped)
+        run: ./mvnw -f labs verify
+
+      - name: Diagnostics must pass in the solution modules
+        run: ./mvnw -f labs verify -Pdiagnostics -pl lab-01-boot2-to-boot4-solution

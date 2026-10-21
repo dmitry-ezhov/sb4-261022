@@ -1,3 +1,11 @@
+#:schema https://mise.run/schema.json
+
+# Toolchain for the course. The Maven wrapper (./mvnw) pins Maven itself, but
+# the JDK must be on PATH before the wrapper starts.
+#
+# mise picks this up automatically inside the repo (shims resolve per directory;
+# activated shells also get JAVA_HOME set), so `./mvnw -f labs verify` runs on
+# JDK 25 with no manual JAVA_HOME.
 [tools]
 java = "25"
-maven = "latest"
+maven = "3.10.0"

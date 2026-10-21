@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SpotBugs exclusions for the Spring Boot 4 course.
+
+  Only patterns that are intentional in this codebase are excluded. If a rule is
+  not listed here, SpotBugs wins - that is the point of running it.
+-->
+<FindBugsFilter xmlns="https://github.com/spotbugs/filter/3.0.0">
+
+  <!--
+    Data classes (records, DTOs) legitimately hand out references to their own
+    mutable state, and Spring entities are constructed from framework state.
+  -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2,EI_EXPOSE_STATIC_REP2,MS_EXPOSE_REP,MS_PKGPROTECT"/>
+  </Match>
+
+  <!--
+    Null-analysis noise around Spring proxies and generated accessors.
+  -->
+  <Match>
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE,NP_NULL_PARAM_DEREF,SIC_INNER_SHOULD_BE_STATIC_ANON,URF_UNREAD_FIELD,RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+  </Match>
+
+  <!--
+    Records and other value types trip the equals/hashCode heuristics.
+  -->
+  <Match>
+    <Bug pattern="HE_EQUALS_USE_HASHCODE,HE_INHERITS_EQUALS_USE_HASHCODE"/>
+  </Match>
+
+</FindBugsFilter>

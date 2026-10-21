@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.example</groupId>
+    <artifactId>spring-boot-4-course-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>labs</artifactId>
+  <packaging>pom</packaging>
+
+  <name>labs</name>
+  <description>
+    Aggregator for the course lab modules. Every piece of build configuration -
+    dependency versions, plugin versions, quality gates - lives in the root parent
+    POM. This file only lists the modules.
+  </description>
+
+  <modules>
+    <module>lab-01-boot2-to-boot4-start</module>
+    <module>lab-01-boot2-to-boot4-solution</module>
+    <!-- Module entries are added by the task that authors the corresponding
+         lab. Do not pre-create module directories. -->
+  </modules>
+</project>

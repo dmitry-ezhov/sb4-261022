@@ -1,0 +1,12 @@
+# Keep the Windows wrapper script's CRLF line endings: Git would otherwise
+# rewrite them to LF and cmd.exe mis-parses the batch file.
+mvnw.cmd text eol=crlf
+mvnw text eol=lf
+*.sh text eol=lf
+
+# Text files
+*.md text
+*.xml text
+*.yml text
+*.yaml text
+*.properties text

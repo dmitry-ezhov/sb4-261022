@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.1.1</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.example</groupId>
+  <artifactId>spring-boot-4-course-parent</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>spring-boot-4-course-parent</name>
+  <description>
+    Parent and aggregator for the Spring Boot 4 course. Owns every piece of build
+    configuration - dependency versions, plugin versions, quality gates - that the
+    child lab modules inherit. Contains no course content.
+  </description>
+
+  <modules>
+    <module>labs</module>
+  </modules>
+
+  <properties>
+    <!-- ============ Toolchain ============ -->
+    <java.version>25</java.version>
+    <maven.compiler.release>25</maven.compiler.release>
+    <maven.compiler.source>25</maven.compiler.source>
+    <maven.compiler.parameters>true</maven.compiler.parameters>
+    <!-- Empty by default so @{argLine} always resolves; JaCoCo fills it in. -->
+    <argLine></argLine>
+
+    <!-- ============ Quality plugin versions ============ -->
+    <spotless-maven-plugin.version>3.10.4</spotless-maven-plugin.version>
+    <palantir-java-format.version>2.102.0</palantir-java-format.version>
+    <maven-pmd-plugin.version>3.28.0</maven-pmd-plugin.version>
+    <pmd.version>7.17.0</pmd.version>
+    <spotbugs-maven-plugin.version>4.10.5.0</spotbugs-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
+    <sonar-maven-plugin.version>5.8.0.7211</sonar-maven-plugin.version>
+    <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+    <checkstyle.version>14.3.0</checkstyle.version>
+    <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
+    <maven-failsafe-plugin.version>3.6.0</maven-failsafe-plugin.version>
+    <versions-maven-plugin.version>2.23.0</versions-maven-plugin.version>
+
+    <!-- ============ Shared library versions ============ -->
+    <!-- testcontainers.version (2.0.5) and lombok.version (1.18.46) are managed
+         by Spring Boot itself and are deliberately not overridden here. -->
+    <wiremock.version>3.13.2</wiremock.version>
+    <archunit.version>1.5.1</archunit.version>
+    <rest-assured.version>6.2.0</rest-assured.version>
+    <mapstruct.version>1.6.3</mapstruct.version>
+
+    <!-- ============ Quality gate knobs ============ -->
+    <!-- Flip one of these to true to downgrade that gate to a warning. -->
+    <spotless.check.skip>false</spotless.check.skip>
+    <pmd.skip>false</pmd.skip>
+    <spotbugs.skip>false</spotbugs.skip>
+    <checkstyle.skip>false</checkstyle.skip>
+    <jacoco.skip>false</jacoco.skip>
+
+    <pmd.failOnViolation>true</pmd.failOnViolation>
+    <pmd.printFailingErrors>true</pmd.printFailingErrors>
+
+    <spotbugs.effort>Max</spotbugs.effort>
+    <spotbugs.threshold>Medium</spotbugs.threshold>
+    <spotbugs.failOnError>true</spotbugs.failOnError>
+    <spotbugs.excludeFilterFile>${course.config.dir}/spotbugs/exclude.xml</spotbugs.excludeFilterFile>
+
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <checkstyle.config.location>${course.config.dir}/checkstyle/checkstyle.xml</checkstyle.config.location>
+    <checkstyle.excludes>**/target/**,**/generated/**</checkstyle.excludes>
+    <checkstyle.includeTestSourceDirectory>true</checkstyle.includeTestSourceDirectory>
+    <checkstyle.consoleOutput>true</checkstyle.consoleOutput>
+
+    <!-- Coverage floors. Enforced on solution modules; start modules opt out. -->
+    <jacoco.line.minimum>0.60</jacoco.line.minimum>
+    <jacoco.branch.minimum>0.50</jacoco.branch.minimum>
+
+    <!-- ============ Sonar ============ -->
+    <sonar.projectKey>sb4-261022</sonar.projectKey>
+    <sonar.projectName>Spring Boot 4 Course</sonar.projectName>
+    <!-- Leave host/organisation empty and pass them on the command line:
+         -Dsonar.host.url=... -Dsonar.organization=... -Dsonar.token=... -->
+    <sonar.host.url></sonar.host.url>
+    <sonar.organization></sonar.organization>
+    <sonar.exclusions>**/target/**,**/generated/**,**/*Application.class</sonar.exclusions>
+
+    <!-- ============ Shared config locations ============ -->
+    <course.config.dir>${maven.multiModuleProjectDirectory}/config</course.config.dir>
+  </properties>
+
+  <!-- ==================================================================
+       Dependencies every child module inherits.
+       Versions live in <dependencyManagement> below; only what a module
+       genuinely always needs is declared here.
+       ================================================================== -->
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- JSpecify null-safety annotations. Portfolio-wide standard in Boot 4. -->
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+    </dependency>
+  </dependencies>
+
+  <!-- ==================================================================
+       The full dependency catalogue. Children get versions from here and
+       declare only the artifacts they actually use.
+       ================================================================== -->
+  <dependencyManagement>
+    <dependencies>
+      <!-- Testcontainers 2.0 BOM. Boot 4.1.1 manages Testcontainers 2.0.5;
+           imported explicitly so the shared choice is visible and overridable
+           in exactly one place. -->
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- WireMock for HTTP fault injection.
+           Use wiremock-standalone, NOT the plain wiremock jar: the plain jar
+           mixes Jetty 11 and Jetty 12, ships no server implementation, and the
+           mixed Jetty breaks unrelated auto-configuration on the test classpath.
+           WireMock 3.x is built on Jackson 2 (com.fasterxml.*) while Boot 4's
+           default is Jackson 3 (tools.jackson.*). They coexist (different
+           packages) and WireMock stays test-scoped, so lab code must never
+           serialize application types with WireMock's Jackson 2 mapper. -->
+      <dependency>
+        <groupId>org.wiremock</groupId>
+        <artifactId>wiremock-standalone</artifactId>
+        <version>${wiremock.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.tngtech.archunit</groupId>
+        <artifactId>archunit-junit5</artifactId>
+        <version>${archunit.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.rest-assured</groupId>
+        <artifactId>rest-assured</artifactId>
+        <version>${rest-assured.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- ==================== Spotless (Palantir style) ==================== -->
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless-maven-plugin.version}</version>
+          <configuration>
+            <java>
+              <palantirJavaFormat>
+                <version>${palantir-java-format.version}</version>
+                <style>PALANTIR</style>
+                <formatJavadoc>false</formatJavadoc>
+              </palantirJavaFormat>
+              <removeUnusedImports/>
+              <importOrder>
+                <!-- Static imports first, then java/jakarta, then everything else. -->
+                <order>\#,java,javax,jakarta,,org,com.example</order>
+              </importOrder>
+              <trimTrailingWhitespace/>
+              <endWithNewline/>
+            </java>
+          </configuration>
+          <executions>
+            <execution>
+              <!-- Bound early: formatting is the cheapest thing to fix. -->
+              <id>spotless-check</id>
+              <phase>process-sources</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- ==================== PMD ==================== -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>${maven-pmd-plugin.version}</version>
+          <configuration>
+            <!-- pmd.skip / pmd.failOnViolation / pmd.printFailingErrors are set
+                 as properties above, so they apply to both the pmd and check goals. -->
+          </configuration>
+          <executions>
+            <execution>
+              <!-- The check goal forks this one; 'none' keeps it from running
+                   twice while still handing it its configuration. -->
+              <id>pmd</id>
+              <phase>none</phase>
+              <goals>
+                <goal>pmd</goal>
+              </goals>
+              <configuration>
+                <targetJdk>${java.version}</targetJdk>
+                <rulesets>
+                  <ruleset>${course.config.dir}/pmd/ruleset.xml</ruleset>
+                </rulesets>
+                <excludeRoots>
+                  <excludeRoot>target</excludeRoot>
+                  <excludeRoot>generated</excludeRoot>
+                </excludeRoots>
+              </configuration>
+            </execution>
+            <execution>
+              <id>pmd-check</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+          <dependencies>
+            <!-- Pin the PMD version explicitly. 7.17.0 understands Java 25. -->
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-core</artifactId>
+              <version>${pmd.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>net.sourceforge.pmd</groupId>
+              <artifactId>pmd-java</artifactId>
+              <version>${pmd.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <!-- ==================== SpotBugs ==================== -->
+        <plugin>
+          <groupId>com.github.spotbugs</groupId>
+          <artifactId>spotbugs-maven-plugin</artifactId>
+          <version>${spotbugs-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <id>spotbugs-check</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- ==================== Checkstyle ==================== -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>${maven-checkstyle-plugin.version}</version>
+          <configuration>
+            <failsOnError>true</failsOnError>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <version>${checkstyle.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+
+        <!-- ==================== JaCoCo ==================== -->
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco-maven-plugin.version}</version>
+          <configuration>
+            <excludes>
+              <exclude>**/*Application.class</exclude>
+              <exclude>**/config/**</exclude>
+              <exclude>**/*Properties.class</exclude>
+            </excludes>
+          </configuration>
+          <executions>
+            <execution>
+              <id>jacoco-prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>jacoco-report</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>jacoco-check</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <rule>
+                    <element>BUNDLE</element>
+                    <limits>
+                      <limit>
+                        <counter>LINE</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>${jacoco.line.minimum}</minimum>
+                      </limit>
+                      <limit>
+                        <counter>BRANCH</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>${jacoco.branch.minimum}</minimum>
+                      </limit>
+                    </limits>
+                  </rule>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- ==================== Enforcer ==================== -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>${maven-enforcer-plugin.version}</version>
+          <configuration>
+            <rules>
+              <requireJavaVersion>
+                <version>[${java.version},)</version>
+                <message>This course requires JDK ${java.version} or newer. Check 'java -version' and your mise.toml.</message>
+              </requireJavaVersion>
+              <requireMavenVersion>
+                <version>[3.9.11,)</version>
+                <message>maven-pmd-plugin ${maven-pmd-plugin.version} requires Maven 3.9.11+. Use ./mvnw.</message>
+              </requireMavenVersion>
+              <banDuplicatePomDependencyVersions/>
+            </rules>
+          </configuration>
+          <executions>
+            <execution>
+              <id>enforce-build-environment</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- ==================== Surefire / Failsafe ==================== -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <!-- @{argLine} is late-evaluated so the JaCoCo agent property
+                 survives; the flag silences the JDK 25 dynamic-agent warning
+                 from Mockito's inline mock maker. -->
+            <argLine>@{argLine} -XX:+EnableDynamicAgentLoading</argLine>
+            <!-- Diagnostic tests expose the deliberate lab defects. They are
+                 excluded from the default run so start modules stay green;
+                 -Pdiagnostics runs exactly those tests instead. -->
+            <excludes>
+              <exclude>**/*$*</exclude>
+              <exclude>**/diagnostics/*Test.java</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${maven-failsafe-plugin.version}</version>
+          <configuration>
+            <argLine>@{argLine} -XX:+EnableDynamicAgentLoading</argLine>
+            <includes>
+              <include>**/*IT.java</include>
+            </includes>
+          </configuration>
+          <executions>
+            <execution>
+              <id>default</id>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <!-- ==================== Sonar ==================== -->
+        <plugin>
+          <groupId>org.sonarsource.scanner.maven</groupId>
+          <artifactId>sonar-maven-plugin</artifactId>
+          <version>${sonar-maven-plugin.version}</version>
+          <configuration>
+            <sonar.projectKey>${sonar.projectKey}</sonar.projectKey>
+            <sonar.projectName>${sonar.projectName}</sonar.projectName>
+            <sonar.host.url>${sonar.host.url}</sonar.host.url>
+            <sonar.organization>${sonar.organization}</sonar.organization>
+            <sonar.exclusions>${sonar.exclusions}</sonar.exclusions>
+          </configuration>
+        </plugin>
+
+        <!-- ==================== Versions ==================== -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${versions-maven-plugin.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <!-- The parent activates the always-on gates. Every child module
+           inherits them; configuration lives only in pluginManagement above. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>io.github.git-commit-id</groupId>
+        <artifactId>git-commit-id-maven-plugin</artifactId>
+        <configuration>
+          <failOnNoGitDirectory>false</failOnNoGitDirectory>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <!--
+      Lenient quality gates: same configuration, warnings instead of failures.
+      Use while you are mid-task: mvn -f labs verify -Pquality-lenient
+    -->
+    <profile>
+      <id>quality-lenient</id>
+      <properties>
+        <spotless.check.skip>true</spotless.check.skip>
+        <pmd.skip>true</pmd.skip>
+        <spotbugs.skip>true</spotbugs.skip>
+        <checkstyle.skip>true</checkstyle.skip>
+        <jacoco.skip>true</jacoco.skip>
+      </properties>
+    </profile>
+
+    <!--
+      Runs only the diagnostic tests (src/test/java/.../diagnostics/*Test.java):
+      mvn -f labs verify -Pdiagnostics
+    -->
+    <profile>
+      <id>diagnostics</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes combine.self="override">
+                <exclude>none</exclude>
+              </excludes>
+              <includes>
+                <include>**/diagnostics/*Test.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+      Sonar analysis. Credentials and host come from the command line:
+        mvn -f labs verify -Psonar \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.organization=<org> \
+          -Dsonar.token=<token>
+    -->
+    <profile>
+      <id>sonar</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonarsource.scanner.maven</groupId>
+            <artifactId>sonar-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sonar-scan</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sonar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
