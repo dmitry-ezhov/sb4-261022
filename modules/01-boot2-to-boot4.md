@@ -206,8 +206,59 @@ Read the Solution module after you have solved the Lab, not instead of it.
 
 ## Quiz
 
-Five questions, with answers that explain themselves. Authored with the quiz
-ticket that follows this one.
+Five questions about the delta above. Read the answer after you have answered
+it - the answers explain why, not only what.
+
+1. **Boot 3 moved the validation and persistence annotations to a new
+   namespace. Which one, and what actually happens to code that keeps the old
+   one?**
+
+   `jakarta.*`. The framework looks for `jakarta.validation` constraints, so a
+   `javax.validation` constraint on the same field is not recognised and is
+   never applied. Nothing fails, nothing warns: the constraint is simply
+   inert, and the invalid request that it would have rejected sails through.
+   This is the dangerous shape of a migration bug - it looks like it works.
+
+2. **Jackson 3 moved the package root of its core and its databind. Which part
+   of Jackson did *not* move, and what does that mean for a class that imports
+   both?**
+
+   The annotations. `jackson-annotations` stayed at
+   `com.fasterxml.jackson.core` - still version 2.21 in the BOM Boot 4.1.1
+   imports - and its package is still `com.fasterxml.jackson.annotation`. So a
+   Jackson 3 class imports `com.fasterxml.jackson.annotation.JsonProperty` and
+   `tools.jackson.databind.json.JsonMapper`. The annotation you already know
+   still applies to a Jackson 3 mapper, and you cannot tell from the import
+   alone which Jackson a class is on.
+
+3. **You upgrade an application and its `spring-boot-starter-web` dependency
+   keeps resolving. What has happened, and what should you do about it?**
+
+   It was deprecated in Boot 4 in favour of `spring-boot-starter-webmvc` -
+   deprecated, not removed, so the build stays green and the warning is easy
+   to miss. Meanwhile the JSON starter was *renamed* rather than deprecated
+   (`spring-boot-starter-json` is now `spring-boot-starter-jackson`), so that
+   one breaks loudly. Move to `spring-boot-starter-webmvc` deliberately, and
+   depend on the narrowest starter that gives you what you use.
+
+4. **`@MockBean` was deprecated in a Boot 3.x release and removed in Boot 4.
+   What replaces it, and where does it live?**
+
+   `@MockitoBean`, in `org.springframework.test.context.bean.override.mockito`
+   - which is in Spring Framework's `spring-test`, not in Spring Boot. It
+   moved because the bean-override mechanism became a framework feature rather
+   than a Boot one, so the annotation moved with it. The old package is not
+   merely renamed: it belongs to a different artifact, which is why the
+   import does not resolve.
+
+5. **Framework 7's `@Retryable` retries a failed call. What is the one case it
+   will not retry?**
+
+   A call from inside the same bean. The retry is applied by a proxy around
+   the bean, so a method that calls another method of the same class never
+   goes through the proxy and is not retried - the same rule you already know
+   from `@Transactional`. If you need the retry, the call has to cross the
+   proxy: move it to another bean, or inject the bean into itself.
 
 ## Checklist
 
