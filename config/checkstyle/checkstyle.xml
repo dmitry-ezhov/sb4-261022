@@ -8,23 +8,45 @@
   Spotless (Palantir style) already owns whitespace, indentation and import
   order, so nothing here may overlap with it. What remains are correctness,
   naming and structural rules - the things a formatter cannot fix for you.
+
+  What Spotless owns, and this ruleset therefore does not repeat:
+
+    - whitespace around tokens: WhitespaceAround, WhitespaceAfter
+    - brace placement: LeftCurly, RightCurly
+    - the trailing newline: NewlineAtEndOfFile
+    - indentation: FileTabCharacter
+
+  A rule that disagrees with the formatter is a rule a learner cannot
+  satisfy, and the two gates would then disagree about the same line. The
+  empty record body - Palantir writes it as `record Loan() {}` - is the case
+  that made the point: WhitespaceAround reported all twenty of them, and the
+  formatter was right.
+
+  FileTabCharacter went for the same reason, one step further: Palantir
+  rewrites the indentation of every line it owns, so the rule could only
+  ever fire inside a string literal or a text block - where a tab is legal
+  Java and the formatter will not touch it. A rule that can only report
+  something the learner cannot change is a false positive waiting to happen.
+
+  Every rule that is here earns its place: it catches something a formatter
+  cannot, and it does not fire on code the formatter has already made.
 -->
 <module name="Checker">
   <property name="charset" value="UTF-8"/>
   <property name="fileExtensions" value="java"/>
 
-  <module name="NewlineAtEndOfFile"/>
-  <module name="FileTabCharacter">
-    <property name="eachLine" value="true"/>
-  </module>
   <module name="LineLength">
+    <!-- Palantir wraps at 120 columns, so this only fires on the lines the
+         formatter cannot split: a long string literal, a long import. -->
     <property name="max" value="120"/>
     <property name="ignorePattern" value="^package.*|^import.*|https?://|@see|@link"/>
   </module>
 
   <module name="TreeWalker">
 
-    <!-- Imports -->
+    <!-- Imports. Spotless removes unused imports and orders the rest, but it
+         neither forbids a star import nor removes a redundant one, so these
+         three are still worth having. -->
     <module name="UnusedImports"/>
     <module name="RedundantImport"/>
     <module name="AvoidStarImport"/>
@@ -41,12 +63,8 @@
     <module name="ClassTypeParameterName"/>
     <module name="MethodTypeParameterName"/>
 
-    <!-- Blocks and whitespace -->
+    <!-- Blocks and statements -->
     <module name="NeedBraces"/>
-    <module name="LeftCurly"/>
-    <module name="RightCurly"/>
-    <module name="WhitespaceAfter"/>
-    <module name="WhitespaceAround"/>
     <module name="EmptyStatement"/>
     <module name="EmptyBlock">
       <property name="option" value="text"/>
@@ -71,7 +89,15 @@
 
     <!-- Design -->
     <module name="FinalClass"/>
-    <module name="HideUtilityClassConstructor"/>
+    <module name="HideUtilityClassConstructor">
+      <!-- The application class is an application class, not a utility class:
+           Spring Boot instantiates it, and it carries the main method. The
+           rule is right about utility classes and wrong about this one, so
+           the annotation is the exemption - not the class name, which a
+           later Lab may well change. Both forms of the annotation are listed
+           because the rule matches the name as the source writes it. -->
+      <property name="ignoreAnnotatedBy" value="SpringBootApplication,org.springframework.boot.autoconfigure.SpringBootApplication"/>
+    </module>
     <module name="InterfaceIsType"/>
     <module name="VisibilityModifier"/>
 

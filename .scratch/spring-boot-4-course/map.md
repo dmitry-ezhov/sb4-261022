@@ -140,11 +140,12 @@ The implementation map for the feature described in
   `labs/lab-05-persistence-*` directories in the working tree are scratch
   copies of the M04 application, not Modules.
 - **2026-10-22 · ticket 70** — The Checkstyle gate now runs: `check` is bound
-  to `verify` in the parent POM, and the curated ruleset dropped the five
+  to `verify` in the parent POM, and the curated ruleset dropped the six
   rules that duplicate Spotless (`WhitespaceAround`, `WhitespaceAfter`,
-  `LeftCurly`, `RightCurly`, `NewlineAtEndOfFile`) - the ruleset's own header
-  said it must not overlap the formatter, and Palantir's empty record body
-  (`record Loan() {}`) was the proof. The application class is exempt from
+  `LeftCurly`, `RightCurly`, `NewlineAtEndOfFile`, `FileTabCharacter`) - the
+  ruleset's own header said it must not overlap the formatter, and Palantir's
+  empty record body (`record Loan() {}`) was the proof. The application class
+  is exempt from
   `HideUtilityClassConstructor` by annotation, not by name. The ruleset also
   lints the test sources now: `checkstyle.includeTestSourceDirectory` as a
   *property* was inert, because the `check` goal exposes no user property for

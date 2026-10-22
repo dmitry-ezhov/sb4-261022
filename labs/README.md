@@ -81,7 +81,10 @@ Why curated rulesets rather than the stock ones:
   used in one place). The curated set keeps the rules that catch real defects
   and drops the ceremony. Every exclusion carries a comment saying why.
 - **Checkstyle** — Spotless already owns whitespace, indentation and import
-  order, so Checkstyle only covers naming, correctness and structure.
+  order, so Checkstyle only covers naming, correctness and structure. The
+  ruleset says which rules it dropped and why, in its own header: a rule that
+  disagrees with the formatter is a rule nobody can satisfy. It lints the
+  test sources too — the diagnostics are code the learner reads.
 - **SpotBugs** — only the patterns that are intentional here are excluded:
   data classes handing out their own state, and null-analysis noise around
   Spring proxies.

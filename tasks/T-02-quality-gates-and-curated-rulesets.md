@@ -64,6 +64,17 @@ that matches no rule is reported by PMD as a warning, so the lists are honest.
 - [x] A deliberate violation fails the build and names the gate.
 - [x] `-Pquality-lenient` turns every gate into a warning.
 
+### Follow-up (2026-10-22, ticket 70)
+
+"Every gate runs on every module" was ticked too early: the Checkstyle
+plugin was declared and activated, but it had no `<executions>`, so no goal
+was bound to a phase and `verify` never ran it. The
+`checkstyle.includeTestSourceDirectory` property in the parent POM was inert
+too — the `check` goal exposes no user property for it, so it has to live in
+the plugin block. Both are fixed, the curated ruleset was pruned of the rules
+that duplicate Spotless, and the application class is exempted from
+`HideUtilityClassConstructor` by annotation rather than by name.
+
 ## Verification
 
 ```bash
