@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: library-lab
+
+library:
+  loan:
+    # How long a loan lasts. The application.yml is where a default belongs:
+    # it is visible to whoever deploys it, and it can be changed without a
+    # rebuild.
+    period: 14d
+    # How many loans a member may hold at once.
+    limit: 3
