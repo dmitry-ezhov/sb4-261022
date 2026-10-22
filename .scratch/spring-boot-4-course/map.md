@@ -48,6 +48,14 @@ The implementation map for the feature described in
   out of the shared ruleset: it is a style rule that fights the guard clause
   and catches no defects.
 
+- **2026-10-22 · ticket 08** — The starter map is read off the published
+  POMs, not remembered. Boot 4's starters are per-responsibility, and the
+  test starter pulls the whole web stack in at compile scope. Maven's three
+  mechanisms - parent, aggregator, BOM import - are taught as three things,
+  because they are three things. The M02 Lab is the one Lab whose subject is
+  the build, so its Diagnostics read the module's POM.
+  [Answer](issues/08-m02-doc-the-boot-4-module-map-and-a-multi-module-build.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
