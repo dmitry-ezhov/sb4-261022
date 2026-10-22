@@ -56,6 +56,17 @@ The implementation map for the feature described in
   the build, so its Diagnostics read the module's POM.
   [Answer](issues/08-m02-doc-the-boot-4-module-map-and-a-multi-module-build.md)
 
+- **2026-10-22 · tickets 09-10** — M02's Lab is the one Lab whose subject
+  is the build, so its Diagnostics read the module's POM rather than an HTTP
+  response. The POM is read as text, with XML comments stripped, because the
+  JDK's XML parser lives in `javax.xml` and this course teaches that a
+  `javax.*` import is a smell. The application also gained an integration
+  test that inspects the packaged jar.
+- **2026-10-22 · ticket 08 follow-up** — `spring-boot-starter-parent`
+  *manages* the `repackage` goal; it never activates it, in Boot 2, Boot 3
+  or Boot 4. A module declares the plugin to get an executable jar.
+  [Answer](issues/10-m02-lab-solution-the-boot-4-module-map-and-a-multi-module-build.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
