@@ -82,6 +82,22 @@ The implementation map for the feature described in
   carries no JSpecify annotations.
   [Answer](issues/13-m03-doc-typed-configuration-and-validation.md)
 
+- **2026-10-22 · tickets 14-15** — M03's Lab is the first behavioural
+  configuration Lab: the loan period is bound from `library.loan.period`, and
+  an invalid limit must stop the application at startup. The application
+  injects its clock, so the lab is the first consumer of the shared fixture
+  module. A loan period is a number of days and a due date is a date, so the
+  bound `Duration` is converted to days.
+  [Answer](issues/14-m03-lab-start-typed-configuration-and-validation.md)
+
+- **2026-10-22 · tickets 14-15** — M03's Lab is the first behavioural
+  configuration Lab: the loan period is bound from `library.loan.period`, and
+  an invalid limit must stop the application at startup. The application
+  injects its clock, so the lab is the first consumer of the shared fixture
+  module. A loan period is a number of days and a due date is a date, so the
+  bound `Duration` is converted to days.
+  [Answer](issues/14-m03-lab-start-typed-configuration-and-validation.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
