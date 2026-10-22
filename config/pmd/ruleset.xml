@@ -19,6 +19,9 @@
 
   <rule ref="category/java/bestpractices.xml">
     <exclude name="ConstantsInInterface"/>
+    <!-- An HTTP Service client interface has one method because the service
+         has one operation, not because it is meant to be a lambda. -->
+    <exclude name="ImplicitFunctionalInterface"/>
   </rule>
 
   <rule ref="category/java/codestyle.xml">
