@@ -103,6 +103,13 @@ The implementation map for the feature described in
   a `Duration` is a number of milliseconds, not an error.
   [Answer](issues/16-m03-quiz-typed-configuration-and-validation.md)
 
+- **2026-10-22 · ticket 18** — The Jackson 3 story is more than the package
+  root: a JSON `null` for a primitive is now an error, while unknown
+  properties are still ignored because Boot disables the feature. The
+  declarative HTTP client and its starter are new in Boot 4 - Boot 3.5 has
+  no `spring-boot-restclient` module at all.
+  [Answer](issues/18-m04-doc-the-web-stack-mvc-jackson-3-and-problem-details.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
