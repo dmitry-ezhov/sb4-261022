@@ -21,6 +21,19 @@
     provides. The application behaves correctly; the POM does not.
   </description>
 
+  <properties>
+    <!--
+      Start modules ship fewer tests than their solution counterpart, so the
+      coverage floor does not apply here. Every other gate still does: a start
+      module must be formatted, lint-clean and bug-free - its defects are the
+      ones the lab asks you to fix, not accidental ones.
+    -->
+    <jacoco.skip>true</jacoco.skip>
+    <!-- This module's diagnostics fail by design, so the diagnostics-solutions
+         profile skips it. -->
+    <diagnostics.skip>true</diagnostics.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <!-- The Boot 2 starter name. It still resolves in Boot 4 - it is
@@ -28,8 +41,7 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
       <version>4.1.1</version>
-    </dependency>
-    <dependency>
+    </dependency>    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
       <version>4.1.1</version>

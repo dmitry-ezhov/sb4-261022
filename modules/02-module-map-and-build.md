@@ -166,15 +166,35 @@ The packaging of a Boot application has not changed since Boot 2, and it is
 worth knowing exactly where it comes from, because "why is my jar executable?"
 is a question every Boot 2 developer asked once.
 
-`spring-boot-starter-parent` binds `spring-boot-maven-plugin`'s `repackage`
-goal in its plugin management. Every module that inherits from it therefore
-gets an executable jar without declaring a plugin at all: the `package` phase
-writes a plain jar, and `repackage` rewrites it with the application's classes
-under `BOOT-INF/classes` and its dependencies under `BOOT-INF/lib`, with
-`JarLauncher` as the entry point in the manifest. `java -jar target/app.jar`
-works because of that, not because of anything in your POM.
+`spring-boot-starter-parent` puts `spring-boot-maven-plugin`'s `repackage`
+goal in its **plugin management** - in Boot 2, in Boot 3 and in Boot 4 alike.
+Plugin management runs nothing; it supplies the version and the execution to
+a plugin that is *declared*. So the module declares the plugin, without a
+version:
 
-If you do declare the plugin - to set `mainClass`, or to turn the
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-maven-plugin</artifactId>
+    </plugin>
+  </plugins>
+</build>
+```
+
+and takes both the version and the execution from the parent. With that
+declaration, the `package` phase writes a plain jar and `repackage` rewrites
+it: the application's classes under `BOOT-INF/classes`, its dependencies under
+`BOOT-INF/lib`, and the launcher as the entry point in the manifest.
+`java -jar target/app.jar` works because of that declaration.
+
+Leave the plugin out and you get a plain jar - no `BOOT-INF`, no entry point,
+and `java -jar` fails with "no main manifest attribute". That is not a Boot 4
+change; it is how Maven has always worked, and it surprises everyone who has
+never read their parent's plugin management.
+
+If you declare the plugin for a reason - to set `mainClass`, or to turn the
 repackaging off - declare it **without a version**, and let the parent's plugin
 management supply the version. A version written into your POM is a version
 that will still be there when the parent moves on.
@@ -206,7 +226,7 @@ The Lab is the same library application you finished in M01 - the catalogue of
 pinned in the child, plugins pinned in the child, dependencies re-declared that
 the parent already provides, and the deprecated web starter.
 
-Four Diagnostic tests say what the Lab asks for. They are the first Diagnostics
+Five Diagnostic tests say what the Lab asks for. They are the first Diagnostics
 in the course that read a POM rather than an HTTP response, because M02 is the
 one Module whose subject is the build and not the application:
 
@@ -218,9 +238,11 @@ one Module whose subject is the build and not the application:
 3. **The module declares only what it uses.** `spring-boot-starter-test` and
    `jspecify` are inherited from the root POM; declaring them again is
    duplication.
-4. **The starters are the Boot 4 ones.** The module depends on
-   `spring-boot-starter-webmvc`, and it does not depend on the deprecated
-   `spring-boot-starter-web`.
+4. **The web starter is the Boot 4 one.** The module depends on
+   `spring-boot-starter-webmvc`.
+5. **The deprecated starter is gone.** The module does not depend on
+   `spring-boot-starter-web`, which still resolves - that is what makes it a
+   trap.
 
 Run them:
 
@@ -240,7 +262,7 @@ Solution module shows what a correct child POM looks like - and it is short:
 </dependencies>
 ```
 
-No versions. No plugin block. Nothing that the parent has already decided.
+No versions. No plugin version. Nothing that the parent has already decided.
 
 ## Quiz
 
