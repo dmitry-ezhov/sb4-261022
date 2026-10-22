@@ -152,11 +152,11 @@ the [Loan](../GLOSSARY.md). A [Member](../GLOSSARY.md) borrows a
 lasts fourteen days and a member may hold three at a time.
 
 Your job is the Start module. It compiles, it is formatted, it passes every
-Quality gate, and its tests pass - and the two rules are written into the
-code as constants, where nobody can change them without a rebuild and nobody
-can find them by searching the configuration.
+Quality gate, and its tests pass - and the loan period is a constant in the
+code, where nobody can change it without a rebuild and nobody can find it by
+searching the configuration. There is no loan limit at all.
 
-Three Diagnostic tests say what the Lab asks for:
+Two Diagnostic tests say what the Lab asks for:
 
 1. **The loan period comes from the configuration.** With
    `library.loan.period=30D`, a loan created today is due in thirty days.
@@ -164,8 +164,6 @@ Three Diagnostic tests say what the Lab asks for:
 2. **An invalid loan limit stops the application at startup.** With
    `library.loan.limit=0`, the application must not start - and the failure
    must name the property that was wrong.
-3. **The loan limit is bound too.** The limit is configuration, not a
-   constant, and it is validated on the way in.
 
 Run them:
 
@@ -174,9 +172,13 @@ Run them:
 ```
 
 The Solution module shows what the answer looks like: a `@ConfigurationProperties`
-record, `@Validated` on it, the constraints on its components, and the loan
-controller reading the period from the bound properties rather than from a
-constant.
+record with the period and the limit, `@Validated` on it, the constraints on
+its components, and the loan controller reading the period from the bound
+properties rather than from a constant.
+
+The loan period is a number of days - that is what the glossary says it is -
+and the due date is a date, so the controller converts the bound `Duration`
+to days. The configuration file writes `14d`, the application knows days.
 
 ## Quiz
 

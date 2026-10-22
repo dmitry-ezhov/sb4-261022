@@ -27,6 +27,8 @@
     <module>lab-01-boot2-to-boot4-solution</module>
     <module>lab-02-module-map-and-build-start</module>
     <module>lab-02-module-map-and-build-solution</module>
+    <module>lab-03-typed-configuration-start</module>
+    <module>lab-03-typed-configuration-solution</module>
     <!-- Module entries are added by the task that authors the corresponding
          lab. Do not pre-create module directories. -->
   </modules>
