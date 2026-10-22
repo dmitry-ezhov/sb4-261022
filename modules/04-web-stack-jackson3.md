@@ -190,9 +190,10 @@ Run them:
 ```
 
 The Solution module shows what the answer looks like: an `@HttpExchange`
-interface for the availability service, its base URL in the configuration,
-and an exception handler that turns the client's typed exceptions into
-problem details.
+interface for the availability service, its base URL in the configuration, a
+timeout on the call so an unresponsive service fails fast rather than hanging
+a request thread, and an exception handler that turns the client's typed
+exceptions into problem details.
 
 ## Quiz
 
@@ -274,6 +275,12 @@ enforces.
   what the service offers; the wiring says how to call it.
 - **The service's address is configuration.** The base URL is a property, not
   a constant in a client class, and the stubbing in the tests points at it.
+- **The outbound call gives up in time.** A service that does not answer is a
+  failure the application reports like any other, not a request thread that
+  hangs: the connect and read timeouts are named in the configuration, and a
+  call that outlives its read timeout fails loudly. M11 gives that failure
+  the resilience treatment - the retry, the fallback - but the give-up has
+  to exist first.
 - **The vocabulary is the glossary's.** [Title](../GLOSSARY.md),
   [Copy](../GLOSSARY.md), [Member](../GLOSSARY.md),
   [Loan](../GLOSSARY.md), [Due date](../GLOSSARY.md) - and a copy that is

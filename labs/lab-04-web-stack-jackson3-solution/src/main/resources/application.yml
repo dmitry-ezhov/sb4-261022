@@ -1,6 +1,14 @@
 spring:
   application:
     name: library-lab
+  http:
+    clients:
+      # A service that does not answer is a failure, not a hang. These are
+      # Boot 4's deadlines for the shared RestClient.Builder, so the
+      # availability client inherits them: a call that outlives its read
+      # timeout fails loudly instead of holding a request thread forever.
+      connect-timeout: 1s
+      read-timeout: 2s
 
 library:
   availability:
