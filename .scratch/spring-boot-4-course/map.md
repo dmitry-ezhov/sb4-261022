@@ -117,6 +117,15 @@ The implementation map for the feature described in
   reaches the application through `@DynamicPropertySource`.
   [Answer](issues/19-m04-lab-start-the-web-stack-mvc-jackson-3-and-problem-details.md)
 
+- **2026-10-22 · ticket 20** — The declarative client is built from an
+  `@HttpExchange` interface over a `RestClient` whose base URL is
+  configuration; a 4xx from the service becomes a typed exception, which is
+  what makes "not available" (409) and "unknown copy" (404) two different
+  failures. The proxy factory is
+  `org.springframework.web.service.invoker.HttpServiceProxyFactory` in
+  Framework 7.
+  [Answer](issues/20-m04-lab-solution-the-web-stack-mvc-jackson-3-and-problem-details.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
