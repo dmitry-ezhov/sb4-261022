@@ -72,8 +72,9 @@ brings. The published POMs (checked for 4.1.1) say exactly this:
   brings the JDBC half and the pool. JPA in a Boot application *is* JDBC in a
   Boot application, plus Hibernate.
 - `spring-boot-starter-flyway` is `spring-boot-starter`,
-  `spring-boot-starter-jdbc` and `spring-boot-flyway`. The last one is what
-  made the migration run; without it, H2 stayed empty.
+  `spring-boot-starter-jdbc` and `spring-boot-flyway`. The last one is the
+  module that makes the migration run in Boot 4; declare the Flyway
+  version on its own instead, and H2 stays empty all boot.
 
 ```xml
 <dependency>
@@ -369,9 +370,9 @@ why, not just what.
    verified the silence empirically: a 4.1.1 application with bare
    `flyway-core` started with an empty H2 and no Flyway logging.
 
-3. **A codebase from Boot 2 has `schema.sql` and `data.sql`, guarded to run
-   only for the H2 profile. Why does this course make them Flyway
-   migrations instead?**
+3. **About the migrations row: a codebase from Boot 2 has `schema.sql`
+   and `data.sql`, guarded to run only for the H2 profile. Why does this
+   course make them Flyway migrations instead?**
 
    Because the default mode of script-based initialization - verified in
    4.1.1's configuration metadata - is `spring.sql.init.mode=embedded`, and
