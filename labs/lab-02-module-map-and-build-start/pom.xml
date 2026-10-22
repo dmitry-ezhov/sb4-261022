@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.example</groupId>
+    <artifactId>labs</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>lab-02-module-map-and-build-start</artifactId>
+
+  <name>lab-02-module-map-and-build-start</name>
+  <description>
+    M02 lab (start): the same library catalog API as M01, with a build written
+    the way a Boot 2 build was written - versions pinned in the child, the
+    deprecated web starter, and dependencies declared that the parent already
+    provides. The application behaves correctly; the POM does not.
+  </description>
+
+  <dependencies>
+    <dependency>
+      <!-- The Boot 2 starter name. It still resolves in Boot 4 - it is
+           deprecated, not removed - which is exactly what makes it a trap. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <version>4.1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+      <version>4.1.1</version>
+    </dependency>
+    <dependency>
+      <!-- The webmvc test slice has its own starter in Boot 4. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <version>4.1.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The parent already gives every child the test starter. Declaring it
+           again is duplication, not explicitness: a version bump has to be
+           made in both places. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <version>4.1.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- And the parent already gives every child the null-safety
+           annotations. Same story. -->
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- The parent's plugin management already knows this plugin and its
+             version. Repeating the version here is the same mistake as
+             repeating a dependency version. -->
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>4.1.1</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
