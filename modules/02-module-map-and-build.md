@@ -266,8 +266,59 @@ No versions. No plugin version. Nothing that the parent has already decided.
 
 ## Quiz
 
-Five questions, with answers that explain themselves. Authored with the quiz
-ticket that follows this one.
+Five questions about the build. Read the answer after you have answered it -
+the answers explain why, not only what.
+
+1. **Your module declares `spring-boot-starter-webmvc` without a version, and
+   the parent manages it. Then somebody adds `<version>4.1.2</version>` to
+   your module. What happens, and why is that a problem?**
+
+   It keeps working: an explicit version wins over the managed one. That is
+   exactly the problem. Your module is now pinned to 4.1.2 while the parent
+   moves on, so the next version bump reaches every module except yours, and
+   nothing tells you. This is the copying disease from the Boot 2 days, in a
+   shape that looks tidy.
+
+2. **A POM has both a `<parent>` and `<modules>`. What does each one do, and
+   can one POM have both?**
+
+   The parent is *inheritance*: the child's effective POM is the parent's
+   configuration plus its own. The modules list is *what the POM builds*: the
+   aggregator's reactor. They are unrelated mechanisms, and yes - one POM can
+   have both. This course's root POM is the parent of the labs and the
+   aggregator of the labs, which is why every lab inherits the gates and the
+   versions without a word of configuration.
+
+3. **`spring-boot-starter-test` does not bring the MockMvc test slice in
+   Boot 4, although it did in Boot 3. Where does the slice live now, and why
+   did it move?**
+
+   In its own artifact, `spring-boot-webmvc-test`, with the starter
+   `spring-boot-starter-webmvc-test`; the annotation moved with it, to
+   `org.springframework.boot.webmvc.test.autoconfigure`. It moved because the
+   slice drags the whole web stack onto the test classpath - the starter shows
+   as much, depending on `spring-boot-starter-webmvc` at compile scope - and
+   that does not belong in the generic test starter every module carries.
+
+4. **You inherit from `spring-boot-starter-parent` and declare
+   `spring-boot-maven-plugin` with no version and no executions. Which goal
+   runs, and where did it come from?**
+
+   The `repackage` goal, and it came from the parent's plugin management,
+   which supplies the version and the execution to a plugin you declare.
+   Plugin management on its own runs nothing: leave the declaration out and
+   you get a plain jar, and `java -jar` fails with "no main manifest
+   attribute".
+
+5. **What does importing a BOM give you, and what does it not give you?**
+
+   The imported BOM's `<dependencyManagement>` - the managed versions - and
+   nothing else. Not its dependencies: they do not land on your classpath.
+   Not its plugins. And not its properties: import the Boot BOM and
+   `${java.version}` is still the JVM's version rather than Boot's. That is
+   why Boot's own starter-parent is *inherited* rather than imported - the
+   parent brings the managed versions, the plugin management, the build
+   defaults and the properties, and the import brings only the first.
 
 ## Checklist
 
