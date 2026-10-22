@@ -67,6 +67,13 @@ The implementation map for the feature described in
   or Boot 4. A module declares the plugin to get an executable jar.
   [Answer](issues/10-m02-lab-solution-the-boot-4-module-map-and-a-multi-module-build.md)
 
+- **2026-10-22 · tickets 11-12** — M02's quiz and checklist close the
+  Module. Two claims were checked rather than believed: an imported BOM
+  contributes managed versions only (not properties, not plugins), and
+  `spring-boot-starter-parent` manages the `repackage` goal without
+  activating it.
+  [Answer](issues/11-m02-quiz-the-boot-4-module-map-and-a-multi-module-build.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
