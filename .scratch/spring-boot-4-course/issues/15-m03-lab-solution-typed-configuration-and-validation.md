@@ -15,7 +15,7 @@
 
 ## Answer
 
-Built in commit `HEAD~0` (the commit that added this module).
+Built in commit `4d9d539`.
 
 - **The Solution module** binds the rules:
   - a `@ConfigurationProperties(prefix = "library.loan")` record with the

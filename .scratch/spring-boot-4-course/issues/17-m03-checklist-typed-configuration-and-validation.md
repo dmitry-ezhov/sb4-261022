@@ -4,7 +4,7 @@
 
 **Blocked by:** 16
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [ ] the checklist names observable properties, not implementation steps
 - [ ] every item is verifiable by reading the change or running a command
@@ -13,3 +13,17 @@
 - [ ] it covers defaults are documented where they are declared
 - [ ] it covers the invalid case is covered by a test
 - [ ] no item restates a Quality gate that the build already enforces
+
+## Answer
+
+Built in commit `19278a9` (together with the quiz, ticket 16).
+
+Eight observable properties: the rules are configuration rather than
+constants, the configuration class is a record and is registered exactly
+once, the defaults live in the configuration file, the constraints have an
+implementation behind them, an invalid value stops the application at
+startup with a message that names the property, the vocabulary is the
+glossary's, the clock is injected rather than called statically, and the
+failures are still problem details.
+
+None repeats a gate the build enforces.

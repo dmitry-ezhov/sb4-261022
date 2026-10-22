@@ -98,6 +98,11 @@ The implementation map for the feature described in
   bound `Duration` is converted to days.
   [Answer](issues/14-m03-lab-start-typed-configuration-and-validation.md)
 
+- **2026-10-22 · tickets 16-17** — The M03 quiz and checklist close the
+  Module. One doc claim was corrected by reading the source: a bare number in
+  a `Duration` is a number of milliseconds, not an error.
+  [Answer](issues/16-m03-quiz-typed-configuration-and-validation.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
