@@ -110,6 +110,13 @@ The implementation map for the feature described in
   no `spring-boot-restclient` module at all.
   [Answer](issues/18-m04-doc-the-web-stack-mvc-jackson-3-and-problem-details.md)
 
+- **2026-10-22 · ticket 19** — M04's Lab is the course's first outbound
+  dependency: the library asks an availability service before it lends a
+  copy. The start module declares the service and does not use it. The
+  service is stubbed with WireMock on a dynamic port, and its base URL
+  reaches the application through `@DynamicPropertySource`.
+  [Answer](issues/19-m04-lab-start-the-web-stack-mvc-jackson-3-and-problem-details.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
