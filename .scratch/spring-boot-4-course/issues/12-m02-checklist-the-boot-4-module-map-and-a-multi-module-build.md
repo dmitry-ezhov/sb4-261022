@@ -11,7 +11,7 @@
 - [x] it covers one parent owns every version
 - [x] it covers no child repeats a version or a plugin configuration
 - [x] it covers the child declares only what it uses
-- [ ] it covers the reactor still builds green from the root
+- [x] it covers the reactor still builds green from the root
 - [x] no item restates a Quality gate that the build already enforces
 
 ## Answer
@@ -34,3 +34,10 @@ is a build fix with a bug in it.
   checklist has no item about the reactor being green from the root. The
   checklist's items cover the module's own POM, not the reactor. The item
   belongs in `modules/02-module-map-and-build.md`; add it, then tick the box.
+- **2026-10-22 · reviewer** — Done. The checklist gained
+  "**The reactor builds green from the root.**": `./mvnw verify` at the
+  repository root succeeds for every listed module, in reactor order. The
+  gates judge a module one at a time; only the reactor proves the
+  aggregator's list is right. The checklist's intro now says verifiable
+  "by reading the change or running a command", which the new item is. The
+  reactor was run green from the root as part of resolving this item.

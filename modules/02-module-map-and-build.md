@@ -324,8 +324,8 @@ the answers explain why, not only what.
 
 What a reviewer applies to a solution of this Lab to judge it production-shaped
 rather than merely working. Every item is observable - you can check it by
-reading the change - and none of them repeats a gate the build already
-enforces.
+reading the change or running a command - and none of them repeats a gate the
+build already enforces.
 
 - **The module declares only what it uses.** Every dependency in the POM is one
   the module's code actually needs. No dependency is there "just in case" -
@@ -345,6 +345,10 @@ enforces.
   review unless somebody looks.
 - **The module is listed, and the aggregator lists nothing else.** The labs
   aggregator has the module in its `<modules>` and no configuration of its own.
+- **The reactor builds green from the root.** `./mvnw verify` at the
+  repository root succeeds for every listed module, in reactor order. The
+  gates judge a module one at a time; only the reactor proves the
+  aggregator's list is right.
 - **The vocabulary is the glossary's.** The code and the tests say
   [Title](../GLOSSARY.md), [Copy](../GLOSSARY.md),
   [Member](../GLOSSARY.md), [Reservation](../GLOSSARY.md). Not "book", not
