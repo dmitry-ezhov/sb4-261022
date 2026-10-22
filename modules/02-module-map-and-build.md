@@ -322,5 +322,35 @@ the answers explain why, not only what.
 
 ## Checklist
 
-What a reviewer applies to a solution of this Lab. Authored with the checklist
-ticket that follows this one.
+What a reviewer applies to a solution of this Lab to judge it production-shaped
+rather than merely working. Every item is observable - you can check it by
+reading the change - and none of them repeats a gate the build already
+enforces.
+
+- **The module declares only what it uses.** Every dependency in the POM is one
+  the module's code actually needs. No dependency is there "just in case" -
+  that is how a classpath grows a version nobody chose.
+- **No dependency pins a version.** Every version comes from the parent's
+  management. `${project.version}` is a reference and is fine; a literal
+  version is a pin.
+- **No plugin pins a version.** Plugin versions come from the parent's plugin
+  management - including the Boot plugin, whose `repackage` execution comes
+  with it.
+- **Nothing the parent already provides is declared again.** The test starter
+  and the null-safety annotations arrive by inheritance. Declaring them again
+  is duplication, not explicitness.
+- **The starters are the Boot 4 names.** `spring-boot-starter-webmvc`,
+  `spring-boot-starter-jackson`, `spring-boot-starter-webmvc-test` - and
+  nothing deprecated. A deprecated starter still resolves, so it survives
+  review unless somebody looks.
+- **The module is listed, and the aggregator lists nothing else.** The labs
+  aggregator has the module in its `<modules>` and no configuration of its own.
+- **The vocabulary is the glossary's.** The code and the tests say
+  [Title](../GLOSSARY.md), [Copy](../GLOSSARY.md),
+  [Member](../GLOSSARY.md), [Reservation](../GLOSSARY.md). Not "book", not
+  "item", not "patron", not "hold".
+- **The behaviour did not change.** The Lab changed the build, not the
+  application: the same endpoints answer the same way, and the failures are
+  still RFC 9457 problem details with the right status and the
+  `application/problem+json` media type. A build fix that quietly changes
+  behaviour is a build fix with a bug in it.
