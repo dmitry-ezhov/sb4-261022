@@ -6,10 +6,10 @@
 
 **Status:** resolved
 
-- [ ] the diagnostics profile skips Start modules and runs Solution modules
-- [ ] one command over the whole reactor asserts every Solution's diagnostics
-- [ ] the command still runs a Start module's diagnostics when that module is selected explicitly
-- [ ] CI uses that command in place of a hand-maintained module list
+- [x] the diagnostics profile skips Start modules and runs Solution modules
+- [x] one command over the whole reactor asserts every Solution's diagnostics
+- [x] the command still runs a Start module's diagnostics when that module is selected explicitly
+- [x] CI uses that command in place of a hand-maintained module list
 
 ## Answer
 

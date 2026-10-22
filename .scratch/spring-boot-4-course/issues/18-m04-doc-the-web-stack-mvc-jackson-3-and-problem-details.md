@@ -6,12 +6,12 @@
 
 **Status:** resolved
 
-- [ ] the doc states the Boot 2 to Boot 3 to Boot 4 delta as a table, covering the webmvc starter, Jackson 3 payloads and problem details
-- [ ] every claim in the delta table is checked against the version in use, not remembered
-- [ ] the terms it introduces are the glossary's terms, and are linked
-- [ ] it names the Lab, and the command that runs the Lab's diagnostics
-- [ ] every snippet in it compiles against the version in use
-- [ ] it states what the reader is assumed to know and what they are not
+- [x] the doc states the Boot 2 to Boot 3 to Boot 4 delta as a table, covering the webmvc starter, Jackson 3 payloads and problem details
+- [x] every claim in the delta table is checked against the version in use, not remembered
+- [x] the terms it introduces are the glossary's terms, and are linked
+- [x] it names the Lab, and the command that runs the Lab's diagnostics
+- [x] every snippet in it compiles against the version in use
+- [x] it states what the reader is assumed to know and what they are not
 
 ## Answer
 

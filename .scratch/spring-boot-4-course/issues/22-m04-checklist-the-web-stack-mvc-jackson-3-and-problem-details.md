@@ -6,13 +6,13 @@
 
 **Status:** resolved
 
-- [ ] the checklist names observable properties, not implementation steps
-- [ ] every item is verifiable by reading the change or running a command
-- [ ] it covers payloads are typed, not maps
-- [ ] it covers failures are problem details with the correct status
-- [ ] it covers no Jackson 2 type leaks into application code
+- [x] the checklist names observable properties, not implementation steps
+- [x] every item is verifiable by reading the change or running a command
+- [x] it covers payloads are typed, not maps
+- [x] it covers failures are problem details with the correct status
+- [x] it covers no Jackson 2 type leaks into application code
 - [ ] it covers the outbound call has a timeout
-- [ ] no item restates a Quality gate that the build already enforces
+- [x] no item restates a Quality gate that the build already enforces
 
 ## Answer
 
@@ -27,3 +27,12 @@ glossary's; and the service is stubbed with a real server so the wiring is
 exercised rather than assumed.
 
 The last two are the ones a build cannot check.
+
+## Comments
+
+- **2026-10-22 · acceptance audit** — One criterion is still open: the M04
+  checklist has no item about the outbound call carrying a timeout. The M04
+  solution's `AvailabilityClientConfiguration` sets a base URL and nothing
+  else, so the item belongs in the checklist *and* in the Lab's Lab section
+  before the criterion can be ticked. The timeout is also the natural bridge
+  to M11, which teaches timeouts as a first-class concern.

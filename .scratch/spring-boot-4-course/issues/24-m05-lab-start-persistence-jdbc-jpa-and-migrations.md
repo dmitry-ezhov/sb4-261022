@@ -11,3 +11,13 @@
 - [ ] its diagnostics fail, and each failure message names what is missing
 - [ ] the default build stays green; the diagnostics run is red
 - [ ] the application is the one the previous Module left, extended rather than rewritten
+
+## Comments
+
+- **2026-10-22 · acceptance audit** — Not started, but there is scratch work in
+  the working tree: `labs/lab-05-persistence-start/` and
+  `labs/lab-05-persistence-solution/` hold a copy of the M04 application
+  (both sides are byte-identical, and neither has a POM, a diagnostics
+  package, a schema or a migration). They are not in `labs/pom.xml`, so the
+  reactor does not see them. Treat them as a starting point for the M05 POM
+  and the schema, not as a half-finished Lab.

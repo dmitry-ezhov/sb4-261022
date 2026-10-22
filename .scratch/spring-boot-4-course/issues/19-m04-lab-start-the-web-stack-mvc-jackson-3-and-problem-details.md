@@ -6,11 +6,11 @@
 
 **Status:** resolved
 
-- [ ] the Start module exists and is listed in the labs aggregator
-- [ ] it compiles, is formatted, passes every Quality gate except the coverage floor, and passes its own tests
-- [ ] its diagnostics fail, and each failure message names what is missing
-- [ ] the default build stays green; the diagnostics run is red
-- [ ] the application is the one the previous Module left, extended rather than rewritten
+- [x] the Start module exists and is listed in the labs aggregator
+- [x] it compiles, is formatted, passes every Quality gate except the coverage floor, and passes its own tests
+- [x] its diagnostics fail, and each failure message names what is missing
+- [x] the default build stays green; the diagnostics run is red
+- [x] the application is the one the previous Module left, extended rather than rewritten
 
 ## Answer
 

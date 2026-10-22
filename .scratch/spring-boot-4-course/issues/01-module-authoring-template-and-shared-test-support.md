@@ -6,11 +6,11 @@
 
 **Status:** resolved
 
-- [ ] the doc skeleton names every section a Module doc must have, in order
-- [ ] the quiz format states how many questions there are and what an answer looks like
-- [ ] the checklist format states what a reviewer applies it to
-- [ ] the shared support module publishes a fixed Clock as a test-jar, consumable by any Lab
-- [ ] a Module can be authored from the template without inventing a structure
+- [x] the doc skeleton names every section a Module doc must have, in order
+- [x] the quiz format states how many questions there are and what an answer looks like
+- [x] the checklist format states what a reviewer applies it to
+- [x] the shared support module publishes a fixed Clock as a test-jar, consumable by any Lab
+- [x] a Module can be authored from the template without inventing a structure
 
 ## Answer
 

@@ -6,13 +6,13 @@
 
 **Status:** resolved
 
-- [ ] the checklist names observable properties, not implementation steps
-- [ ] every item is verifiable by reading the change or running a command
-- [ ] it covers one parent owns every version
-- [ ] it covers no child repeats a version or a plugin configuration
-- [ ] it covers the child declares only what it uses
+- [x] the checklist names observable properties, not implementation steps
+- [x] every item is verifiable by reading the change or running a command
+- [x] it covers one parent owns every version
+- [x] it covers no child repeats a version or a plugin configuration
+- [x] it covers the child declares only what it uses
 - [ ] it covers the reactor still builds green from the root
-- [ ] no item restates a Quality gate that the build already enforces
+- [x] no item restates a Quality gate that the build already enforces
 
 ## Answer
 
@@ -27,3 +27,10 @@ glossary's, and the behaviour did not change.
 None repeats a gate the build enforces, and the last item is the judgement
 call the diagnostics cannot make: a build fix that quietly changes behaviour
 is a build fix with a bug in it.
+
+## Comments
+
+- **2026-10-22 · acceptance audit** — One criterion is still open: the M02
+  checklist has no item about the reactor being green from the root. The
+  checklist's items cover the module's own POM, not the reactor. The item
+  belongs in `modules/02-module-map-and-build.md`; add it, then tick the box.

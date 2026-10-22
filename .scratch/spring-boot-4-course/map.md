@@ -11,7 +11,7 @@ The implementation map for the feature described in
 - The two seams are the reactor build (`./mvnw -f labs verify`) and the
   diagnostics profile (`-Pdiagnostics`). Every ticket is verified against
   those two commands and nothing else.
-- The domain vocabulary is fixed in [`GLOSSARY.md`](../../../GLOSSARY.md):
+- The domain vocabulary is fixed in [`GLOSSARY.md`](../../GLOSSARY.md):
   Title, Copy, Member, Loan, Reservation. A fixture may not mention the
   domain, because every Lab carries its own copy of the domain classes.
 - Each Module is delivered as five tickets - doc, lab start, lab solution,
@@ -125,6 +125,30 @@ The implementation map for the feature described in
   `org.springframework.web.service.invoker.HttpServiceProxyFactory` in
   Framework 7.
   [Answer](issues/20-m04-lab-solution-the-web-stack-mvc-jackson-3-and-problem-details.md)
+
+- **2026-10-22 · acceptance audit** — Every ticket's acceptance criteria were
+  checked against the repository as it stands, and the boxes that hold are
+  ticked. Tickets 01 to 22 are done: the reactor build is green, every
+  Solution module's diagnostics pass, every Start module's diagnostics fail
+  with a message that names what is missing, and the verified-versions table
+  was re-confirmed against the resolved classpath. Three gaps were found and
+  are recorded where they belong: the M02 checklist has no item about the
+  reactor being green from the root (ticket 12), the M04 checklist has no
+  item about the outbound call's timeout (ticket 22), and the Checkstyle gate
+  is configured but never bound to a phase, so `verify` does not run it
+  (ticket 70, which blocks the final audit). M05 onwards is unwritten; the
+  `labs/lab-05-persistence-*` directories in the working tree are scratch
+  copies of the M04 application, not Modules.
+- **2026-10-22 · ticket 70** — The Checkstyle gate now runs: `check` is bound
+  to `verify` in the parent POM, and the curated ruleset dropped the five
+  rules that duplicate Spotless (`WhitespaceAround`, `WhitespaceAfter`,
+  `LeftCurly`, `RightCurly`, `NewlineAtEndOfFile`) - the ruleset's own header
+  said it must not overlap the formatter, and Palantir's empty record body
+  (`record Loan() {}`) was the proof. The application class is exempt from
+  `HideUtilityClassConstructor` by annotation, not by name. The ruleset also
+  lints the test sources now: `checkstyle.includeTestSourceDirectory` as a
+  *property* was inert, because the `check` goal exposes no user property for
+  it, so it lives in the plugin block instead.
 
 ## Fog
 

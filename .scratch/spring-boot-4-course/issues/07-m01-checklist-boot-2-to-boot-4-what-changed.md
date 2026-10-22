@@ -6,13 +6,13 @@
 
 **Status:** resolved
 
-- [ ] the checklist names observable properties, not implementation steps
-- [ ] every item is verifiable by reading the change or running a command
-- [ ] it covers every javax import is now jakarta
-- [ ] it covers no Jackson 2 type appears in application code
-- [ ] it covers every starter is named the Boot 4 way
-- [ ] it covers errors are problem details with the right status and media type
-- [ ] no item restates a Quality gate that the build already enforces
+- [x] the checklist names observable properties, not implementation steps
+- [x] every item is verifiable by reading the change or running a command
+- [x] it covers every javax import is now jakarta
+- [x] it covers no Jackson 2 type appears in application code
+- [x] it covers every starter is named the Boot 4 way
+- [x] it covers errors are problem details with the right status and media type
+- [x] no item restates a Quality gate that the build already enforces
 
 ## Answer
 

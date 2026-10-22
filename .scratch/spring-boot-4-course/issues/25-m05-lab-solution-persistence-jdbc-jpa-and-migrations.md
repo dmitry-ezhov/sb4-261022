@@ -12,3 +12,10 @@
 - [ ] it meets the coverage floor
 - [ ] its own tests assert the Lab's behaviour, not the implementation's arrangement
 - [ ] CI asserts its diagnostics through the single diagnostics command
+
+## Comments
+
+- **2026-10-22 · acceptance audit** — Not started. The scratch directory
+  `labs/lab-05-persistence-solution/` in the working tree is currently a copy
+  of the M04 solution: it has no POM, no schema, no migration, no repository
+  and no diagnostics. It is a placeholder, not a reference implementation.

@@ -6,12 +6,12 @@
 
 **Status:** resolved
 
-- [ ] the Solution module exists and is listed in the labs aggregator
-- [ ] it is written from scratch, not patched from the Start module
-- [ ] every diagnostic of the Start module passes against it
-- [ ] it meets the coverage floor
-- [ ] its own tests assert the Lab's behaviour, not the implementation's arrangement
-- [ ] CI asserts its diagnostics through the single diagnostics command
+- [x] the Solution module exists and is listed in the labs aggregator
+- [x] it is written from scratch, not patched from the Start module
+- [x] every diagnostic of the Start module passes against it
+- [x] it meets the coverage floor
+- [x] its own tests assert the Lab's behaviour, not the implementation's arrangement
+- [x] CI asserts its diagnostics through the single diagnostics command
 
 ## Answer
 

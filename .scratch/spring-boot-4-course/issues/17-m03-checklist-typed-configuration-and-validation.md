@@ -6,13 +6,13 @@
 
 **Status:** resolved
 
-- [ ] the checklist names observable properties, not implementation steps
-- [ ] every item is verifiable by reading the change or running a command
-- [ ] it covers no raw value injection anywhere
-- [ ] it covers configuration is typed and validated
-- [ ] it covers defaults are documented where they are declared
-- [ ] it covers the invalid case is covered by a test
-- [ ] no item restates a Quality gate that the build already enforces
+- [x] the checklist names observable properties, not implementation steps
+- [x] every item is verifiable by reading the change or running a command
+- [x] it covers no raw value injection anywhere
+- [x] it covers configuration is typed and validated
+- [x] it covers defaults are documented where they are declared
+- [x] it covers the invalid case is covered by a test
+- [x] no item restates a Quality gate that the build already enforces
 
 ## Answer
 

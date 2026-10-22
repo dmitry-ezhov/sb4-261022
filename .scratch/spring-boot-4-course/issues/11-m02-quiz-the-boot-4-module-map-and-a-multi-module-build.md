@@ -6,11 +6,11 @@
 
 **Status:** resolved
 
-- [ ] five questions with answers
-- [ ] every question has exactly one defensible answer
-- [ ] each answer explains why, not only what
-- [ ] the questions test understanding of the delta, not trivia
-- [ ] no question is answerable by guessing from the wording alone
+- [x] five questions with answers
+- [x] every question has exactly one defensible answer
+- [x] each answer explains why, not only what
+- [x] the questions test understanding of the delta, not trivia
+- [x] no question is answerable by guessing from the wording alone
 
 ## Answer
 
