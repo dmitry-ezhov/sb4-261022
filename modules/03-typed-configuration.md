@@ -91,8 +91,11 @@ The rules that catch people out:
   `PT14D` is the same thing in ISO-8601, `240h` is ten days. The value in the
   file is a String; the conversion happens in the binder, so the type in the
   record is what decides the format.
-- **A `Duration` in the file is not a number of milliseconds.** `120000` does
-  not mean two minutes; a bare number is not a valid duration at all.
+- **A bare number is a number of milliseconds.** `120000` is two minutes, not
+  an error and not "no unit": the shorthand (`2m`, `14d`) and the ISO form
+  (`PT2M`) both carry a unit, and a bare number does not, so Boot picks the
+  millisecond for it. Write the unit you mean - which is why the loan period
+  in this course is written `14d`.
 - **Lists and maps bind from indexed and keyed properties.**
   `library.loan.holidays[0]=...` binds to a `List<String>`,
   `library.loan.rooms[main]=...` to a `Map<String, String>`.
@@ -182,10 +185,79 @@ to days. The configuration file writes `14d`, the application knows days.
 
 ## Quiz
 
-Five questions, with answers that explain themselves. Authored with the quiz
-ticket that follows this one.
+Five questions about configuration. Read the answer after you have answered it -
+the answers explain why, not only what.
+
+1. **Your configuration record has one constructor and two components. Which
+   binding style does Boot use, and what do you add when a class has two
+   constructors?**
+
+   Constructor binding. It has been the default since Boot 3 for a class with
+   a single parameterized constructor; in Boot 2 you had to write
+   `@ConstructorBinding` to get it, with a record as the exception. With two
+   constructors, `@ConstructorBinding` says which one the binder should use.
+
+2. **You put `@NotNull` on a `Duration` component and `@Min(1)` on an `int`
+   component, and the configuration file omits both. What does the
+   application do?**
+
+   It refuses to start. The `Duration` binds to `null` and `@NotNull`
+   rejects it; the `int` binds to `0` - the primitive's default - and `@Min(1)`
+   rejects that. The difference is worth keeping in mind: for the `int`,
+   "not configured" and "configured as zero" are the same value, so a missing
+   limit is only caught because zero happens to be illegal. For the `Duration`
+   they are different, and the constraint says which one it is.
+
+3. **The constraints are on your class, and the application starts happily
+   with a nonsense value. What is missing?**
+
+   The validation implementation. The constraints are Jakarta's -
+   `jakarta.validation.constraints.*` - and the implementation is Hibernate
+   Validator, which arrives with `spring-boot-starter-validation`. Without it
+   the annotations are decoration, and nothing warns you.
+
+4. **You write `library.loan.period=120000` and expect two minutes. What does
+   Boot bind?**
+
+   Two minutes. A bare number is a number of milliseconds: the shorthand
+   (`2m`, `14d`) and the ISO form (`PT2M`) both carry a unit, and a bare
+   number does not, so Boot picks the millisecond for it. That is exactly why
+   the loan period in this course is written `14d` - a reader should not have
+   to know the default unit to know what the number means.
+
+5. **You put `@DefaultValue("14d")` on the period component. When is it used,
+   and what does it not do?**
+
+   Only when the property is *not found*. A property that is present but empty
+   still binds as empty, and does not get the default. And the value must be a
+   constant: it is not a placeholder, so `${...}` inside it is not resolved.
 
 ## Checklist
 
-What a reviewer applies to a solution of this Lab. Authored with the checklist
-ticket that follows this one.
+What a reviewer applies to a solution of this Lab to judge it production-shaped
+rather than merely working. Every item is observable - you can check it by
+reading the change - and none of them repeats a gate the build already
+enforces.
+
+- **The rules are configuration.** The loan period and the loan limit are
+  bound, not constants: there is no `14` in the Java code, and the rules can
+  be changed without a rebuild.
+- **The configuration class is a record**, immutable, and it is registered -
+  by `@ConfigurationPropertiesScan` or by `@EnableConfigurationProperties`,
+  but not by both, and not by neither.
+- **The defaults live in the configuration file**, where whoever deploys the
+  application can see them and change them.
+- **The constraints are on the components**, and the validation implementation
+  is on the classpath. `@Validated` on a class with no validator is
+  decoration.
+- **An invalid value stops the application at startup**, and the failure names
+  the property that was wrong. A rule that is only checked when it is used is
+  a rule that will be used at the wrong time.
+- **The vocabulary is the glossary's.** [Loan](../GLOSSARY.md),
+  [Loan period](../GLOSSARY.md), [Loan limit](../GLOSSARY.md),
+  [Due date](../GLOSSARY.md), [Member](../GLOSSARY.md),
+  [Copy](../GLOSSARY.md). Not "borrow", not "rental", not "due".
+- **The clock is injected**, not called statically, so a test can decide what
+  today is. `LocalDate.now()` in a controller is a test that cannot exist.
+- **The failures are still problem details.** The Lab changed how the rules
+  arrive, not how the API reports trouble.
