@@ -74,6 +74,14 @@ The implementation map for the feature described in
   activating it.
   [Answer](issues/11-m02-quiz-the-boot-4-module-map-and-a-multi-module-build.md)
 
+- **2026-10-22 · ticket 13** — Configuration changed less than the web
+  stack, and the delta table says so: the real change is Boot 3's default
+  constructor binding, the Jakarta move in the constraint annotations, and
+  Boot 4's `@ConfigurationPropertiesSource`. Two beliefs were corrected by
+  checking - `@DefaultValue` is not new, and Boot 4's configuration API
+  carries no JSpecify annotations.
+  [Answer](issues/13-m03-doc-typed-configuration-and-validation.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
