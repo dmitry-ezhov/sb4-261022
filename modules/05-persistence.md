@@ -462,11 +462,21 @@ repeats a gate the build already enforces.
   and the exception handler from M04 gets a chance to translate it.
   A `500` whose stack trace starts in `org.hibernate` is the defect M04
   was written to prevent, wearing a data-layer coat.
-- **One schema, two engines.** The migration answers "does this run the
-  same on H2 and PostgreSQL": only standard types - identity for the
-  primary keys, `boolean not null` where on loan is needed - no
-  H2-only `LIMIT` syntax, no `MODE=PostgreSQL` compatibility setting, and
-  no dialect in the configuration.
+- **One schema, two engines - and both are green.** The migration answers
+  "does this run the same on H2 and PostgreSQL": only standard types -
+  identity for the primary keys, `boolean not null` where on loan is
+  needed - no H2-only `LIMIT` syntax, no `MODE=PostgreSQL` compatibility
+  setting, and no dialect in the configuration. And the answer is run,
+  not assumed: the same module is green on both databases - H2 in the
+  module's own build, PostgreSQL through the diagnostics profile,
+  `./mvnw -f labs -pl lab-05-persistence-solution verify -Pdiagnostics`
+  with a Docker daemon. A skipped PostgreSQL diagnostic is no Docker
+  daemon, not a pass.
+- **The repository is exercised by a test, not only by the application.**
+  The reads are under test: a test writes rows with the migration's own
+  SQL and asserts what the endpoints answer, so the repository is the
+  thing being driven. A repository the application alone reaches is
+  exercised, but nothing asserts what it returns.
 - **The vocabulary is the glossary's, in the database too.** Table and
   column names are written in the glossary's terms - `title`, `copy` with a
   `title_id` - never a `book_id`, a `member_id` or an `item`. The words are
