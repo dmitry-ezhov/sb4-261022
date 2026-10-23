@@ -157,6 +157,14 @@ The implementation map for the feature described in
   went, because its answer was guessable from the question's shape.
   [Answer](issues/26-m05-quiz-persistence-jdbc-jpa-and-migrations.md)
 
+- **2026-10-23 · ticket 27** — The M05 checklist had a ready draft from
+  ticket 23; grading it left two criteria open, and both became items of
+  their own: the lab is *run* green on both databases (a skipped PostgreSQL
+  diagnostic is no Docker daemon, not a pass), and the repository is
+  exercised by a test that writes the migration's own SQL and asserts what
+  the endpoints answer.
+  [Answer](issues/27-m05-checklist-persistence-jdbc-jpa-and-migrations.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
