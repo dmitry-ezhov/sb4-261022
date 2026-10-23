@@ -544,23 +544,36 @@ already enforces.
   and the skipped test is understood as a skip, never as green. Whatever is
   asserted on H2 and *not* asserted on PostgreSQL is stated as the
   difference, not left as an invisible assumption.
-- **The stubs are the fixture's, not the test's inventions.** Where a bean is
-  substituted, the annotations that carry it are `@MockitoBean` and
-  `@MockitoSpyBean`; the typed stub's name is a `@MockitoBean` field rather
-  than a hidden subclass, and no test reaches into a private field or a
-  package-local method to "set the state" that a request could set.
+- **The removed mock-bean annotation appears nowhere.** No test imports
+  `org.springframework.boot.test.mock.mockito`: `@MockBean` and `@SpyBean`
+  are not deprecated in 4.1.1, they are gone from the jars, and the
+  substitution is carried by Framework's pair - `@MockitoBean` and
+  `@MockitoSpyBean` at `org.springframework.test.context.bean.override.mockito`.
+- **The stubs are the fixture's, not the test's inventions.** The typed
+  stub's name is a `@MockitoBean` field rather than a hidden subclass, and
+  no test reaches into a private field or a package-local method to "set
+  the state" that a request could set.
 - **Every test states a user-observable outcome.** The names say what a
   client of the library sees - a borrow accepted, a refusal told in the
   glossary's words, a [Loan](../GLOSSARY.md) surviving a restart - and the
   bodies assert status, media type, payload, problem `title`/`detail`, in
   that vocabulary. No assertion names a method it calls or a bean it
   crosses: rename-safe by construction, not by hope.
+- **One test asserts one behaviour.** A test method's name states a single
+  outcome - a borrow accepted, a [Loan limit](../GLOSSARY.md) refusal - and
+  its body backs exactly that one, so a red has one lie to name. A method
+  that joins two outcomes with an And, or asserts a second thing beside the
+  claim its name makes, makes the reader guess which claim failed: two
+  one-claim tests tell the same story without the guess.
 - **The costs are counted, not assumed.** The slice / full-context /
   container division was run, not merely written: the measured boots - the
   M06 lab application's 2.7 s full context against the 1.4 s slice - are
   recorded where the reader can find them, every test class is placed by
   the rule that evidence justified rather than by the neighbouring file's
-  example, and a suite that claims "faster" says with what numbers.
+  example, a suite that claims "faster" says with what numbers, and the
+  suite's slowest class is the one whose claim nothing cheaper can make -
+  a boundary status decided before any engine is consulted is not re-paid
+  on the container's clock.
 - **The suite's red means "a claim is false", never "a stub is stale".** Run
   the whole module's own build
   (`./mvnw -f labs -pl lab-07-testing-solution verify`), then the
