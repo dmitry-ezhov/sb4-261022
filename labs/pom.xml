@@ -34,6 +34,7 @@
     <module>lab-05-persistence-start</module>
     <module>lab-05-persistence-solution</module>
     <module>lab-06-validation-and-errors-start</module>
+    <module>lab-06-validation-and-errors-solution</module>
     <!-- Module entries are added by the task that authors the corresponding
          lab. Do not pre-create module directories. -->
   </modules>

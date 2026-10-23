@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.example</groupId>
+    <artifactId>labs</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>lab-06-validation-and-errors-solution</artifactId>
+
+  <name>lab-06-validation-and-errors-solution</name>
+  <description>
+    M06 lab (solution): the reference implementation of the validation and
+    error-handling lab. The library answers its own failures in its own words:
+    a borrow request that does not validate is refused with a 400 problem
+    detail titled as the loan's failure, its field errors listed; and the Loan
+    limit is a domain rule - the loan feature's service counts a member's
+    Active loans against the limit configuration binds and throws the domain
+    exception, which the handler translates into a 409 problem detail. No
+    constraint on the request record owns the limit.
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The Jakarta Bean Validation implementation: the constraints on the
+           request bodies are read, so the boundary's half of the lab is
+           exercised, and the LoanService's own validation surface is the
+           property validation M03 already wired. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The declarative HTTP Service client: the @HttpExchange interfaces
+           and the proxy that implements them. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-restclient</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Inherited from the persistence lab: the Copy reads are derived from
+           the method name, and the entities are checked against the
+           migration at boot. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The module that makes Flyway's migration run under Boot 4's
+           auto-configuration. A bare flyway-core configures nothing. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Flyway 12 modularised its database support out of flyway-core:
+           without this module, booting against PostgreSQL fails with
+           "Unsupported Database: PostgreSQL", while H2 runs. -->
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The second engine's driver. The migration still runs as written. -->
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The lab rig's engine, the application.yml's default. -->
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The webmvc test slice has its own starter in Boot 4. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The shared test fixtures: a deterministic clock. -->
+      <groupId>com.example</groupId>
+      <artifactId>labs-support</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The availability service, stubbed for the tests and the
+           diagnostics. -->
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

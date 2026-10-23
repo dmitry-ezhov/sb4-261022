@@ -175,6 +175,16 @@ The implementation map for the feature described in
   application's own types in a throwaway 4.1.1 module.
   [Answer](issues/28-m06-doc-validation-and-error-handling.md)
 
+- **2026-10-23 · ticket 30** — The M06 solution keeps the shared handler but
+  gives the title to the request: `LoanRequest` and `ReservationRequest`
+  implement a small `InvalidRequestTitle`, and the `@ExceptionHandler` asks
+  the failing body whose words to use - one exception type, two features'
+  titles, `ProblemDetail` still imported only in `api`. The Loan limit went
+  the doc's way verbatim: `LoanService` counts the Member's Active loans
+  against `properties.limit()` and throws `LoanLimitExceededException`
+  (glossary wording), translated to a `409` titled "Loan limit reached".
+  [Answer](issues/30-m06-lab-solution-validation-and-error-handling.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
