@@ -230,6 +230,16 @@ The implementation map for the feature described in
   trade tickets 26 and 36 made.
   [Answer](issues/41-m08-quiz-transactions-and-consistency.md)
 
+- **2026-10-23 · ticket 42** — The M08 checklist had a ready draft from
+  ticket 38; grading it left two criteria open, and both became items of
+  their own, each checked off the resolved lab code: no `@Transactional`
+  but the use case's (no read-only path opens a boundary, and the Loan
+  limit's count is named as inside the boundary on purpose, not a read to
+  fix), and no `isolation = ...` anywhere (the absence is the doc's stated
+  choice - `READ_COMMITTED` plus the guard statement). The solution's
+  diagnostics re-ran green with the PostgreSQL rig actually executing.
+  [Answer](issues/42-m08-checklist-transactions-and-consistency.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a

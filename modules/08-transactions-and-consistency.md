@@ -628,6 +628,15 @@ repeats a gate the build already enforces.
   `maximum-pool-size` is not spent waiting on a WireMock or a tempo'd
   service. A read of the code answers in seconds; a stack trace in
   production would take an evening.
+- **No transaction is opened on a read-only path.** The feature's reads -
+  the barcode mapping the controller does before the boundary, the
+  catalogue's Copies of a [Title](../GLOSSARY.md) - run without a boundary
+  of their own: the only `@Transactional` in the change is on the use case,
+  so a search of the diff answers in seconds, and `readOnly = true` appears
+  nowhere as decoration for a query auto-commit serves. The
+  [Loan limit](../GLOSSARY.md)'s count is not that path - it is half of the
+  guard, inside the boundary with the write it protects, not a read that
+  opened a transaction.
 - **The guard is one statement, and the answer decides.** The contested
   field ([Copy](../GLOSSARY.md) on loan) is not read-and-written by
   separate calls; the update's `where` clause carries the whole condition
@@ -657,6 +666,13 @@ repeats a gate the build already enforces.
   is reached via the data starter the labs already declare - a review that
   finds a hand-wired transaction infrastructure in a Spring Boot
   application asks what the starter was thought to be missing.
+- **The isolation level is the database default, on purpose, and the doc
+  states it.** No `isolation = ...` appears on any `@Transactional` in the
+  change, and that absence is the choice this Module's isolation section
+  argues for: PostgreSQL's `READ_COMMITTED` plus the guard statement placed
+  correctly, not a tighter isolation bought to fix a race the statement
+  should have fixed. A reviewer reads the absence against the doc's
+  statement rather than reopening the trade.
 - **Optimistic-versus-pessimistic is a stated decision, not a habit.** The
   borrow's guard is a statement (the rule is one row's one flag); the
   reservation's hold on a [Title](../GLOSSARY.md) - where the rule spans a
