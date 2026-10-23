@@ -300,20 +300,32 @@ failures problem details with titles the glossary would sign.
 
 ## Quiz
 
-Five questions about the delta table above. Answer first; the answers say
-why, not just what.
+Five questions about the delta table above and the ownership it stops at.
+Answer first; the answers say why, not just what.
 
-1. **About the implementation row: your Boot 4 POM has `jakarta.validation-api`
-   on the classpath and constraints on the request record, and the requests
-   sail through unvalidated. What is missing?**
+1. **About the boundary the table stops at - the rules get no row: a
+   colleague proposes finishing the Lab early, by giving the
+   [Loan limit](../GLOSSARY.md) the same treatment every other check on the
+   borrow request gets - a constraint on `LoanRequest`, next to the
+   `@NotBlank`s. Why can bean validation not enforce that rule, for two
+   reasons?**
 
-   The implementation - Hibernate Validator, which arrives with
-   `spring-boot-starter-validation`. The API is the annotations; they are read
-   by an implementation, and without one the constraints are decoration.
-   Boot 4 makes this a modularisation story rather than a version one: the
-   auto-configuration lives in the `spring-boot-validation` module, which only
-   the starter brings. It is the Boot 2 trap again - the starter that fell out
-   of the web starter in 2.3 - wearing a Boot 4 module map.
+   Because a constraint can express neither half of it. *First*, a
+   constraint is a constant: `@Max(3)` bakes a number into an annotation
+   value, and annotation values must be compile-time constants - the limit
+   is `library.loan.limit`, configuration that M03 bound and the loan
+   feature reads off `LoanProperties`, so the annotation reads nothing and
+   hard-codes a three the rule does not own; change the configuration, and
+   the constraint still says three. *Second*, the constraints on a record
+   describe that one request - `@NotBlank` says something about the body -
+   and the [Loan limit](../GLOSSARY.md) compares a count the request does
+   not contain: the [Member](../GLOSSARY.md)'s other
+   [Active loan](../GLOSSARY.md)s. There is no field on the record the
+   count could sit on, so "validated at the boundary" is unavailable in
+   principle, not just for this record's shape. Which is why the count is
+   taken in `LoanService` against `properties.limit()` and the refusal is
+   the domain exception the handler translates - input constraints for
+   shape, the feature's service for the rule.
 
 2. **About the method-parameter row: the Boot 2 codebase you just upgraded has
    `@Validated` on a controller and `@RequestParam @NotBlank String memberId`
@@ -363,21 +375,32 @@ why, not just what.
    invalid request the constraint would have rejected is not being rejected
    while the code looks validated.
 
-5. **About the `ErrorResponse` row: what does it mean that Spring's standard
-   exceptions implement `ErrorResponse`, and what does it change for the
-   handler you write?**
+5. **About which layer owns which error: a reviewer objects that
+   `LoanService` already holds everything the refusal's answer needs - the
+   count, the limit, the rule's wording - and proposes skipping the domain
+   exception and the handler method entirely: the service builds the
+   `ProblemDetail` itself and the controller returns whatever it is handed.
+   What does that move cost the feature, and what does it undo?**
 
-   It means the exception *carries* its rendering: a status and a body -
-   `getStatusCode()`, `getBody()` - instead of being an exception the
-   framework must guess at, which is what a `BindException` with no rendering
-   opinion was in Boot 2 (checked: the type is in `spring-web` 7.0.9 and 6.2,
-   and absent from 5.3.31 entirely). For your handler, two consequences: the
-   status of a failed `@Valid` body or an invalid parameter was already
-   correct before you caught it - your handler fixes the *body*, the words
-   and the field errors, not the `400`; and should you want the framework's
-   rendering for all of them at once, the switch in the row above does it -
-   which is exactly why that switch is useful for the unanticipated and
-   pointless for the designed.
+   It turns the [Loan](../GLOSSARY.md) feature into an HTTP responder. A
+   `ProblemDetail` in `LoanService` imports the translation layer's
+   vocabulary into the rule's package - the Solution keeps that import in
+   the `api` package, exactly one layer - and it answers "who chooses the
+   status" with "the throw site": `409` for the
+   [Loan limit](../GLOSSARY.md), `404` for an unknown
+   [Title](../GLOSSARY.md), decided per feature and per method, with HTTP
+   enums under the rule's nose. The domain exception is the feature's half
+   of the contract, and not only for HTTP callers: another part of the
+   application calling `borrow()` cannot read a status code, but a
+   `LoanLimitExceededException` says what the library refuses and by how
+   much. The tests change shape with the body: a rule asserted through a
+   response body can no longer be tested without the boundary rendering it.
+   The service throws, in the domain's words; the handler translates, one
+   method per refusal, choosing the status and the title. If the service
+   builds bodies too, the two failures the Module separated - a `400` about
+   the request, a `409` about the domain's state - stop being
+   distinguishable at the boundary, which is the merge the Module argues
+   against.
 
 ## Checklist
 
