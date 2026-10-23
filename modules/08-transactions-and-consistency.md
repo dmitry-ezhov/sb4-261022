@@ -506,24 +506,29 @@ to review. Answer first; the answers say why, not just what.
    Delta Table's "checked" habit, in all four rows, is named and not
    implied.
 
-2. **About the JPA transaction manager row: a colleague "upgrades" by
-   deleting what the 3.5 jar carried and looks for the
-   `JpaTransactionManagerAutoConfiguration` the docs have been naming for a
-   decade. What did they look for, where does 4.1.1 actually keep the Bean,
-   and what type does it resolve to?**
+2. **About the boundary - the section that says it wraps the use case and
+   nothing bigger: a colleague reviews the Lab's solution and proposes two
+   "cleanups" - move `@Transactional` up onto the controller method so the
+   request is transactional end to end, and pull the availability call
+   into `LoanService.borrow` so the check and the [Loan](../GLOSSARY.md)
+   row commit atomically. Both are rejected. Name the mechanism each
+   proposition breaks.**
 
-   There is no `JpaTransactionManagerAutoConfiguration` to find, and there
-   was not one to lose - the `transactionManager` `@Bean` has been on
-   `JpaBaseConfiguration` since Boot 2, and we read the 2.7.18 class file
-   before reasoning that it was ever otherwise. The Boot 4 `@Bean` is the
-   same one on the same class; what changed is the class's packaging - it
-   rides in `spring-boot-jpa` now - and the Bean resolves at runtime to
-   `JpaTransactionManager`, the type the era of `JpaDialect` and
-   `EntityManager` flushing expects. The catch is that the *modularisation*
-   of Boot 4 means the search is wasted: the institution that holds the
-   Bean is a class packaged beside the `EntityManagerFactory` builder it
-   coordinates with, and finding one well means reading POMs, not filing
-   the missing name in a memory-shaped place.
+   The first breaks the proxy rule: `@Transactional` is honoured only on
+   beans the transaction infrastructure proxies, and the controller is not
+   one - Spring MVC invokes the controller method directly, so an
+   annotation there is read by nobody, and the end-to-end transaction it
+   promises does not exist. The boundary sits on the service's use case
+   because that is the bean the proxy wraps. The second breaks the pool:
+   the availability call is a remote HTTP round trip, and dragged inside
+   the boundary it pins one of HikariCP's `maximum-pool-size` connections
+   for the duration - against a WireMock stub in the tests and a genuinely
+   remote service in production - so the transactions the pool was sized
+   for stop fitting while the round trip runs. The boundary spans the
+   statements the database needs and nothing else: the controller asks the
+   availability gate, maps the barcode to the
+   [Copy](../GLOSSARY.md) row, and only then hands the borrow to
+   `LoanService`, where the transaction begins.
 
 3. **About the propagation row - the row the table does not carry: you
    verified `Propagation` and `Isolation` unchanged between 5.3.31 and
@@ -580,27 +585,28 @@ to review. Answer first; the answers say why, not just what.
    not in the annotation, and 4.1.1 changes neither.
 
 5. **About the lock row - the row whose `for update` is the claim the rig's
-   second engine exists to judge: the tests are green on H2 - and the
-   colleague reports "concurrency proven" without a Docker daemon in sight,
-   having run only the H2 suite. What is true about the claims the rig can
-   carry, and what does a *skip* mean when the diagnostics need PostgreSQL
-   and none was started?**
+   second engine exists to judge: the Solution module's diagnostics come
+   back green on H2 and the PostgreSQL run is skipped, and the sign-off
+   says "proven". The solution asserts three claims - the guard's `0` for
+   the second borrow, two concurrent borrows cannot both take the Copy,
+   and the loser hears a `409` problem detail. Which did the H2 run carry,
+   which did it not, and why?**
 
-   On H2 the rig can carry the claims whose subject is the application's
-   code and statements - the guard's `1`/`0` contract read off Flyway's
-   `copy` table, the [Loan limit](../GLOSSARY.md)'s refusal, the boundary
-   annotated where the doc put it. What it cannot carry is the *claim about
-   concurrent truth*: H2 is an in-memory engine and its `for update`
-   executes politely for one thread at a time - exactly the condition the
-   race exists to violate - so a green on H2 says "the code declares the
-   lock", not "the database refused a concurrent transaction." The
-   PostgreSQL diagnostics, through Testcontainers, are where the second
-   engine's answers show up, and that is the run the reviewer's green has
-   to come from. A skipped diagnostic - the `@EnabledIfDockerAvailable`
-   guard M07 taught - is a message about *environment*: no daemon, no
-   engine, no evidence. Treating a skip as a pass is not faster review; it
-   is slower, because the race recommits itself to be found in production
-   rather than in the rig.
+   H2 carried the first and the third; it carried none of the second. The
+   first and third are claims about the application's code and statements
+   - H2 executes the conditional update and the M06 handler faithfully for
+   one caller at a time, so the `0` answer and the problem detail are
+   earned on it. The second is a claim about *concurrent truth* - two
+   [Member](../GLOSSARY.md)s racing for one [Copy](../GLOSSARY.md) - and
+   H2 is an in-memory engine whose `for update` executes politely for one
+   thread at a time - exactly the condition the race exists to violate -
+   so a green on H2 says "the code declares the lock", never "the database
+   refused a concurrent transaction"; that claim belongs to the PostgreSQL
+   refused a concurrent transaction"; that claim belongs to the PostgreSQL
+   diagnostics, through Testcontainers, and the skip standing in for them
+   is an environment message - no daemon, no engine, no evidence - which
+   is a skip, never a pass. The split is the habit the lock row exists to
+   teach: name the engine each claim was earned on before signing off.
 
 ## Checklist
 

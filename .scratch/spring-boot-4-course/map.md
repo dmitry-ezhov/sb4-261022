@@ -219,6 +219,17 @@ The implementation map for the feature described in
   service just said yes to it.
   [Answer](issues/40-m08-lab-solution-transactions-and-consistency.md)
 
+- **2026-10-23 · ticket 41** — The M08 quiz graded against its criteria and
+  two questions rebuilt: the boundary-placement understanding went untested
+  (the draft's questions 1-2 both ask the machinery rows), and the rig
+  question was guessable from its wording ("reports 'concurrency proven'
+  without a Docker daemon in sight" narrates the verdict). Rebuilt: the
+  colleague's two "cleanups" that break the proxy rule and the pool; the
+  three-claim partition of what an H2 run can carry. The
+  JPA-transaction-manager question was dropped to make room - the same
+  trade tickets 26 and 36 made.
+  [Answer](issues/41-m08-quiz-transactions-and-consistency.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
