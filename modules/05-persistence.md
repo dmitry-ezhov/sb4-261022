@@ -357,21 +357,29 @@ rather than in code.
 Five questions about the delta table above. Answer first; the answers say
 why, not just what.
 
-1. **Your POM has `spring-boot-starter-data-jpa`. Does the Boot 4 upgrade
-   change that line?**
+1. **About the hand-written SQL row: the catalogue lookup "find the
+   [Title](../GLOSSARY.md) by its ISBN" - do you put it behind the JPA
+   repository, or reach for `JdbcClient`?**
 
-   No: the starter name survived all three majors - the *web* starter took
-   the `spring-boot-starter-webmvc` rename in Boot 4, the data starters did
-   not. What changed under the unchanged name are the Boot artifacts - the
-   auto-configuration was spread across `spring-boot-jpa`,
-   `spring-boot-hibernate` and `spring-boot-data-jpa`, Hibernate goes from
-   6.6 to 7.4.5.Final and Jakarta Persistence from 3.1 to 3.2. The lesson,
-   checked against 4.1.1 rather than remembered: most starters did not
-   get renamed, and the renames that happened (the web one) happened for
-   specific reasons, not as a sweep.
+   For that read, `JdbcClient` - and you settle it per read, not per
+   application, because the row says the tools coexist: Boot 4 ships
+   `JdbcTemplate` *and* `JdbcClient` side by side in `spring-jdbc` 7.0.9,
+   and `JdbcClient` grew in Framework 6.1 (Boot 3.2), which you never
+   shipped, so the choice itself is part of the delta. The criterion: a
+   read whose rows have no state of their own to change - an ISBN is not
+   mutated, no persistence context is watching it - is catalogue plumbing,
+   and JPA's costs there (an entity class, dirty tracking, a session) buy
+   nothing the read needs; the `JdbcClient` query maps the row straight
+   into the record the API serves. A [Copy](../GLOSSARY.md) is the other
+   case - the library acts on it, it goes on loan - so it earns the entity
+   and the derived repository. The classpath forces neither choice:
+   `spring-boot-starter-data-jpa` brings `spring-boot-starter-jdbc`
+   transitively, so `JdbcClient` is injectable in the same application
+   that runs derived queries - this Lab's Solution module does both.
 
-2. **You do what worked in Boot 2 and Boot 3: add `org.flywaydb:flyway-core`
-   and expect Boot to run the migrations. What happens on Boot 4?**
+2. **About the migrations row: you do what worked in Boot 2 and Boot 3 -
+   add `org.flywaydb:flyway-core` and expect Boot to run the migrations.
+   What happens on Boot 4?**
 
    Nothing runs. The Flyway auto-configuration used to live in
    `spring-boot-autoconfigure`; it has been extracted into a module of its
@@ -399,18 +407,25 @@ why, not just what.
    unique constraints the same work on the lab rig that they are in
    production.
 
-4. **Three Boot majors ago you wrote `spring.datasource.hikari.*` keys.
-   Do they survive Boot 4, and what did the upgrades give you?**
+4. **About the connection pool row: Boot 4 still spells
+   `spring.datasource.hikari.*`. What does that layer own - and what does
+   the pool not own?**
 
-   Virtually the same keys - `maximum-pool-size`, `minimum-idle`,
-   `connection-timeout`, verified present in 4.1.1 - but under HikariCP
-   7.0.2 instead of 4.0.3. The durability of that property layer is the
-   one part of persistence where Boot asked you to learn nothing new
-   across three majors, while the ORM on top of it changed majors twice.
-   The upgrade story is not uniform; the version moves only where
-   something had to.
+   The pool owns the connections and their life: how many may exist
+   (`maximum-pool-size`, `minimum-idle`), how long a caller waits for one
+   (`connection-timeout`), how long one may live before the pool retires
+   it (`max-lifetime`, `keepalive-time`) and how long an idle one lingers
+   (`idle-timeout`) - every one of those setters verified in HikariCP
+   7.0.2's jar. That is the whole layer, and that is why the row looks the
+   way it does: HikariCP 4.0.3 to 7.0.2 across three Boot majors, and not
+   one property renamed. What the pool does not own is the rest of the
+   delta table: the schema belongs to the migrations row, the reads and
+   their mapping to the starter and hand-written SQL rows, and the
+   transaction boundaries to `@Transactional` - whose enablement, checked
+   against 4.1.1's jars, now lives in `spring-boot-transaction` and is
+   absent from `spring-boot-autoconfigure`.
 
-5. **Your Boot 3 slice test imports**
+5. **About the JPA test slice row: your Boot 3 slice test imports**
    `org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest`.
    **What does the Boot 4 compilation change?**
 

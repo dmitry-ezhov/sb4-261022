@@ -150,6 +150,12 @@ The implementation map for the feature described in
   lints the test sources now: `checkstyle.includeTestSourceDirectory` as a
   *property* was inert, because the `check` goal exposes no user property for
   it, so it lives in the plugin block instead.
+- **2026-10-23 · ticket 26** — The M05 quiz was graded against its
+  acceptance criteria and two questions rebuilt: the spec named three
+  understandings to test - JDBC or JPA, what a migration owns, what a pool
+  owns - and the draft covered only one of them. The starter-name question
+  went, because its answer was guessable from the question's shape.
+  [Answer](issues/26-m05-quiz-persistence-jdbc-jpa-and-migrations.md)
 
 ## Fog
 
