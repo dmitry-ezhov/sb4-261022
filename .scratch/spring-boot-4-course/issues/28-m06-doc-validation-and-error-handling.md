@@ -72,8 +72,8 @@ it**: the shared `ApiExceptionHandler` already answers an invalid body with a
 failure says the reservation's words - and `LoanProperties.limit()` is bound
 and read by nobody. The Lab section states both defects, and the two
 diagnostic requirements: a `400` problem detail that names the loan's
-failure, and a `409` problem detail for a [Member](../../GLOSSARY.md) at the
-[Loan limit](../../GLOSSARY.md), thrown by the loan feature and never a
+failure, and a `409` problem detail for a [Member](../../../GLOSSARY.md) at the
+[Loan limit](../../../GLOSSARY.md), thrown by the loan feature and never a
 constraint on the request record. The command named is
 `./mvnw -f labs -pl lab-06-validation-and-errors-start verify -Pdiagnostics`,
 per the lab index.
