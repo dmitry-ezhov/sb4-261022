@@ -28,7 +28,11 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
  * {@code **&#47;diagnostics/&#42;Test.java}) so that the start module stays green
  * while the defects are still present. Run them with:
  *
- * <pre>./mvnw -f labs -pl lab-05-persistence-start verify -Pdiagnostics</pre>
+ * <pre>./mvnw -f labs -pl lab-05-persistence-solution verify -Pdiagnostics</pre>
+ *
+ * <p>Diagnostics are asserted in CI with the solutions-only profile: the same
+ * tests, run only against the reference implementations by
+ * {@code ./mvnw -f labs verify -Pdiagnostics-solutions}.
  *
  * <p>A Docker daemon is needed to run a PostgreSQL. Machines without one are
  * not blocked from this lab: {@code @EnabledIfDockerAvailable} skips this
