@@ -451,27 +451,50 @@ Answer first; the answers say why, not just what.
    tier at all sits behind a context that cannot fail in any way the edit
    could hurt.
 
-4. **About the Testcontainers row: a 1.21.4 test imports
-   `org.testcontainers.containers.PostgreSQLContainer` from
-   `org.testcontainers:postgresql` and
-   `new PostgreSQLContainer<>("postgres:17")`. Name everything that has to
-   change for 2.0.5.**
+4. **About the container tier: the suite is green on a machine with no
+   Docker daemon - the wiring home runs its persistence on the H2 rig,
+   the slices never boot an engine at all - and `TitleRepositoryTests`
+   is guarded `@EnabledIfDockerAvailable`, so a machine without a
+   daemon skips it. A reviewer calls that class a
+   second opinion the suite pays a daemon for: "green on H2 already."
+   What did the reviewer count wrong, and when is a container-backed
+   test worth its cost - and when is it not?**
 
-   Three changes, in two tiers. The POM tier: the artifact names changed -
-   `postgresql` is now `testcontainers-postgresql`, and the annotations'
-   module is `testcontainers-junit-jupiter`; we checked the published
-   matrix, and the old coordinates stop at 1.x. The code tier, in the
-   import and one line: the type moved to
-   `org.testcontainers.postgresql` (the old one survives as a deprecated
-   bridge, so the old import may still compile - with a deprecation
-   warning - but the canonical type is the new one), and the diamond goes
-   away: `PostgreSQLContainer` stopped self-typing, so
-   `new PostgreSQLContainer("postgres:17")` is written with no `<>`. What
-   does *not* change: the annotation imports - `@Testcontainers`,
-   `@Container` are still `org.testcontainers.junit.jupiter` - and anything
-   wired through the Spring fixture, like `@ServiceConnection`, which
-   locates the container by type and not by package. We verified by
-   compiling exactly this shape against 4.1.1's dependency tree.
+   The reviewer's "green on H2 already" counts the class's assertions as
+   ones the H2 rig also makes, and none of the three is: they are claims
+   about the engine the library ships on, which the rig has never asked.
+   The migration's constraints are the first claim - two titles inserted
+   with one ISBN, and the refusal expected from the engine, a
+   `DataIntegrityViolationException` naming a unique constraint - because
+   a rule the migration declares is only proven to hold the way the
+   library ships: the H2 rig refuses a duplicate too, but that is H2's
+   courtesy, and the green it grants proves the constraint on H2 and
+   says nothing about the shipped engine. On H2 such a test would pass
+   without ever having asked the engine a question - a green for the
+   wrong reason. The second claim is the reads: rows written in plain SQL
+   come back through the catalogue into the `Title` record the API
+   serves, on the engine that will serve them. The third is the
+   repository's derived query, run as real SQL on the second engine. In
+   the doc's words: H2 is what the rig takes everywhere, and the
+   container is what H2 would forgive - and the difference is stated,
+   not left as an invisible assumption. The delta row is what keeps the
+   claims cheap: `testcontainers-postgresql`'s `PostgreSQLContainer`, and
+   `@ServiceConnection` reading the mapped port and credentials off the
+   container into the datasource - no property line to maintain.
+
+   When it is **not** worth its cost: a boundary claim. The `409`'s
+   status, the problem media type, the payload's fields - the slices own
+   these, they are decided before any engine is consulted, and booting
+   PostgreSQL to assert one would be the suite's most expensive way to
+   repeat a green. Hence one container class, like one full-context home:
+   the engine's claims are collected where the engine is the subject,
+   and nowhere else. And the cost, when it is paid, is paid honestly:
+   `@EnabledIfDockerAvailable` makes a machine without a daemon *skip*,
+   and a skip is a skip, never a green tick - so "the suite is green"
+   said without Docker really says "green except the engine tier, which
+   did not run." The reviewer who takes the H2 green as the engine's
+   green has flattened exactly the distinction the checklist insists on
+   reporting.
 
 5. **About what survives refactoring: a test calls
    `when(loanService.borrow("m-001", "c-001"))` and then asserts the status
