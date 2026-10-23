@@ -252,6 +252,19 @@ The implementation map for the feature described in
   2.7's `ProbesCondition`, not 4.1.1's question - the property default is
   true on every platform.
   [Answer](issues/43-m09-doc-actuator-and-observability.md)
+- **2026-10-23 · ticket 44** — The M09 lab start is the lab-08 solution's
+  application byte for byte plus one diagnostics class, and the
+  observability contract is three sockets, two properties and one counter:
+  probes `UP` at `/actuator/health/liveness` and `/actuator/health/readiness`
+  (4.1.1's `matchIfMissing = true` default - no probe property in the
+  change), `library.loans.issued` tagged `title` and read back through
+  `/actuator/metrics`, and `management.server.port` with the public socket
+  answering `404` for `/actuator/health`. The diagnostics are a real-socket
+  rig (`RANDOM_PORT` + `local.management.port`, JDK HTTP client), MockMvc
+  being unable to ask a second socket: the first lab where the
+  "no third seam" line says nothing new, because the requirement itself is
+  about ports, not payloads.
+  [Answer](issues/44-m09-lab-start-actuator-and-observability.md)
 
 ## Fog
 

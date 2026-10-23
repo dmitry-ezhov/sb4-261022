@@ -329,21 +329,22 @@ class ObservabilityDiagnosticsTest {
     }
 
     /**
-     * The health status of one actuator health path, read off the management
-     * socket. A request answered outside 200 is a failure that names the path
-     * and the body, and a socket that never answers is a failure that names
-     * the socket - not an error stack the learner has to decode.
+     * The health status of one actuator health path, read off the socket
+     * whose base the call names. A request answered outside 200 is a failure
+     * that names the path and the body, and a socket that never answers is a
+     * failure that names the socket - not an error stack the learner has to
+     * decode.
      */
-    private String theHealthAt(String managementBase, String path) {
+    private String theHealthAt(String base, String path) {
         try {
-            HttpResponse<String> response = fetch(managementBase, path);
+            HttpResponse<String> response = fetch(base, path);
             assertThat(response.statusCode())
                     .as(
                             "GET %s%s answered %s (%s): the health path the probes ride must answer "
                                     + "200 - on 4.1.1 the probes and the plain health endpoint are the "
                                     + "starter's default exposure, no exposure line of ours belongs in "
                                     + "the change.",
-                            managementBase, path, response.statusCode(), response.body())
+                            base, path, response.statusCode(), response.body())
                     .isEqualTo(200);
             return jsonMapper.readTree(response.body()).path("status").asString();
         } catch (IOException | InterruptedException theSocketDidNotAnswer) {
@@ -351,11 +352,11 @@ class ObservabilityDiagnosticsTest {
                 Thread.currentThread().interrupt();
             }
             fail(
-                    "The management socket %s did not answer a request for %s: the port the property "
+                    "The socket %s did not answer a request for %s: the port the property "
                             + "local.management.port names must be the management server's own, and once "
                             + "the starter is in the build the actuator answers there with no further "
                             + "configuration.",
-                    managementBase, path, theSocketDidNotAnswer);
+                    base, path, theSocketDidNotAnswer);
             return null; // not reached: fail never returns
         }
     }
