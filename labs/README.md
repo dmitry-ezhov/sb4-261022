@@ -18,7 +18,12 @@ behaviour is still wrong. Run them explicitly:
 The first command is the learner's: it runs a Start module's diagnostics, which
 fail until the Lab is done. The second is CI's: it runs the diagnostics of every
 Solution module and skips the Start modules, so it is green when the reference
-implementations are correct.
+implementations are correct. Both diagnostics profiles skip the JaCoCo coverage
+floor: a diagnostics-only run asserts a requirement, not the suite's coverage -
+some labs' diagnostics read the compiled test classes without booting any
+application code, so a coverage number over just the run would fail modules
+whose diagnostics are green. The floor still applies to every module's ordinary
+`verify`.
 
 ## The lab index
 

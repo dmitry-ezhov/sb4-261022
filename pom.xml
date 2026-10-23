@@ -522,9 +522,19 @@
       This is the learner's command: run it against a Start module to see what
       the Lab still asks for. Start modules are NOT skipped here - the point of
       a Start module's diagnostics is that they fail.
+
+      JaCoCo is skipped with the profile: a diagnostics-only run asserts a
+      requirement, not the suite's coverage. Some labs' diagnostics read the
+      compiled test classes without booting any application code (lab 07's
+      shape introspectors, for instance), so a coverage floor measured over
+      just the diagnostics would fail modules whose diagnostics are green.
+      The coverage floor still applies to every module's ordinary build.
     -->
     <profile>
       <id>diagnostics</id>
+      <properties>
+        <jacoco.skip>true</jacoco.skip>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -552,9 +562,16 @@
       its own POM, and this profile skips every module that sets it - so the
       reference implementations are all asserted, and the deliberately
       imperfect modules are not built at all.
+
+      JaCoCo is skipped here for the same reason as in the diagnostics
+      profile above: this run measures the diagnostics, not the suite. The
+      coverage floor is enforced by the ordinary build, which CI also runs.
     -->
     <profile>
       <id>diagnostics-solutions</id>
+      <properties>
+        <jacoco.skip>true</jacoco.skip>
+      </properties>
       <build>
         <plugins>
           <plugin>
