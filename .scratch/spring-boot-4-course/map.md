@@ -194,6 +194,18 @@ The implementation map for the feature described in
   diagnostics was green.
   [Answer](issues/32-m06-checklist-validation-and-error-handling.md)
 
+- **2026-10-23 · ticket 38** — The M08 delta table carries four rows and one
+  deliberate absence: propagation and isolation did not move, so they get no
+  row, only the checked proof (decompiled `Transactional`, `Propagation` and
+  `Isolation` match across `spring-tx` 5.3.31, 6.2.19 and 7.0.9). Checking
+  killed two remembered facts: there never was a
+  `JpaTransactionManagerAutoConfiguration` in any Boot version (the `@Bean`
+  has always lived on `JpaBaseConfiguration`, now packaged in
+  `spring-boot-jpa`), and Jakarta Persistence 3.2 - what 4.1.1 builds against
+  - widens `@Version` to `Instant` and `LocalDateTime`. Every snippet was
+  compiled and run in a throwaway 4.1.1 probe module.
+  [Answer](issues/38-m08-doc-transactions-and-consistency.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
