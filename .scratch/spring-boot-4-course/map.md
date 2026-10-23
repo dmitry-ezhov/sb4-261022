@@ -165,6 +165,16 @@ The implementation map for the feature described in
   the endpoints answer.
   [Answer](issues/27-m05-checklist-persistence-jdbc-jpa-and-migrations.md)
 
+- **2026-10-23 · ticket 28** — The M06 delta table has no row for the domain
+  rules because none of the three Boot versions ever owned them; the table is
+  the boundary's. Two claims fell to checking: Framework 6.1's dispatch-level
+  parameter validation turned Boot 2's `500` into a `400`, and
+  `spring.mvc.problemdetails.enabled` renders only *standard* exceptions (a
+  registered `ProblemDetailsExceptionHandler`), so a domain failure stays a
+  `500` even with the switch on. Every snippet compiled against the
+  application's own types in a throwaway 4.1.1 module.
+  [Answer](issues/28-m06-doc-validation-and-error-handling.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
