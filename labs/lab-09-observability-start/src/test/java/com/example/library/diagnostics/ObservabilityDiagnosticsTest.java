@@ -238,7 +238,7 @@ class ObservabilityDiagnosticsTest {
                                 + "additive one.",
                         meterBody.path("measurements"))
                 .isNotNull();
-        assertThat(count.doubleValue())
+        assertThat(count.path("value").doubleValue())
                 .as(
                         "The counter exists and carries its tag but has counted nothing (%s): the "
                                 + "increment belongs where the loan is issued - the use case that writes "
