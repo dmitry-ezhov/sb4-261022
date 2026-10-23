@@ -431,10 +431,22 @@ enforces.
   named in the body - the Framework 6.1 way, with or without `@Validated` on
   the class - and the handler covers `HandlerMethodValidationException` like
   it covers the body exceptions.
-- **The translation lives in one layer.** `ProblemDetail` is imported only in
-  the `api` package's handler: the service throws domain exceptions, the
+- **Nothing unmapped is answered in invented words.** The handler enumerates
+  the failures the loan feature can raise and covers them all; there is no
+  `@ExceptionHandler(Exception.class)` choosing those answers instead. A
+  failure it does not know - a malformed body, a standard exception the module
+  did not anticipate - answers the way the framework answers it: at the status
+  its type carries and, with the switch on, as a problem detail. The switch is
+  for the failures nobody anticipated; a catch-all handler is a third layer
+  the ownership table has no row for.
+- **The translation lives in exactly one place.** A domain failure is mapped
+  by exactly one `@ExceptionHandler`: one method per exception, all of them
+  methods of the one handler class in the `api` package, and `ProblemDetail`
+  imported nowhere else - the service throws domain exceptions, the
   controllers return payloads or raise them. A `ProblemDetail` built inside a
-  service method is the boundary leaking inward.
+  service method, or a second mapping for an exception one method already
+  answers, is the boundary leaking inward - and the next refusal to translate
+  has nowhere to come from but the handler.
 - **The vocabulary is the glossary's, in the failures too.** The exception
   names, the problem `title`s and the error messages say
   [Member](../GLOSSARY.md), [Loan](../GLOSSARY.md),

@@ -185,6 +185,15 @@ The implementation map for the feature described in
   (glossary wording), translated to a `409` titled "Loan limit reached".
   [Answer](issues/30-m06-lab-solution-validation-and-error-handling.md)
 
+- **2026-10-23 · ticket 32** — The M06 checklist had a ready draft from
+  ticket 28; grading it left two criteria open, and both became explicit:
+  a domain failure is mapped in *exactly one place* (one handler method per
+  exception, `ProblemDetail` imported nowhere else), and nothing unmapped is
+  answered in invented words - no `@ExceptionHandler(Exception.class)`, the
+  switch is for the failures nobody anticipated. Re-run of the solution's
+  diagnostics was green.
+  [Answer](issues/32-m06-checklist-validation-and-error-handling.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
