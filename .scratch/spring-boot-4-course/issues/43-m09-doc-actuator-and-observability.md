@@ -48,7 +48,7 @@ exposed), The Lab, Quiz (5 Q&A), Checklist.
   format printing one JSON line from boot. The scratch project lives
   outside the repository and is not committed. The doc states what was
   checked per jar versus per behaviour in its table preamble.
-- **Glossary terms (criterion 3):** thirteen links into the root
+- **Glossary terms (criterion 3):** fourteen links into the root
   `GLOSSARY.md` across `Available copy`, `Copy`,
   `Loan`, `Member`, `Title`; the metric name, the indicator's component
   key and the readiness vocabulary are glossary words.
@@ -81,3 +81,10 @@ exposed), The Lab, Quiz (5 Q&A), Checklist.
   configuration metadata, and one booted 4.1.1 application with only the
   actuator and webmvc starters). Snippets compiled and run before being
   written into the doc. Lab names taken from the labs README index.
+- **2026-10-23 · code review** — Two axes review of the commit: the one
+  hard finding was the missing `map.md` Decisions-so-far pointer (added);
+  two prose findings fixed (glossary link count corrected to fourteen, the
+  `http.server.requests` quote's `500` explained as the same run's
+  unknown-id request), and one capitalisation drift ("Delta Table")
+  normalised to the doc's own lowercase. Standards' repetition note and the
+  drift of the Answer/Comments overlap read as house style and were left.

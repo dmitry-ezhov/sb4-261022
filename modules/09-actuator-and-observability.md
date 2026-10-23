@@ -323,6 +323,10 @@ observation back with its tags:
  "name":"http.server.requests"}
 ```
 
+- the recorded `500` with `IllegalArgumentException` is the same run's
+  second `/titles/{id}` request, for an id the catalogue does not hold: the
+  error path is observed by the same automatic instrumentation, under the
+  same template, and earns no code of its own;
 - the `uri` tag is the *template* (`/titles/{id}`), which is exactly why the
   automatic observation is cheap even at high traffic, and exactly why
   writing your own `uri` tag (the raw, per-request URI) is the cardinality
@@ -538,7 +542,7 @@ one the [lab index](../labs/README.md) entry teaches, is:
 ./mvnw -f labs -pl lab-09-observability-start verify -Pdiagnostics
 ```
 
-Read the failure messages the way this course reads every Delta Table row:
+Read the failure messages the way this course reads every delta table row:
 each names the behaviour that is missing. The same tests pass against
 `lab-09-observability-solution` (and, in CI, against every Solution module
 at once with `./mvnw -f labs verify -Pdiagnostics-solutions`); read that

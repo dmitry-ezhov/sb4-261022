@@ -240,6 +240,19 @@ The implementation map for the feature described in
   diagnostics re-ran green with the PostgreSQL rig actually executing.
   [Answer](issues/42-m08-checklist-transactions-and-consistency.md)
 
+- **2026-10-23 · ticket 43** — The M09 delta table is checked against the
+  jars, not remembered: starter contents read off the published POMs of
+  2.7.18, 3.5.16 and 4.1.1, endpoint counts by listing the class files (23
+  in the 2.7.18 actuator jar, 15 left on 4.1.1), and the behaviour rows
+  booted - 4.1.1 probes answer `200` unconfigured
+  (`@ConditionalOnBooleanProperty(..., matchIfMissing = true)` in the
+  bytecode), the loan counter and the custom indicator read back live, the
+  logstash format prints its JSON line from the first boot line. Checking
+  killed the habit the quizzes enforce: "Boot 4 auto-detects Kubernetes" is
+  2.7's `ProbesCondition`, not 4.1.1's question - the property default is
+  true on every platform.
+  [Answer](issues/43-m09-doc-actuator-and-observability.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
