@@ -37,6 +37,7 @@
     <module>lab-06-validation-and-errors-solution</module>
     <module>lab-07-testing-start</module>
     <module>lab-07-testing-solution</module>
+    <module>lab-08-transactions-start</module>
     <!-- Module entries are added by the task that authors the corresponding
          lab. Do not pre-create module directories. -->
   </modules>
