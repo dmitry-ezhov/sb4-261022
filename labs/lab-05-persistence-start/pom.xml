@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.example</groupId>
+    <artifactId>labs</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>lab-05-persistence-start</artifactId>
+
+  <name>lab-05-persistence-start</name>
+  <description>
+    M05 lab (start): the library application whose catalogue is still the M04
+    shape - a hard-coded List in compiled code. Restart the application and the
+    catalogue is exactly what the compiled list says, whatever anyone did to
+    the database: there is no schema, no migration and no repository here.
+  </description>
+
+  <properties>
+    <!--
+      Start modules ship fewer tests than their solution counterpart, so the
+      coverage floor does not apply here. Every other gate still does.
+    -->
+    <jacoco.skip>true</jacoco.skip>
+    <!-- This module's diagnostics fail by design, so the diagnostics-solutions
+         profile skips it. -->
+    <diagnostics.skip>true</diagnostics.skip>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The Jakarta Bean Validation constraints on the request body. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The declarative HTTP Service client: the @HttpExchange interfaces
+           and the proxy that implements them. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-restclient</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The webmvc test slice has its own starter in Boot 4. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The shared test fixtures: a deterministic clock. -->
+      <groupId>com.example</groupId>
+      <artifactId>labs-support</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The availability service, stubbed for the tests. -->
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Test-scope persistence plumbing: the diagnostics read
+           flyway_schema_history and write catalogue rows with a JdbcClient.
+           The application itself must not depend on it yet - adding the
+           starter to the main classpath is part of the lab. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jdbc</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The lab rig's in-memory engine, test-scoped for the same reason:
+           the H2 on the main classpath is part of what the learner adds. -->
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- @Container and @EnabledIfDockerAvailable for the diagnostics. -->
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The diagnostics' PostgreSQL engine. -->
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The driver the container's connection details name. The
+           application does not speak PostgreSQL yet, so it stays here. -->
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- @ServiceConnection: the diagnostics hand the application the
+           container's address without a line of configuration. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
