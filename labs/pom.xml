@@ -32,6 +32,7 @@
     <module>lab-04-web-stack-jackson3-start</module>
     <module>lab-04-web-stack-jackson3-solution</module>
     <module>lab-05-persistence-start</module>
+    <module>lab-05-persistence-solution</module>
     <!-- Module entries are added by the task that authors the corresponding
          lab. Do not pre-create module directories. -->
   </modules>

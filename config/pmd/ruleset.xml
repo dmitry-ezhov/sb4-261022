@@ -59,6 +59,10 @@
     <exclude name="AvoidUncheckedExceptionsInSignatures"/>
     <exclude name="UseObjectForClearerAPI"/>
     <exclude name="ExcessiveParameterList"/>
+    <!-- A JPA entity is a data class by the framework's contract: mutable
+         fields, accessors and a no-arg constructor. The rule would flag
+         every entity the labs write and no defect among them. -->
+    <exclude name="DataClass"/>
     <!-- Needs an explicit package/class list; it cannot be enabled as-is. -->
     <exclude name="LoosePackageCoupling"/>
     <!-- Every Spring Boot application class has only a static main method. -->

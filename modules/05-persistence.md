@@ -76,6 +76,17 @@ brings. The published POMs (checked for 4.1.1) say exactly this:
   module that makes the migration run in Boot 4; declare the Flyway
   version on its own instead, and H2 stays empty all boot.
 
+A second trap sits one level deeper, surfaced when this lab was run through
+its lab on the second engine: Flyway modularised its *database* support with
+the same discipline. `flyway-core` (and with it `spring-boot-starter-flyway`)
+speaks H2, but not PostgreSQL - booting a 4.1.1 application against a
+PostgreSQL 17 container failed with `Unsupported Database: PostgreSQL 17.11`
+until `org.flywaydb:flyway-database-postgresql` was on the classpath. The
+lab's Solution module carries it, because the whole point of the lab is the
+second engine: a lab that runs on PostgreSQL only from its tests, without the
+driver and the database module the running application needs, would not be
+one configuration.
+
 ```xml
 <dependency>
   <groupId>org.springframework.boot</groupId>
