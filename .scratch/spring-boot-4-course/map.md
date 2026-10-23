@@ -206,6 +206,19 @@ The implementation map for the feature described in
   compiled and run in a throwaway 4.1.1 probe module.
   [Answer](issues/38-m08-doc-transactions-and-consistency.md)
 
+- **2026-10-23 · ticket 40** — The M08 solution's borrow works on database
+  keys at the edge: the controller maps the request's barcode to the Copy
+  row (`findByBarcode`, a new derived read) and hands the use case the Copy,
+  so no barcode crosses the `@Transactional` boundary. The payload keeps the
+  library's words - member id and barcode as named, the loan row's key as
+  `id`. Design detail worth keeping: the Loan store's `save` is
+  `SimpleJdbcInsert` because `JdbcClient` cannot return a generated key, and
+  "one Loan per Copy" is deliberately not a unique constraint - the guard
+  statement's `0` is the refusal, and a constraint would rephrase it.
+  Unknown barcode is a 404 ("Copy not found"), not a 409: the availability
+  service just said yes to it.
+  [Answer](issues/40-m08-lab-solution-transactions-and-consistency.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
