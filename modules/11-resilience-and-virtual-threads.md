@@ -18,7 +18,11 @@ three different layers), where the timeouts now live and which spelling 4.1
 answers to, what the retry the *framework itself* ships is - in annotations
 and in a `RetryTemplate` - how a bulkhead is one annotation that refuses
 with a typed exception, and why the graceful shutdown you had to configure
-is now the thing you get without asking.
+is now the thing you get without asking. One boundary this course draws,
+and this Module is the one that must say it: the *depth* a resilience
+engineer wants - circuit breakers, chaos and failure-injection testing -
+is the sibling course's subject; this course teaches the mechanism and the
+Boot 4 API, and this Module stops there.
 
 ## What you knew
 
@@ -445,7 +449,7 @@ This is M09's metric lesson re-run one process outward:
 `library.loans.issued` answers *how many Loans*,
 `library.availability.retried` answers *how many times the library asked
 again* - a count an operator reads as an incident signature, because a
-spike in retries *is* the availability outage, seen from the borrower's
+spike in retries *is* the availability outage, seen from the Member's
 side. `event.getMethod().getName()` names the annotated method, so one
 listener serves every resilient method in the application;
 `isRetryAborted()` distinguishes an attempt the policy made from the
@@ -491,8 +495,10 @@ public class ShelfSearcher {
   exception nobody's handler expects.
 
 The wiring is the sibling of the retry's:
-`ConcurrencyLimitBeanPostProcessor`, in the same
-`org.springframework.resilience.retry` neighbourhood. Where an
+`ConcurrencyLimitBeanPostProcessor`, in the annotations' own package,
+`org.springframework.resilience.annotation` (the interceptors the two
+post-processors install, `SimpleRetryInterceptor` and friends, live in
+`org.springframework.resilience.retry`). Where an
 executor-level cap is the right tool - library work driven *through* the
 task executor, rather than through a request-driven use case - the 3.2
 property still does that job on the simple executor the virtual switch

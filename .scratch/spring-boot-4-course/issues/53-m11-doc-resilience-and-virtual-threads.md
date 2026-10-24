@@ -86,4 +86,20 @@ artifacts rather than remembered.
   2.7.18), the two jar-provable behaviours run or read off published
   contracts where the bytecode could not carry them. Doc edit is the
   resolution; no code changed.
+- **2026-10-24 · agent** — Review fixes (code-review, two axes, HEAD~1
+  base): the Spec axis caught (1) `ConcurrencyLimitBeanPostProcessor`
+  placed in `org.springframework.resilience.retry` - the 7.0.9 jar puts it
+  in the annotations' own package, `.annotation`, where
+  `RetryAnnotationBeanPostProcessor` lives too; the doc now names both,
+  with the interceptors (`SimpleRetryInterceptor` &c.) correctly left in
+  `.retry` - and (2) the spec's out-of-scope boundary ("The Modules that
+  touch those areas say so and link across") - the intro now states that
+  depth (circuit breakers, chaos, failure injection) is the sibling
+  course's and this Module teaches mechanism plus Boot 4 API. The
+  Standards axis caught one glossary avoid-word: "borrower's side" - the
+  glossary's Member bans Borrower - now "Member's side". The
+  retry-observability breadth (RetryMeter, the counter) survived review
+  as a judgement call: M09's metric shape re-run outward, and the
+  checklist's four always-present items lean on it.
+
 
