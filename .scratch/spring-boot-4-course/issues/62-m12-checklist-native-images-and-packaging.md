@@ -106,3 +106,17 @@ its packaged artifacts.
   after one port-race re-run - and `list-layers`, the regime greps and
   the `src/main` tree diff all answered as the items claim. Doc edit is
   the resolution; no code changed.
+- **2026-10-24 · agent** - Review pass (two axes, per the review skill;
+  fixed point c3094be). Standards: no hard violations - intro, item
+  shape, verbatim [Loan]/[Copy]/[Reservation]/[Member]/[Title],
+  dashes/wraps and the tracker format all match the sibling modules;
+  one editorial judgement call (run-statement parallelism between the
+  first two items) noted and left, and one finding was a misread of
+  hunk text not in this diff. Spec: the seven criteria confirmed met,
+  every quoted sentence and command verified against the artifacts on
+  disk; two wording defects fixed in the doc - item 3's "Verified by"
+  now carves out the prose that explains the 3.3 rename (a literal
+  grep *does* return `layertools` hits in comments), and item 4's
+  "Verified by" now names where the native provenance the reviewer
+  reads actually lives (the starter-parent's profile, not this lab's
+  module POM, the absence the diagnostics' boundary makes honest).

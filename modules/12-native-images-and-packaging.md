@@ -912,7 +912,10 @@ repeats a gate the build already enforces.
   one counter-example that might be raised is not one:
   `PropertiesLauncher` surviving in the 4.1.1 loader jar is the
   launcher, not the choice behind it. Verified by grepping the diff and
-  the module's POMs - each pattern set answers nothing.
+  the module's POMs for the *configuration* spellings - each pattern
+  set answers nothing there, and the only hits are the prose that
+  explains the 3.3 rename itself, which is the doc's own history, not
+  carry-over riding back in.
 - **The native build is scripted, pinned and whole - reproducible by
   construction, with every input named where the build is taught.** The
   artifact's build is not a set of lines a CI file improvises: the
@@ -931,13 +934,14 @@ repeats a gate the build already enforces.
   of the machine that built it, the product being "a complete,
   platform-specific executable. You do not need to ship a Java Virtual
   Machine in order to run a native image". Verified by reading the
-  build's profile and the versionless plugin declaration, and by
-  grepping the diff for what would break the claim - a hand-pinned
-  `native-maven-plugin` version beside the managed one, or an
-  undocumented `-H:`/`-Ob` flag nobody can explain a year later - with
-  the honest boundary the diagnostics state kept in view: they depend
-  on none of the native build, and the change does not pretend
-  otherwise.
+  form's provenance where the change adopts it - for this Lab's own
+  solution that provenance is the starter-parent's `native` profile and
+  the versionless plugin declaration quoted above, none of it in the
+  module's own POM, the absence the diagnostics' honest boundary makes
+  the right one - and by grepping the diff for what would break the
+  claim - a hand-pinned `native-maven-plugin` version beside the
+  managed one, or an undocumented `-H:`/`-Ob` flag nobody can explain a
+  year later.
 - **Each form is the artifact's smallest honest one: nothing rides
   along that the run never reads, and no second build path is
   improvised beside the buildpacks'.** Three negative readings about
