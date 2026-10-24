@@ -281,6 +281,18 @@ The implementation map for the feature described in
   the start, green 3/3 on the solution, CI's single diagnostics command
   green across the whole 20-module reactor.
   [Answer](issues/45-m09-lab-solution-actuator-and-observability.md)
+- **2026-10-24 · ticket 46** — The M09 quiz graded against its criteria
+  and two questions rebuilt: the ticket named three understandings -
+  liveness against readiness, metric rather than log, management surface
+  off the public path - and the draft tested none of the first two
+  (question 2 asked the probes condition and telegraphed its verdict,
+  question 3 the property rename's spelling). Rebuilt: the availability
+  client moved into the liveness group - the restart loop against the
+  routing decision, published as an event, answered `OUT_OF_SERVICE` -
+  and the counter against the INFO line, with the Copy-tag cardinality
+  mistake as the second half. The rename question went, the same drop
+  tickets 26 and 41 made.
+  [Answer](issues/46-m09-quiz-actuator-and-observability.md)
 
 ## Fog
 

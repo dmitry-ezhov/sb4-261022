@@ -580,57 +580,71 @@ equips you to review. Answer first; the answers say why, not just what.
    error is loud and cheap, which is why the delta table states the row as
    a package move, not a redesign.
 
-2. **About the probe row: a colleague writes "Boot 4 auto-detects
-   Kubernetes, that is why the probes answer" - the exact habit Boot 2 and
-   Boot 3 taught. The 4.1.1 bytecode says otherwise. What single condition
-   does `AvailabilityProbesAutoConfiguration` carry on 4.1.1, what did the
-   2.7/3.5 bytecode carry that the colleague's sentence describes, and what
-   does the runtime difference mean for an application that deploys to a
-   Kubernetes *orthogonal to its local development*?**
+2. **About the probe row and the section that splits liveness from
+   readiness: a colleague declares the upgraded library's probes "too
+   shallow", and their change moves the availability-service client - the
+   M04 gate the borrow use case calls - into the liveness probe group, with
+   the reasoning "the platform restarts what liveness calls broken, and an
+   unreachable dependency is exactly the kind of outage a restart fixes."
+   Name the question each of the two probes answers, the state pair each
+   holds, where a temporarily unreachable dependency belongs instead, and
+   the one API the change of readiness state is published through.**
 
-   The 4.1.1 condition is one annotation, read off the class file:
-   `@ConditionalOnBooleanProperty(name = "management.endpoint.health.probes.enabled", matchIfMissing = true)`
-   - the property always decides, and when it is absent it decides *true*,
-   on every platform. The colleague's sentence is exactly 2.7's and 3.5's
-   `ProbesCondition`, whose bytecode we decompiled to find both halves: a
-   property check
-   (`management.endpoint.health.probes.enabled` and its 2.x spelling
-   `management.health.probes.enabled`) *or* a
-   `CloudPlatform.getActive(...)` match whose condition message is the word
-   "running on Kubernetes" - auto-enablement as a *platform observation*.
-   The runtime difference: on 4.1.1, an application that never wrote the
-   property has two reachable endpoints on every machine it boots on - the
-   developer's laptop included, which our boot verified (`200` on
-   `/actuator/health/liveness` and `/actuator/health/readiness`, no
-   orchestrator involved). That makes the upgrade a two-sided question
-   rather than a claim: a Boot 2/3 deployment that *wrote* the probes
-   property re-configures an old decision, and an application that relied
-   on the probes being absent locally discovers them answering in the
-   first dev boot. The course's lesson: state the upgrade's first observability
-   claim on the *local* machine's first boot, before the deployment is
-   trusted - the same rule M08 ran on the database's lock rig.
+   The two probes are two questions about one process, and splitting them
+   is the section's first move. Liveness answers "restart me?" - is this
+   process itself intact, the bits it runs on working - and its state is
+   `LivenessState`, with exactly the two values `CORRECT` and `BROKEN`. It
+   answers about the process, so it carries no database, no network call
+   and no availability client inside it: the availability service is not
+   part of the process, and a restart is the platform's fix for a broken
+   *process*, not for a broken *dependency* - which is why the colleague's
+   liveness spends an outage demanding the one remedy that cannot remedy
+   it, restart after restart, while the process's own code was never the
+   fault. Readiness answers "route me?" - willing and able to receive
+   traffic - and its state is `ReadinessState`, with exactly
+   `ACCEPTING_TRAFFIC` and `REFUSING_TRAFFIC`; a temporarily unreachable
+   dependency belongs to this decision, because what the outage should
+   move is traffic, not life. And that move is an event, not a boolean a
+   handler reads: the one API is
+   `AvailabilityChangeEvent.publish(context, ReadinessState.REFUSING_TRAFFIC)`,
+   which the probe endpoint translates to `OUT_OF_SERVICE`, not `DOWN` -
+   "unroute me", never "break me". The doc adds a second, cost-shaped
+   verdict on the same diff: an outbound call inside any `health()` runs
+   on every health poll, and health polls are frequent by design - the
+   client belongs there cached and cheap, or not at all.
 
-3. **About the metrics-consent row: a configuration review of an upgraded
-   application spots a line `management.metrics.export.prometheus.enabled`
-   held over from a Boot 2 file. What did 3.0 rename these keys to, what is
-   the deprecation policy the rename left in place, and what does the
-   4.1.1 `spring-boot-micrometer-metrics` module's metadata decide about
-   the 2.x spelling?**
+3. **About the section that publishes the metric where the Loan is issued:
+   two colleagues review the Lab's solution, and each proposes a change.
+   One replaces the `library.loans.issued` counter with an INFO log line
+   per borrow - "the log already carries every Loan; count the lines when
+   the dashboard asks." The other keeps the counter but adds a second tag
+   to it, the [Copy](../GLOSSARY.md) identifier - "so one Copy's borrowing
+   history becomes a graph of its own." Name the question the counter
+   answers that the counted lines cannot, and what property decides
+   whether a tag is safe.**
 
-   3.0 decided metrics *export* configuration is per-exporter, not
-   global-registry: each exporter's keys moved from
-   `management.metrics.export.<id>.*` to `management.<id>.metrics.export.*`
-   - the Prometheus line becomes
-   `management.prometheus.metrics.export.enabled`. The policy the rename
-   established (read off the 3.5.16 and 4.1.1 metadata) is the *error-level*
-   deprecation alias: the 2.x key stays *known* to the build, marked
-   `deprecated: { level: "error", replacement: "management.<id>.metrics.export.<key>",
-   since: "3.0.0" }`, so the boot *stops* on it rather than silently
-   dropping one exporter from one environment, and the error names the
-   correction. 4.1.1's metadata carries the same aliases at the same level
-   - the 2.x spelling is not accepted in 4.1.1, and its failure is the
-   mechanism's point: the mistakes you cannot silently make are the
-   mistakes you do not make.
+   Both proposals fail the same section from opposite ends. "How many
+   [Loan](../GLOSSARY.md)s were issued this morning" is a question about
+   an aggregate, and the aggregate is what the counter owns: one
+   increment in the use case, where the Loan is issued, and one series -
+   `library.loans.issued` - in the registry, cheap to keep, alertable,
+   comparable across mornings, and readable before any dashboard exists
+   (`GET /actuator/metrics/library.loans.issued` answers with the
+   measurements). A log line answers an event's question about one Loan,
+   and count-the-lines turns it into the aggregate's answer the expensive
+   way: ship, index and query the whole corpus to produce the number the
+   registry holds for free, a cost that grows with every borrowed
+   [Loan](../GLOSSARY.md) rather than staying one series wide. The
+   second proposal attacks the other end: a tag whose values are as
+   unbounded as the requests - the section's own examples are a request
+   id and a Copy identifier - splits the one counter into its own time
+   series zoo, one series per Copy ever borrowed, and the per-Copy
+   history is a log or payload query's question, not a metric tag's. The
+   property that decides a tag's safety is boundedness by the data, not
+   by the traffic: the [Title](../GLOSSARY.md) the Loan was issued
+   against is finite for the catalogue, which is why the section's
+   increment reads `registry.counter("library.loans.issued", "title",
+   titleId).increment()` and not a Copy-keyed line.
 
 4. **About the tracing row: a colleague says "with
    `spring-boot-starter-opentelemetry` on the classpath we must configure
