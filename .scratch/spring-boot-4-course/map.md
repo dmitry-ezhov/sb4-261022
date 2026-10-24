@@ -322,6 +322,26 @@ The implementation map for the feature described in
   start, ordinary build green with every gate but the coverage floor.
   [Answer](issues/49-m10-lab-start-spring-security-7.md)
 
+- **2026-10-24 · ticket 50** — The M10 lab solution is the lab-09 answers
+  with the security upgrade written in: the chain as a bean and the lambda
+  the only form (two chains - management `@Order(1)` behind a
+  `PathPatternRequestMatcher`, the health probe public and the rest
+  `OPERATOR`; the API `@Order(2)` with the catalogue's GETs public,
+  `MEMBER` on `/api/loans/**` and `anyRequest().authenticated()` closing),
+  the delegating `PasswordEncoder` producing every stored `{bcrypt}` value
+  for the diagnostics' five principals, the borrow's Member the principal
+  (`LoanRequest` keeps only the barcode; the controller passes
+  `authentication.getName()`) and the use case's
+  `@PreAuthorize("#memberId == authentication.name")` the second lock. The
+  own suite asserts behaviour at the real chains riding the slices, the
+  wiring home borrows over Basic as `ada`, and two 7.1.1 facts surfaced:
+  `PathPatternRequestMatcher` moved to the `.servlet.util.matcher` package,
+  and the configurers no longer declare `throws Exception` - which kept the
+  shared PMD ruleset un-suppressed. Diagnostics red 5/5 on the start, green
+  5/5 on the solution, JaCoCo 87.6%/87.5%, the full reactor green both with
+  the plain build and the diagnostics-solutions profile.
+  [Answer](issues/50-m10-lab-solution-spring-security-7.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
