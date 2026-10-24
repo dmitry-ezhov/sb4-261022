@@ -416,6 +416,14 @@
             <includes>
               <include>**/*IT.java</include>
             </includes>
+            <!-- Diagnostic tests run in the packaged form return ITs
+                 (deployment forms can only be run after the package phase).
+                 They fail by design on a Start module, so the default run
+                 excludes them; the diagnostics profiles lift this exclusion
+                 below, and the ITs only ever run there. -->
+            <excludes>
+              <exclude>**/diagnostics/*IT.java</exclude>
+            </excludes>
           </configuration>
           <executions>
             <execution>
@@ -516,12 +524,24 @@
     </profile>
 
     <!--
-      Runs only the diagnostic tests (src/test/java/.../diagnostics/*Test.java):
-      mvn -f labs verify -Pdiagnostics
+      Runs only the diagnostic tests: src/test/java/.../diagnostics/*Test.java
+      for the labs whose diagnostics boot exploded forms, plus
+      src/test/java/.../diagnostics/*IT.java for those whose diagnostics run
+      packaged forms:
+      mvn -f labs -pl <module> verify -Pdiagnostics
 
       This is the learner's command: run it against a Start module to see what
       the Lab still asks for. Start modules are NOT skipped here - the point of
       a Start module's diagnostics is that they fail.
+
+      Failsafe joins the run: a diagnostic that must exercise the packaged
+      application cannot run from the test phase, where the jar is not yet
+      packaged, so its ITs are failsafe's, and the default fail-safe exclusion
+      of diagnostics is lifted here.
+
+      failIfNoSpecifiedTests is off on both runners because a lab may rightly
+      have no test of one kind: lab 12's diagnostics are all failsafe ITs, so
+      its surefire run cleanly finds nothing.
 
       JaCoCo is skipped with the profile: a diagnostics-only run asserts a
       requirement, not the suite's coverage. Some labs' diagnostics read the
@@ -547,6 +567,20 @@
               <includes>
                 <include>**/diagnostics/*Test.java</include>
               </includes>
+              <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes combine.self="override">
+                <exclude>none</exclude>
+              </excludes>
+              <includes>
+                <include>**/diagnostics/*IT.java</include>
+              </includes>
+              <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
             </configuration>
           </plugin>
         </plugins>
@@ -562,6 +596,11 @@
       its own POM, and this profile skips every module that sets it - so the
       reference implementations are all asserted, and the deliberately
       imperfect modules are not built at all.
+
+      Failsafe joins this run for the same reason as in the diagnostics
+      profile above, and its skipTests rides the same per-module switch: the
+      packaged-form ITs of a Start module would otherwise still run red here,
+      because failsafe knows no skipTests from the surefire configuration.
 
       JaCoCo is skipped here for the same reason as in the diagnostics
       profile above: this run measures the diagnostics, not the suite. The
@@ -585,6 +624,21 @@
                 <include>**/diagnostics/*Test.java</include>
               </includes>
               <skipTests>${diagnostics.skip}</skipTests>
+              <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes combine.self="override">
+                <exclude>none</exclude>
+              </excludes>
+              <includes>
+                <include>**/diagnostics/*IT.java</include>
+              </includes>
+              <skipTests>${diagnostics.skip}</skipTests>
+              <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
             </configuration>
           </plugin>
         </plugins>

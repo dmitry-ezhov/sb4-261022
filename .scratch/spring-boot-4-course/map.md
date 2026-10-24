@@ -554,9 +554,31 @@ The implementation map for the feature described in
   fixed one. If they do, the fixture grows a second factory; the guide
   already lists what the module holds.
 
-- The lab index's row 12 still reads `lab-12-capstone-*` with the Infra
+- ~~The lab index's row 12 still reads `lab-12-capstone-*` with the Infra
   column "Docker" - a stale entry from before the M12 tickets named the
-  pair `lab-12-native-images-and-packaging-start`/`-solution` (58's
-  doc names those); the row belongs to the M12/M13 lab tickets to
-  correct, since the aggregator listing is authored by the ticket that
-  creates the modules.
+  pair `lab-12-native-images-and-packaging-start`/`-solution`~~ - the row
+  was corrected to the real pair with "GraalVM (opt.)" as ticket 59
+  authored the Start module (the fog's reading that the row belongs to
+  the ticket that creates the modules proved right).
+
+- **2026-10-24 · ticket 59** — The M12 lab's Start module is the
+  resilience lab's application carried forward byte for byte, its
+  diagnostics replaced by one **failsafe IT** rather than a surefire
+  test: an M12 diagnostic has to boot the *packaged* jar the diagnostics
+  are about, and the jar only exists after `package`, so the diagnostics
+  have to ride failsafe. The parent POM gained the mirror of the surefire
+  diagnostics convention (`**/diagnostics/*IT.java` excluded by default,
+  lifted and narrowed by both diagnostics profiles,
+  `failIfNoSpecifiedTests=false` because the two halves of the lab
+  package don't stream symmetrically). The three reds name one missing
+  `<execution>`, the `process-aot` goal, because the four deployment
+  forms the Lab walks (plain jar, tools-extracted form, AOT-processed
+  jar, AOT-cached run) all differ only in what the build put around the
+  same missing initializer - the scratch prototype had proven the whole
+  green chain before the reds were pinned. Two jar-grade facts worth
+  keeping: Boot's `extract` verb refuses a destination that already holds
+  anything (its own extract log has to live elsewhere), and the training
+  JVM resolves `-XX:AOTCacheOutput` against the child process's working
+  directory, so diagnostic scratch paths must be absolute.
+  [Answer](issues/59-m12-lab-start-native-images-and-packaging.md)
+
