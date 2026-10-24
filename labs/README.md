@@ -109,12 +109,13 @@ a plain `verify`.
 
 ## Verified versions
 
-Checked on 2026-10-22 against the versions actually resolved by the build.
+Checked on 2026-10-24 against the versions actually resolved by the build.
 
 | Component | Version |
 |---|---|
 | Spring Boot | 4.1.1 (latest stable; 4.2.0-M2 is a milestone) |
 | Spring Framework | 7.0.9 |
+| Spring Security | 7.1.1 |
 | Jackson | 3.1.5 (Jackson 3 — `tools.jackson.*`) |
 | Testcontainers | 2.0.5 (managed by Boot) |
 | JDK | 25.0.4 (Temurin) |

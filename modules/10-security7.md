@@ -75,7 +75,7 @@ are **5.7.11** and **6.5.11**.
 | The request matcher | `AntPathRequestMatcher` and `MvcRequestMatcher` in `spring-security-web` 5.7.11 | both of those, plus `PathPatternRequestMatcher` (present in 6.5.11); `requestMatchers(String...)` chooses Ant or MVC by what is on the classpath | `PathPatternRequestMatcher` only: `AntPathRequestMatcher` and `MvcRequestMatcher` are not in the 7.1.1 jar, and the string overloads build a PathPattern matcher |
 | Method security | `@EnableGlobalMethodSecurity(prePostEnabled = true)`; its `prePostEnabled` default is **false**; `@EnableMethodSecurity` already exists in 5.7.11 and already defaults `prePostEnabled=true` | `@EnableMethodSecurity` is the recommended annotation; `@EnableGlobalMethodSecurity` is `@Deprecated` in 6.5.11; neither is auto-configured by Boot | unchanged from 6.5: `@EnableMethodSecurity` defaults `prePostEnabled=true`, `securedEnabled=false`, `jsr250Enabled=false`, `mode=PROXY`; `@EnableGlobalMethodSecurity` is still present and still deprecated |
 | CSRF defaults | on by default; `CsrfConfigurer` wraps `HttpSessionCsrfTokenRepository` in a `LazyCsrfTokenRepository`; `CsrfFilter` has no request-handler abstraction and no `DeferredCsrfToken` | on by default; the default repository is `HttpSessionCsrfTokenRepository`; `CsrfFilter` defaults to `XorCsrfTokenRequestAttributeHandler` and loads a `DeferredCsrfToken` | **unchanged from 6.5**: same repository, same XOR handler, same deferred token, same unsafe methods (everything except `GET`, `HEAD`, `TRACE`, `OPTIONS`); 7.0 adds `csrf(csrf -> csrf.spa())` and narrows `CookieCsrfTokenRepository` to `setCookieCustomizer` + name/path |
-| Password encoding | `PasswordEncoderFactories.createDelegatingPasswordEncoder()`, `{id}`-prefixed, default `bcrypt`; `BCryptPasswordEncoder` available directly | the same factory and the same default | the same factory and the same default; 7.0 adds `Password4jPasswordEncoder` and its algorithm-specific encoders; Boot's default principal still gets `{noop}` when the configured password has no `{id}` - the constant is in the 2.7 and 4.1.1 bytecode alike |
+| Password encoding | `PasswordEncoderFactories.createDelegatingPasswordEncoder()`, `{id}`-prefixed, default `bcrypt`; `BCryptPasswordEncoder` available directly | the same factory and the same default | the same factory and the same default; 7.0 adds Password4j's five algorithm-specific encoders, listed in the Passwords section |
 | Resource server | `spring-boot-starter-oauth2-resource-server`; `http.oauth2ResourceServer().jwt()` | the same starter; `oauth2ResourceServer(oauth2 -> oauth2.jwt(...))`, with the no-arg overload still present | starter renamed `spring-boot-starter-security-oauth2-resource-server` (the old name is still published, and its 4.1.1 POM says deprecated in favor of the new one); `oauth2ResourceServer(Customizer)` only, and `jwt(Customizer)` / `opaqueToken(Customizer)` only |
 | Where Boot's auto-configuration lives | `org.springframework.boot.autoconfigure.security.servlet.*` inside `spring-boot-autoconfigure` | the same package and the same jar | `org.springframework.boot.security.autoconfigure.*`, with the servlet chain in `.web.servlet`, inside the new `spring-boot-security` module the starter pulls |
 | Security in tests | `spring-security-test` on the test classpath; `@WithMockUser` | the same | `spring-boot-starter-security-test`, which brings `spring-boot-security-test`; `spring-boot-starter-test` alone does not put `@WithMockUser` on the classpath |
@@ -221,7 +221,7 @@ Every line is a 7.1.1 fact:
 - The rules are ordered, and order is the whole review: the two `permitAll`
   rules come first, then `hasRole("MEMBER")` on the lending endpoints, then
   `anyRequest().authenticated()`. The [Title](../GLOSSARY.md) catalogue and the
-  health probe are public, borrowing needs an authenticated Member, and
+  health probe are public, a Loan needs an authenticated Member, and
   *everything else* - including every other actuator endpoint - needs an
   authenticated principal. `/actuator/health/**` is the M09 probe path;
   exposing the rest of the management surface is a separate decision M09's
@@ -445,10 +445,12 @@ stored value, and still reads it back on `matches`. A stored
 the same table; the prefix tells the encoder which one to use, and the
 `PasswordEncoder` interface's `upgradeEncoding` is the hook a rehash-on-login
 policy uses. Security 7.0 adds Password4j's encoders -
-`Password4jPasswordEncoder` and the Argon2, Bcrypt, Pbkdf2, Scrypt and
-BalloonHashing variants - for the deployment that wants Password4j's tuning
-rather than Spring's own implementations. The delegating factory's contract
-did not change.
+`Argon2Password4jPasswordEncoder`, `BcryptPassword4jPasswordEncoder`,
+`Pbkdf2Password4jPasswordEncoder`, `ScryptPassword4jPasswordEncoder` and
+`BalloonHashingPassword4jPasswordEncoder`, five classes in
+`org.springframework.security.crypto.password4j` - for the deployment that
+wants Password4j's tuning rather than Spring's own implementations. The
+delegating factory's contract did not change.
 
 Two `{id}` values matter to the Lab. `{bcrypt}` is what the factory produces
 for a new password, and it is the value a production row should hold. `{noop}`
@@ -491,10 +493,11 @@ one a 4.1.1 POM should carry. The configurer is `Customizer`-only: 7.1.1's
 `opaqueToken(Customizer)` and no no-arg `jwt()` or `opaqueToken()`; a Boot 2
 `http.oauth2ResourceServer().jwt()` is a compile error twice over.
 
-The chain's three lines are one argument again. A bearer token is not a
+The `STATELESS` and `csrf.disable()` pairing is the one argument the CSRF
+section derived, and the token is why it holds here. A bearer token is not a
 cookie: it is attached by the client's code, not by the browser's cookie jar,
-so a cross-site page cannot make the request carry it. There is no session to
-fix, hence `STATELESS`; there is no ambient credential, hence `csrf.disable()`.
+so a cross-site page cannot make the request carry it - the chain has nothing
+ambient to lose.
 The authority name is the token's claim by default (`scope` becomes
 `SCOPE_...`), and a token whose claim is named something else needs the
 converter:
@@ -568,10 +571,11 @@ this order:
    layer above them, not a rewrite of them.
 
 The rule generalises to the next feature: when the
-[Reservation](../GLOSSARY.md) endpoints arrive, a hold belongs to the Member
-who placed it, and the same `authentication.getName()` rule decides whose hold
-the use case may create or cancel. The Lab's diagnostics do not test the
-Reservation feature, but the shape they teach is the shape it will use.
+[Reservation](../GLOSSARY.md) endpoints arrive, the Reservation belongs to the
+Member who placed it, and the same `authentication.getName()` rule decides
+whose Reservation the use case may create or cancel. The Lab's diagnostics do
+not test the Reservation feature, but the shape they teach is the shape it
+will use.
 
 The requirement is stated by Diagnostic tests in the `diagnostics` package -
 the tests that fail on the Start module (which authenticates nobody and still
@@ -596,7 +600,7 @@ the Member comes from the principal.
 
 ## Quiz
 
-Five questions about the delta table above and the security register it
+Five questions about the delta table above and the security configuration it
 equips you to review. Answer first; the answers say why, not just what.
 
 1. **About the chain rows: a Boot 2 codebase upgrades to 4.1.1. Its
@@ -722,8 +726,9 @@ equips you to review. Answer first; the answers say why, not just what.
    so there is no confused deputy to defend against. It is wrong for the
    browser chain because the browser does attach the session cookie, and the
    token is the only thing that distinguishes the Member's own request from a
-   forged one. The two lines - `STATELESS` and `csrf.disable()` - are one
-   argument, and the argument is "no ambient credential".
+   forged one. `STATELESS` and `csrf.disable()` stand or fall together - the
+   pairing the CSRF section derived, whose argument is "no ambient
+   credential".
 
 ## Checklist
 
