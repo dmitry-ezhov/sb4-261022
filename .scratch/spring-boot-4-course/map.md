@@ -394,6 +394,12 @@ The implementation map for the feature described in
 
 ## Fog
 
+- Whether the sibling checklists' diagnostics commands (M08, M09: `-pl
+  <module> verify -Pdiagnostics` without `-am`) resolve on a fresh clone,
+  where `labs-support` is not yet in the local repository; the M10
+  checklist spells `-am` after ticket 52 ran it both ways, the siblings
+  predate the observation.
+
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
   fixed one. If they do, the fixture grows a second factory; the guide
   already lists what the module holds.

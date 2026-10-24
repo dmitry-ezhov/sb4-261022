@@ -779,9 +779,11 @@ repeats a gate the build already enforces.
   [Copy](../GLOSSARY.md) mapped and the use case consulted on neither.
   Between them sits the passing case: the `201` the owner's borrow
   earns. And on any session- or cookie-authenticated chain the change
-  keeps, a `POST` without a token answers `403` even authenticated -
-  CSRF's filter refuses before authorization reaches it. Verified by
-  reading the test tree at the tier whose slice carries the real chain.
+  keeps - this Lab keeps none, both chains are stateless over Basic,
+  and the read of the tests answers that absence - a `POST` without a
+  token answers `403` even authenticated: CSRF's filter refuses before
+  authorization reaches it. Verified by reading the test tree at the
+  tier whose slice carries the real chain.
 - **The [Member](../GLOSSARY.md) is the authenticated principal, and the
   domain is the second lock.** Nothing the request carries names a
   Member: `LoanRequest` keeps the [Copy](../GLOSSARY.md)'s barcode and
@@ -830,7 +832,10 @@ repeats a gate the build already enforces.
   `{bcrypt}` prefix names the algorithm the comparison uses, `{noop}`
   appears nowhere except a generated development principal deleted
   before production, and no credential sits in an `application.yml` or
-  a migration row that no rotation can reach. The principal store is
+  a migration row that no rotation can reach. The lab's principals are
+  the lab's fixtures, and the change says what a deployment waters the
+  store with - a swap the encoder-produced shape survives unchanged.
+  The principal store is
   also the log check: Boot's own generated principal prints its
   password on a warn line - `Using generated security password:` - and
   an application whose `UserDetailsService` bean is its own store is

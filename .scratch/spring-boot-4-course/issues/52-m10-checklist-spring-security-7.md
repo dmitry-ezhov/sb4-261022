@@ -74,8 +74,10 @@ ticket 47 graded its checklist.
   substance, tightened and given its real-chain ground.** The rebuilt item
   names what makes the pair the product's: the slice imports the change's
   own `SecurityConfiguration`, so `401` (authentication missing) and `403`
-  (a qualifying identity that does not qualify - `@WithMockUser` in the
-  `OPERATOR` role) are two different refusals answered before the
+  (a qualifying identity that does not qualify - `@WithMockUser`'s
+  `OPERATOR` principal in the module's own slice tests, real `operator`
+  Basic credentials in the diagnostics) are two different refusals answered
+  before the
   controller runs, with the `201` owner's borrow between them and the
   conditional CSRF refusal kept. The security-test starter's presence rides
   the same sentence: `@WithMockUser` is off the classpath without it.
@@ -111,3 +113,11 @@ ticket 47 graded its checklist.
   half-met; each became or reshaped an item, with every rebuilt claim
   checked off the resolved lab-10 code and the 6.5.11/7.1.1 jars. Doc edit
   is the resolution; no code changed.
+- **2026-10-24 · agent** — Review fix: the secrets item now carries the
+  lab-fixtures clause a verbatim reading would trip over (the resolved
+  solution's principal constants are the lab's fixtures; the item judges
+  the stored shape and the named store swap, not the lab code), and the
+  both-refusals item names the 403's two homes - `@WithMockUser`'s
+  `OPERATOR` principal in the slice tests, real `operator` Basic
+  credentials in the diagnostics - so the Answer's attribution cannot be
+  read as the diagnostics carrying a mock.
