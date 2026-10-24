@@ -767,20 +767,24 @@ the items read both.
   the publish was never asked for - the extra `503`'s shape, the quiz's
   own finding - and the item refuses it there. Verified by running the
   readiness diagnostics, which read each of those surfaces off the wire
-  during one outage, in order, and by reading the assertions, whose
-  failure messages name the surface and the question it answers.
-- **The bounds are the environment's numbers, written in one
-  configuration namespace beside the base URL, and a stripped yml boots
-  shaped.** The replay geometry is no longer compiled constants: the
-  String variants (`maxRetriesString` and kin) each carry a `${...}`
+  across one outage and its recovery, in order, and by reading the
+  assertions, whose failure messages name the surface and the question
+  it answers.
+- **The bounds are the environment's numbers, each spelled where a
+  deployment reads them, and a stripped yml boots shaped.** The replay
+  geometry is no longer compiled constants: the String variants
+  (`maxRetriesString` and kin) each carry a `${...}`
   placeholder whose default is the jar's own reviewed geometry, so a
   boot the environment says nothing to keeps exactly the policy that
   was reviewed, and a command line - the one property source that
-  outranks the yml - retunes the geometry without a rebuild. The two
-  half-measures this item refuses are the geometry that moved to the
-  yml but not to the String variants (the override reaches the
-  environment and reaches nothing) and the placeholder without a
-  default (a stripped yml boots unbounded). `includes` stays the
+  outranks the yml - retunes the geometry without a rebuild. The
+  geometry's keys sit in one namespace beside the base URL, the drain
+  window and the client timeouts beside them in their own `spring.*`
+  keys - every line of the assembled yml, spelled where the deployment
+  reads it. The two half-measures this item refuses are the geometry
+  that moved to the yml but not to the String variants (the override
+  reaches the environment and reaches nothing) and the placeholder
+  without a default (a stripped yml boots unbounded). `includes` stays
   compiled `ResourceAccessException` - a type is not a chain of
   property sources, and placeholders cannot express it. Verified by
   reading the annotation and the yml's `library.availability` block,
@@ -827,34 +831,34 @@ the items read both.
 - **Every earlier Module's checklist is applied to this code, in
   Module order, and the capstone invents no thirteenth.** The review of
   the assembled application is the twelve earlier checklists carried
-  out against one tree: M02's packaged jar read (`PackagedApplicationIT`
-  reads the manifest every run of this Lab's own build), M01's spellings
-  served by the grep set in this doc, M03's bound configuration read on
-  the yml, M04's timeouts read on the wire, M05's migration in the
-  schema the diagnostics' fresh H2 boots run, M06 and M08 in the
-  refusal map the outage kept answering, M09 in the two counters read
-  back through the management socket, M10 in the chains the outage
-  walked, M11 in the bounds and the drain, M12 in the repackage every
-  run produces. No item here is a new opinion an earlier checklist does
-  not already ask, and the one gap the Lab closes is the readiness
-  state the twelfth's walk had no item for - the earlier reviews now
-  run against a tree that answers it. Verified by walking the earlier
-  checklists' verification lines against this tree - the commands
-  those checklists name run unchanged here - and by the diagnostics,
-  which assert the claims rather than recite them.
+  out against one tree: M01's spellings served by the grep set in this
+  doc, M02's packaged jar read (`PackagedApplicationIT` reads the
+  manifest every run of this Lab's own build), M03's bound
+  configuration read on the yml, M04's timeouts read on the wire, M05's
+  migration in the schema the diagnostics' fresh H2 boots run, M06 and
+  M08 in the refusal map the outage kept answering, M09 in the two
+  counters read back through the management socket, M10 in the chains
+  the outage walked, M11 in the bounds and the drain, M12 in the
+  repackage every run produces. No item here is a new opinion an
+  earlier checklist does not already ask, and the one gap the Lab
+  closes is the readiness state the twelfth's walk had no item for -
+  the earlier reviews now run against a tree that answers it. Verified
+  by walking the earlier checklists' verification lines against this
+  tree - the commands those checklists name run unchanged here - and
+  by the diagnostics, which assert the claims rather than recite them.
 - **The green the change is accepted under is the strict green, and
   the review's record says what ran.** Reviewer-applied strictness is a
   property of the report, not a hope: the whole-module build is green
-  with every gate at full strength - `./mvnw -f labs -pl
-  lab-13-the-production-capstone-solution -am verify` - the Solution
-  module's diagnostics are green under their profile, and a
-  `-Pquality-lenient` green is named as mid-task convenience, never as
-  the run the acceptance rests on. The asymmetry the capstone reviews
-  with is its own: `./mvnw -f labs -pl
-  lab-13-the-production-capstone-start -am verify -Pdiagnostics` - red,
-  the two diagnostics stating the missing publish and the unreachable
-  geometry - then the same against the Solution module - green - and
-  CI's `./mvnw -f labs verify -Pdiagnostics-solutions` holds what the
-  local run showed. Verified by running those commands and reporting
-  the run that was made.
+  with every gate at full strength -
+  `./mvnw -f labs -pl lab-13-the-production-capstone-solution verify` -
+  the Solution module's diagnostics are green under their profile, and
+  a `-Pquality-lenient` green is named as mid-task convenience, never
+  as the run the acceptance rests on. The asymmetry the capstone
+  reviews with is its own -
+  `./mvnw -f labs -pl lab-13-the-production-capstone-start verify -Pdiagnostics`
+  - red, the two diagnostics stating the missing publish and the
+  unreachable geometry - then the same against the Solution module -
+  green - and CI's `./mvnw -f labs verify -Pdiagnostics-solutions`
+  holds what the local run showed. Verified by running those commands
+  and reporting the run that was made.
 

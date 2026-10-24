@@ -83,3 +83,25 @@ across every item, the four named coverage targets are one item each:
   diagnostics were not re-run: no code changed, doc edit is the
   resolution, and the red-on-Start/green-on-Solution record is taken
   from ticket 65's resolved runs. Map entry appended.
+- **2026-10-25 · agent** - Review pass (two axes, HEAD~1 base). The
+  Spec axis verified every load-bearing claim against the artifacts -
+  the three-file diff between the Start and Solution trees, the publish
+  homes, the String-variant defaults, the bounds diagnostics' numbers
+  (the two-event counter ceiling, the 2.5s read under a named 5s, the
+  3s drain), `PackagedApplicationIT`'s manifest read and the three
+  profile spellings in the root POM - and found the seven criteria met
+  and no scope creep. Three wording defects fixed in the doc: the
+  bounds item's headline first claimed all three bounds sit in "one
+  configuration namespace", false of the timeouts and the drain window
+  (now: the geometry in one namespace beside the base URL, the
+  `spring.*` keys beside it); item 2's "during one outage" miscounted
+  the readiness diagnostics' evidence (the `library.loans.issued` read
+  is post-recovery - now "across one outage and its recovery"); and
+  item 6's "in Module order" enumerated M02 before M01 (now M01
+  first). The Standards axis found no hard violations against the
+  sibling checklist conventions, the tracker format or the glossary;
+  its two command-spelling judgements were consolidated into the Spec
+  fix - the checklist's commands now match the Lab section's and the
+  labs index's spelling (`-pl ... verify` with no `-am`), which also
+  removed the same Start-module red command being asserted two ways in
+  one doc.
