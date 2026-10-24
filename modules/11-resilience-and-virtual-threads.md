@@ -619,39 +619,66 @@ property and the retry lives on one annotation.
 Five questions about the delta table above and the resilience arithmetic it
 equips you to review. Answer first; the answers say why, not just what.
 
-1. **About the request-thread row: a colleague upgrades to 4.1.1, sets
-   `spring.threads.virtual.enabled=true`, and then defends the
-   `application.yml` line `server.tomcat.threads.max=20` from the Boot 2
-   era - "this is our new concurrency ceiling." What did the flag change
-   about Tomcat's worker model, which release introduced the flag, and
-   which two connector properties *still* bound the requests that arrive?**
+1. **About the request-thread row: the upgrade memo for the library
+   proposes `spring.threads.virtual.enabled=true` and carries three
+   promises. (1) "The borrow stops holding a scarce worker while it waits
+   on the availability service - under the 200-thread pool, a slow
+   upstream emptied the library's serving capacity along with the
+   threads." (2) "The rollout audit the JDK 21 era demanded is settled
+   for us: on this JDK nothing pins any more." (3) "Under the flag, the
+   connector can accept far more connections than the 8192 we configured
+   in the Boot 2 era." Which promise survives the Module's read, what does
+   each of the others get wrong, and what did the flag actually flip?**
 
-   The flag changed the model *underneath* the ceiling. Introduced with the
-   3.2 line (the property is absent from the 2.7.18 jar altogether),
-   `spring.threads.virtual.enabled=true` triggers
-   `@ConditionalOnThreading(Threading.VIRTUAL)` in the `spring-boot-tomcat`
-   customizer, which installs Tomcat's
-   `VirtualThreadExecutor` as the protocol handler's executor - thread
-   names `tomcat-handler-` - and Tomcat's own documentation of that
-   executor is: *a new virtual thread to execute each task*. Executor-level
-   sizing stops meaning anything, so the line `threads.max=20` caps a pool
-   that no longer exists; it is a dead line a review should strike, not a
-   ceiling to trust. What still bounds arriving work is what binds the
-   *connector*, not the executor: `server.tomcat.max-connections` (default
+   Promise (1) is the Module's thesis and it survives. In Boot 2's model
+   one in-flight request held one of `server.tomcat.threads.max`'s 200
+   platform workers from first byte to last, so the borrows that *waited*
+   - and the availability call waits - were what emptied the pool; a
+   stampede blocked on a slow availability service could starve it and
+   take unrelated calls down with it. The flag makes a held request cheap
+   - cheap to create, cheap to *hold* - so the pool stops being the
+   capacity model.
+
+   Promise (2) is half right, and the half that fails is the sentence.
+   What this course's JDK 25 retired is one pinning *cause*: JEP 491
+   (shipped in JDK 24) stopped blocking inside `synchronized` from pinning
+   the carrier - the caveat Boot 3-era virtual rollouts worked around.
+   What remains is narrow but real: the call whose stack bottoms out in a
+   *native* frame still pins. For a codebase like this library - a
+   blocking `RestClient` behind MVC, M08's database transactions - the
+   audit is short ("not a list you have to go looking for"); but "nothing
+   pins any more" is not a sentence the Module lets you write.
+
+   Promise (3) is false by pegging the promise to the wrong bean. The
+   property - introduced with the 3.2 line (it is not in the 2.7.18 jar at
+   all), read in 4.1.1 by `Threading` in the base `spring-boot` jar,
+   default still `false` - changes the *executors*, not the connector:
+   `@ConditionalOnThreading(Threading.VIRTUAL)` makes spring-boot-tomcat's
+   customizer install Tomcat's `VirtualThreadExecutor` as the protocol
+   handler's executor - a new virtual thread to execute each task, name
+   prefix `tomcat-handler-` - and the same condition swaps the application
+   task executor for a `SimpleAsyncTaskExecutor` and the scheduler for a
+   `SimpleAsyncTaskScheduler`. The promise's arithmetic reads the old
+   model back: with the executor a spawner, `server.tomcat.threads.max`
+   caps a pool that no longer exists - a dead line a review should strike,
+   not a ceiling to trust. What still bounds *arriving* work is what the
+   connector has always held: `server.tomcat.max-connections` (default
    8192) caps accepted connections and `server.tomcat.accept-count` (100)
    caps the queue behind them - both unchanged in the 2.7.18, 3.5.16 and
-   4.1.1 jars we read. The consequence is the Module's thesis: capacity
-   management moves from the accidental throttle (200 platform threads) to
-   deliberate caps on the *work* - which is what the bulkhead row and the
-   timeout row provide.
+   4.1.1 jars we read. The consequence is the Module's thesis in one
+   line: capacity management moves from the accidental throttle (200
+   platform threads) to deliberate caps on the *work* - the connector's
+   above, the retry row and the bulkhead row below.
 
 2. **About the timeout row: the team copies a Boot 3.4 blog post and sets
    `spring.http.client.read-timeout` on the 4.1.1 application; meanwhile a
    `RestClient` built from the injected `RestClient.Builder` times out
-   though nobody can name where the values came from. Name the two
-   spellings as 4.1.1's metadata presents them, and explain the mechanism
-   that makes the injected builder carry the timeouts without per-client
-   wiring.**
+   though nobody can name where the values came from, and a review memo
+   declares the two lines "the fix that bounds every outbound call this
+   library can make". Name the two spellings as 4.1.1's metadata presents
+   them, explain the mechanism that makes the injected builder carry the
+   timeouts without per-client wiring, and name what the memo's sentence
+   misses.**
 
    The singular form is the blog's key and the deprecated one;
    `spring.http.client.*` first appeared in the 3.4 metadata (3.3.12's has
@@ -668,11 +695,17 @@ equips you to review. Answer first; the answers say why, not just what.
    redirect policy and cookie handling - and `spring-boot-restclient`'s
    `RestClientAutoConfiguration` consumes it in
    `restClientBuilderConfigurer`, so the injected builder shows up with
-   the settings applied to everything it builds. The same reach decides
-   where the review should look: a `RestClient` built *around* the injected
-   builder skips the configurer, carries none of the settings and still
-   waits forever - so the review's search is the builder's provenance, not
-   the factory arguments.
+   the settings applied to everything it builds. The same reach is the
+   fence the memo's sentence falls inside: "every outbound call" overreaches,
+   because the settings ride the builder's *configurer* - a `RestClient`
+   built *around* the injected builder (a hand-`new`ed factory, or a
+   builder whose configurer was replaced) skips the configurer, carries
+   none of the settings and still waits forever - so the review's search
+   is the builder's provenance, not the factory arguments. And a timeout
+   is a *bound*, not a repair: the lines stop the wait, they replay
+   nothing - a call that met its bound still fails the borrow, which is
+   why the replay of a failed ask is a declaration of its own on the
+   retry row, and the Lab's second move is bound *and* retry, plural.
 
 3. **About the retry row: a method is annotated
    `@Retryable(includes = ResourceAccessException.class, maxRetries = 2,
@@ -712,38 +745,66 @@ equips you to review. Answer first; the answers say why, not just what.
 
 4. **About the bulkhead row: a `@ConcurrencyLimit(limit = 2,
    policy = REJECT)` on the availability check starts refusing a burst of
-   concurrent borrows. With which type does it refuse, why does that type's
-   *parentage* matter, and what does the BLOCK default trade that REJECT
-   refuses to?**
+   concurrent borrows. The operator asks for a saturation gauge and is
+   handed the Boot 2 dashboard's busy-worker count; a colleague proposes
+   logging the refusals at debug as noise. With which type does the cap
+   refuse, why does that type's *parentage* matter, what does the
+   busy-worker gauge read on this boot, and where does the saturation
+   actually surface?**
 
    The refusal is `org.springframework.resilience.InvocationRejectedException`,
-   and what matters is what it extends:
+   read off the 7.0.9 class file, and what matters is what it extends:
    `java.util.concurrent.RejectedExecutionException` - the unchecked type
    the executor contract already speaks for "the work does not fit". That
-   parentage is why REJECT composes with the plumbing the application
-   already has: `CompletableFuture` failure handling, `@Async`'s task-queue
-   mechanics, and (here) the problem-detail surface M08 built, which can
-   map a task-shaped refusal of a saturated resource to an answer the
-   Member reads rather than a stack trace. The BLOCK default - which a
-   bare `@ConcurrencyLimit(2)` gets, `ThrottlePolicy.BLOCK` being the
-   annotation's own default - trades *latency for service*: the waiting
-   caller holds its request, and the borrow answers late rather than not
-   at all. Under a Boot 2 pool that wait was expensive - the request held
-   one of 200 scarce platform threads, and a stampede that blocked on a
-   slow availability service could starve the pool and kill unrelated
-   calls; the Module's virtual-thread row changes the price of the wait to
-   a cheap thread, which is what makes BLOCK vs REJECT the considered
-   choice this Module presents rather than a reflex. The executor analogue
-   - `spring.task.execution.simple.concurrency-limit` with
+   parentage is why the colleague's log line is the wrong call twice
+   over: the refusal composes with the plumbing the application already
+   has - `CompletableFuture` failure handling, `@Async`'s task-queue
+   mechanics, and (here) the problem-detail surface M08 built, which maps
+   a task-shaped refusal of a saturated resource to an answer the
+   [Member](../GLOSSARY.md) reads rather than a stack trace - so a
+   saturated dependency answered in problem details *is* the observable
+   contract, and a debug line suppresses the one signal the cap produces.
+   The diagnostics go at exactly that: the exhausted budget answered on
+   the M08 surface, not as a stack trace and never as a hang.
+
+   The gauge reads nothing, and that reading is itself the row's
+   consequence. With the flag on, the task executor is not a pool: the
+   same `@ConditionalOnThreading(Threading.VIRTUAL)` that swapped the
+   Tomcat workers swaps the pooled `ThreadPoolTaskExecutor` for a
+   `SimpleAsyncTaskExecutor` that spawns rather than pools - and a
+   virtual executor has no stable thread count to report. A dashboard
+   that reads the executor as a queue - counts its pool, sizes batches by
+   it, times work against its saturation - measures a queue that no
+   longer exists; the same holds on the request side, where
+   `/actuator/threaddump` lists no idle `tomcat-handler-` worker to
+   count. What surfaces instead is what the Module instrumented: the
+   cap's refusals, typed above and answered as problem details, and one
+   row up the retry counter - `library.availability.retried`, counted on
+   the `MethodRetryEvent` the lab's solution listens for - because a
+   spike in asked-again is the upstream outage, seen from the
+   [Member](../GLOSSARY.md)'s side rather than the executor's.
+
+   The BLOCK default - which a bare `@ConcurrencyLimit(2)` gets,
+   `ThrottlePolicy.BLOCK` being the annotation's own default and
+   `{BLOCK, REJECT}` the whole enum the 7.0.9 constant pool carries -
+   trades *latency for service*: the waiting caller holds its request,
+   and the borrow answers late rather than not at all. Under a Boot 2
+   pool that wait was expensive - the request held one of 200 scarce
+   platform threads, and a stampede that blocked on a slow availability
+   service could starve the pool and kill unrelated calls; the Module's
+   virtual-thread row changes the price of the wait to a cheap thread,
+   which is what makes BLOCK vs REJECT the considered choice this Module
+   presents rather than a reflex. The executor analogue -
+   `spring.task.execution.simple.concurrency-limit` with
    `reject-tasks-when-limit-reached` - caps work that runs *through* the
    task executor; the annotation caps work that runs through the use case
    the caller reaches.
 
 5. **About the graceful-shutdown row: in a post-mortem, a colleague writes
-   "Boot 4 finally turned graceful shutdown on for us." State what is
-   right about the sentence, what release actually flipped the default and
-   how this course checked the flip, and what Boot 4 *itself* changed in
-   the area - so that the sentence's only error is its date.**
+   "Boot 4 finally turned graceful shutdown on for us." State what the
+   sentence gets right and where it goes wrong (the release is part of
+   the answer), how this course checked that attribution, and what Boot 4
+   *itself* changed in the area.**
 
    Right: the 4.1.1 application *does* drain without anyone having set
    `server.shutdown=graceful` - at shutdown the server stops accepting,

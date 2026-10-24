@@ -460,6 +460,39 @@ The implementation map for the feature described in
   coverage floor.
   [Answer](issues/54-m11-lab-start-resilience-and-virtual-threads.md)
 
+- **2026-10-24 · ticket 55** — The M11 lab solution is the lab-10 surface
+  with the resilience move written in: the switch is
+  `spring.threads.virtual.enabled: true` and nothing else (threaddump
+  added to the management exposure so the absence of idle workers is
+  observable on the guarded socket), `AvailabilityChecker` carries the
+  M04 client behind the replay policy (`@EnableResilientMethods` once on
+  `ResilienceConfiguration`, `@Retryable` on the method the borrow calls
+  across the proxy, includes naming `ResourceAccessException`, geometry
+  stated with its sentence: three attempts, 100ms then 200ms, 50ms
+  jitter, maxDelay never reached), `RetryMeter` counts
+  `library.availability.retried` on the `MethodRetryEvent`, the exhausted
+  budget answers `502 application/problem+json` on the M08 surface, and
+  the drain window is named at 10s. Strict build green (JaCoCo 89.1%
+  line), diagnostics red 4/4 on the start and green 4/4 on the solution,
+  both reactor seams green. Pointer backfilled by ticket 56: the entry
+  had not landed with the ticket's resolution.
+  [Answer](issues/55-m11-lab-solution-resilience-and-virtual-threads.md)
+
+- **2026-10-24 · ticket 56** — The M11 quiz graded against the ticket's
+  three named understandings and three questions rebuilt: the virtual
+  threads' help/not-help contrast (the upgrade memo's three promises -
+  the cheap held shore, the retired-but-not-wholly pinning audit,
+  the connector caps that the flag never raised), "what a timeout does
+  not solve" as the reader's job (the memo's "bounds every outbound
+  call" sentence, fenced twice: the configurer-bypassing call base and
+  the bound-vs-repair split), and observing saturation (the busy-worker
+  gauge reads nothing under the flag; the saturation surfaces as
+  problem-detail refusals and the `library.availability.retried`
+  counter). Question 5's telegraphed "only error is its date" clause
+  went; question 3 kept. Claims re-verified on the 7.0.9/4.1.1 jars and
+  the lab-11 solution, not remembered.
+  [Answer](issues/56-m11-quiz-resilience-and-virtual-threads.md)
+
 ## Fog
 
 - Whether the sibling checklists' diagnostics commands (M08, M09: `-pl
