@@ -17,9 +17,10 @@
 ## Answer
 
 The checklist was drafted with the doc (ticket 53); this ticket graded it
-against its criteria and rebuilt four of its items, added one, and kept
-two. Every rebuilt claim was checked against the resolved lab-11
-solution and its diagnostics, the way ticket 52 graded its checklist.
+against its criteria and rebuilt five of its items (four to their
+criteria, one tightened), added one, and kept two. Every rebuilt claim
+was checked against the resolved lab-11 solution and its diagnostics,
+the way ticket 52 graded its checklist.
 
 - **The two meta-criteria graded first, and where the draft fell.** The
   draft's items mostly named observable properties and every "Verified

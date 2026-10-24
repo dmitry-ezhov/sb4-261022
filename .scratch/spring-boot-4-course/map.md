@@ -493,6 +493,20 @@ The implementation map for the feature described in
   the lab-11 solution, not remembered.
   [Answer](issues/56-m11-quiz-resilience-and-virtual-threads.md)
 
+- **2026-10-24 · ticket 57** — The M11 checklist graded and rebuilt from
+  seven items to eight: the carrier property the draft never covered got
+  its read-audit item (the one pinning shape left on JDK 25 is a wait
+  bottoming out in a native frame), saturation was given the metric item
+  its criterion asks for (the busy-worker gauge dead under the flag;
+  `library.availability.retried` read beside M09's counter), the timeout
+  item was re-grounded on the state the Start module already carries (the
+  `spring.http.clients.*` lines ride along from M04 - the review is the
+  survival and the provenance search, not the property), and the
+  shutdown item tightened to the diagnostic's actual shape. Confirmed
+  with the run both ways: red 4/4 on the start, green 4/4 on the
+  solution.
+  [Answer](issues/57-m11-checklist-resilience-and-virtual-threads.md)
+
 ## Fog
 
 - Whether the sibling checklists' diagnostics commands (M08, M09: `-pl
