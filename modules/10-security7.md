@@ -46,13 +46,12 @@ You are assumed to know all of that fluently. You are **not** assumed to know
 that `WebSecurityConfigurerAdapter` left in Security 6.0, that
 `authorizeRequests()`, `and()` and every no-arg configurer method left in
 Security 7.0, that `AntPathRequestMatcher` and `MvcRequestMatcher` are not in
-the 7.1.1 jar
-at all, that `@EnableMethodSecurity` is the annotation to use and
-`@EnableGlobalMethodSecurity` is present-but-deprecated rather than removed,
-that the CSRF defaults changed in Security 5.8 and again in 7.0 but **not** at
-Boot 4's boundary, that Boot 4 moved the security auto-configuration into a
-`spring-boot-security` module with a new package root, or that `@WithMockUser`
-now arrives through a starter of its own.
+the 7.1.1 jar at all, that `@EnableMethodSecurity` is the annotation to use
+and `@EnableGlobalMethodSecurity` is present-but-deprecated rather than
+removed, that the CSRF defaults changed in Security 5.8, survived 7.0 intact,
+and were **not** touched at Boot 4's boundary, that Boot 4 moved the security
+auto-configuration into a `spring-boot-security` module with a new package
+root, or that `@WithMockUser` now arrives through a starter of its own.
 
 ## What changed
 
@@ -173,6 +172,8 @@ public class SecurityConfiguration {
                         .permitAll()
                         .requestMatchers("/actuator/health/**")
                         .permitAll()
+                        .requestMatchers("/api/loans/**")
+                        .hasRole("MEMBER")
                         .anyRequest()
                         .authenticated())
                 .httpBasic(Customizer.withDefaults())
@@ -218,12 +219,21 @@ Every line is a 7.1.1 fact:
   declared one through 6.5 - but keeping it costs nothing and matches the
   `build()` call's history.
 - The rules are ordered, and order is the whole review: the two `permitAll`
-  rules come before `anyRequest().authenticated()`, so the
-  [Title](../GLOSSARY.md) catalogue and the health probe are public and
-  *everything else*, including every mutation and every other actuator
-  endpoint, is not. `/actuator/health/**` is the M09
-  probe path; exposing the rest of the management surface is a separate
-  decision M09's never-list already made.
+  rules come first, then `hasRole("MEMBER")` on the lending endpoints, then
+  `anyRequest().authenticated()`. The [Title](../GLOSSARY.md) catalogue and the
+  health probe are public, borrowing needs an authenticated Member, and
+  *everything else* - including every other actuator endpoint - needs an
+  authenticated principal. `/actuator/health/**` is the M09 probe path;
+  exposing the rest of the management surface is a separate decision M09's
+  never-list already made.
+- `hasRole("MEMBER")` and the use case's `@PreAuthorize` answer two different
+  questions, and the Lab needs both. The URL rule answers *may this principal
+  call the lending API at all* - a principal without the role gets `403`
+  before the use case runs. The expression answers *whose Loan is this* - it
+  refuses any call whose `memberId` argument is not the principal's name, so a
+  path that ever supplies a different id gets `403` from the method rather
+  than a Loan in somebody else's name. Drop either one and a different caller
+  gets through.
 - `SessionCreationPolicy.STATELESS` says the API has no session to create.
   That is not a performance preference; it is the premise of the
   `csrf.disable()` line. A chain that disables CSRF while keeping a session is
@@ -272,10 +282,12 @@ public class LoanService {
 
     private final LoanRepository loans;
     private final LoanProperties properties;
+    private final Clock clock;
 
-    LoanService(LoanRepository loans, LoanProperties properties) {
+    LoanService(LoanRepository loans, LoanProperties properties, Clock clock) {
         this.loans = loans;
         this.properties = properties;
+        this.clock = clock;
     }
 
     /**
@@ -288,7 +300,13 @@ public class LoanService {
         if (loans.countByMemberId(memberId) >= properties.limit()) {
             throw new LoanLimitExceededException(properties.limit());
         }
-        return loans.save(memberId, copy);
+        if (loans.takeOnLoan(copy.id()) == 0) {
+            throw new CopyNotAvailableException(copy.barcode());
+        }
+        LocalDate borrowedOn = LocalDate.now(clock);
+        LocalDate dueOn = borrowedOn.plusDays(properties.period().toDays());
+        Long loanId = loans.save(memberId, copy.id(), borrowedOn, dueOn);
+        return new Loan(loanId, memberId, copy.barcode(), borrowedOn, dueOn);
     }
 }
 ```
@@ -297,12 +315,14 @@ Two things have to be true for that line to mean anything, and the expression
 is only one of them. The first is that parameter names survive compilation:
 the expression's `#memberId` is a name, not a position, and this course's root
 POM sets `maven.compiler.parameters=true` (Boot 4 does not), so the name is in
-the class file. The second
-is that the argument *is* the authenticated name. If the
-controller passes `request.memberId()`, the expression happily compares the
-caller's name with the caller's own claim and lets a Member borrow on somebody
-else's account - the check is real, the value is attacker-controlled, and the
-only fix is at the edge:
+the class file. The second is that the argument *is* the authenticated name.
+If the controller passes `request.memberId()`, the comparison is body value
+against principal name: a Member who sends their own id passes, and a Member
+who sends somebody else's id is refused with a `403` - the check itself is
+real. What is not real is the contract. The API still asks the caller to name
+the Member, so the borrow stays honest only because this one method remembers
+the annotation; the next endpoint that takes a `memberId` and forgets it is a
+cross-Member write. The fix is at the edge - stop accepting the id:
 
 ```java
 @RestController
@@ -310,15 +330,22 @@ only fix is at the edge:
 public class LoanController {
 
     private final LoanService loans;
+    private final AvailabilityClient availabilityClient;
     private final CopyRepository copies;
 
-    LoanController(LoanService loans, CopyRepository copies) {
+    LoanController(LoanService loans, AvailabilityClient availabilityClient, CopyRepository copies) {
         this.loans = loans;
+        this.availabilityClient = availabilityClient;
         this.copies = copies;
     }
 
     @PostMapping
-    ResponseEntity<Loan> borrow(@Valid @RequestBody LoanRequest request, Authentication authentication) {
+    public ResponseEntity<Loan> borrow(@Valid @RequestBody LoanRequest request, Authentication authentication) {
+        // The M04 availability call still runs before any transaction exists.
+        Availability availability = availabilityClient.availability(request.copyId());
+        if (!availability.available()) {
+            throw new CopyNotAvailableException(request.copyId());
+        }
         Copy copy = copies.findByBarcode(request.copyId())
                 .orElseThrow(() -> new CopyNotFoundException(request.copyId()));
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -389,13 +416,15 @@ the test that proves it is a `POST` without a token answering `403` on a chain
 that keeps CSRF on - our 4.1.1 run observed exactly that with an authenticated
 principal on Boot's default chain.
 
-The nuance a review should expect: an *unauthenticated* `POST` with HTTP Basic
-and no CSRF token answers `401`, not `403`, because the CSRF filter's
-`AccessDeniedException` reaches `ExceptionTranslationFilter` while the
-principal is still anonymous, and that filter answers with the entry point's
-`401` rather than a `403`. The 403 is the authenticated case, and it is the
-one the diagnostics assert. The ordering is not a bug to fix; it is the filter
-chain telling you which failure it found first.
+The nuance a review should expect is the order of the two refusals, and it
+runs the other way round from the obvious guess. A `POST` with no token
+answers `403` whether or not the caller is authenticated, because 7.1.1's
+`CsrfFilter` carries its own `AccessDeniedHandler` - an
+`AccessDeniedHandlerImpl` by default - and answers the refusal itself, before
+the request reaches authorization. Send a valid token instead and the
+unauthenticated caller gets `401`: the request now passes the CSRF filter and
+fails at authentication. Both were observed on a 4.1.1 boot, and the
+authenticated `403` is the one the diagnostics assert.
 
 ### Passwords: the hash names its algorithm
 
@@ -523,8 +552,9 @@ this order:
 1. **Authenticate the Member.** Add `spring-boot-starter-security` (and
    `spring-boot-starter-security-test` in test scope), declare the chain as a
    `SecurityFilterChain` bean, keep the title catalogue and the M09 health
-   probe public, and require authentication for everything else. No
-   `WebSecurityConfigurerAdapter`, no `authorizeRequests()`, no `and()`.
+   probe public, require the `MEMBER` role on `/api/loans/**`, and require
+   authentication for everything else. No `WebSecurityConfigurerAdapter`, no
+   `authorizeRequests()`, no `and()`.
 2. **Derive the Member from the principal.** The controller stops reading
    `memberId` from the request and passes `authentication.getName()` to the
    use case instead. The request record keeps only what the caller is allowed
@@ -555,8 +585,10 @@ the [lab index](../labs/README.md) entry teaches, is:
 
 Read the failure messages the way this course reads every delta table row:
 each names the behaviour that is missing - an unauthenticated borrow that
-should answer `401`, a borrow for another Member that should answer `403`, a
-limit that should count the caller's [Loan](../GLOSSARY.md)s. The same tests
+should answer `401`, a principal without the Member role that should answer
+`403`, a body that names another [Member](../GLOSSARY.md) and must still
+produce a [Loan](../GLOSSARY.md) for the authenticated one, a limit that
+should count the caller's [Loan](../GLOSSARY.md)s. The same tests
 pass against `lab-10-security7-solution` (and, in CI, against every Solution
 module at once with `./mvnw -f labs verify -Pdiagnostics-solutions`); read that
 module last, to see how small the secure story is once the chain is a bean and
@@ -616,25 +648,30 @@ equips you to review. Answer first; the answers say why, not just what.
 
 3. **About the method-security section: a reviewer says
    `@PreAuthorize("#memberId == authentication.name")` is enough to stop one
-   Member borrowing as another. The controller still passes
-   `request.memberId()`. Walk through what the expression compares, why the
-   check passes, and what the controller has to change. Then name the two
+   Member borrowing as another, so the controller can keep passing
+   `request.memberId()`. Say what the expression compares and what happens to a
+   Member who sends somebody else's id - then say why the reviewer's conclusion
+   is still the wrong one, and what the controller has to change. Name the two
    annotation defaults that decide whether the check runs at all.**
 
    The expression compares the use case's first argument - `#memberId`, read
    from the compiled parameter name - with the authenticated principal's
-   `name`. If the controller passes `request.memberId()`, the left side is
-   whatever the caller put in the body, and the right side is the caller's
-   authenticated name. A Member who sends their own id gets a true comparison
-   and a [Loan](../GLOSSARY.md) in their own name; a Member who sends somebody
-   else's id gets a false comparison and a `403`. The check is real, but it is
-   checking the caller's claim against the caller's claim - it cannot detect
-   that the claim was attacker-chosen. The controller has to stop accepting
-   the id at all: drop `memberId` from the request record and pass
-   `authentication.getName()` to the use case. The expression then compares
-   the principal with itself, which is the only value it can trust. The two
-   defaults: `@EnableMethodSecurity`'s `prePostEnabled = true` (so
-   `@PreAuthorize` runs with no attribute) and `@EnableGlobalMethodSecurity`'s
+   `name`. With `request.memberId()` still in the controller, the left side is
+   whatever the caller put in the body and the right side is the caller's
+   authenticated name: a Member who sends their own id gets a true comparison
+   and a [Loan](../GLOSSARY.md) in their own name, and a Member who sends
+   somebody else's id gets a false comparison and a `403`. So the cross-Member
+   write is refused today - the reviewer's premise is right about that one
+   call. The conclusion is wrong because it makes the API's safety a property
+   of one annotation on one method: the request still *offers* the caller a
+   `memberId` to choose, and the next endpoint that reads the field and
+   forgets the expression - a list, a cancel, a second use case - is open. The
+   controller stops accepting the id at all: drop `memberId` from the request
+   record and pass `authentication.getName()` to the use case. The expression
+   then compares the principal with itself, and the value the caller could
+   choose is gone rather than merely checked. The two defaults:
+   `@EnableMethodSecurity`'s `prePostEnabled = true` (so `@PreAuthorize` runs
+   with no attribute) and `@EnableGlobalMethodSecurity`'s
    `prePostEnabled = false` (so the old annotation without the attribute runs
    nothing). That difference is why the annotation choice is not cosmetic.
 
@@ -711,15 +748,18 @@ repeats a gate the build already enforces.
   matcher builds it with `PathPatternRequestMatcher.withDefaults()`.
 - **The public surface is exactly the surface that should be public.** The
   [Title](../GLOSSARY.md) catalogue's read endpoints and `/actuator/health/**`
-  are permitted; every other actuator endpoint is not, and
-  `anyRequest().authenticated()` closes the chain. The M09 never-list still
-  holds: the management surface is not re-exposed by a convenience `permitAll`.
+  are permitted; `/api/loans/**` requires the `MEMBER` role; every other
+  actuator endpoint is not public, and `anyRequest().authenticated()` closes
+  the chain. The M09 never-list still holds: the management surface is not
+  re-exposed by a convenience `permitAll`.
 - **The Member is the authenticated principal.** The borrow request carries
   the [Copy](../GLOSSARY.md)'s barcode, not a `memberId`; the controller
   passes `authentication.getName()`; and the use case's
   `@PreAuthorize("#memberId == authentication.name")` is a second lock, not
-  the only one. A request that names another Member answers `403`; a request
-  with no authentication answers `401`.
+  the only one. A request with no authentication answers `401`; a principal
+  without the Member role answers `403`; a body that still carries another
+  Member's id is ignored, and the [Loan](../GLOSSARY.md) lands on the
+  authenticated Member.
 - **Method security is switched on and the old annotation is not used.**
   `@EnableMethodSecurity` is on a configuration class; there is no
   `@EnableGlobalMethodSecurity` in the change (it is present in 7.1.1 but
@@ -751,9 +791,10 @@ repeats a gate the build already enforces.
   not `scope`.
 - **The test dependency is the security one.** `spring-boot-starter-security-test`
   is in test scope, so `@WithMockUser` is on the classpath; the tests assert
-  the behaviour - `401` unauthenticated, `403` for another Member, `200` for
-  the owner, and, on any session chain the change keeps, `403` for a `POST`
-  without a CSRF token - not the arrangement of the configuration classes.
+  the behaviour - `401` unauthenticated, `403` for a principal without the
+  Member role, `201` for the owner's borrow, and, on any session chain the
+  change keeps, `403` for a `POST` without a CSRF token - not the arrangement
+  of the configuration classes.
 - **Boot 4 imports are the Boot 4 packages.** Any reference to Boot's security
   auto-configuration uses `org.springframework.boot.security.autoconfigure.*`,
   not `org.springframework.boot.autoconfigure.security.servlet.*`; the
