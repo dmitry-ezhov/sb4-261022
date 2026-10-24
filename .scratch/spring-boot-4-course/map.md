@@ -597,3 +597,24 @@ The implementation map for the feature described in
   (SpotBugs by a regex in `config/spotbugs/exclude.xml`, JaCoCo in the
   root POM's gate), which takes the module to 0.875 branch coverage.
   [Answer](issues/60-m12-lab-solution-native-images-and-packaging.md)
+
+- **2026-10-24 · ticket 61** — The M12 quiz drafted fresh against the
+  doc and graded against its three named understandings before
+  landing: what AOT processing changes (the memo's three promises - the
+  frozen conditions/beans/profiles, the drop-the-flag regular-mode
+  fallback which is the TRUE and counterintuitive one per the
+  analyzer's own sentence, and the process-aot-needs-GraalVM claim
+  that is backwards; plus the untransformable registrations -
+  instance suppliers and `registerSingleton` - with the hints ledger
+  kept strictly separate from the definition ledger), what a native
+  image costs (four build/run-ledger cost sentences, one mis-filed:
+  the invented "build where it runs" premise puts the version-25
+  distribution on the run fleet, when the executable ships no JVM at
+  all), and when to stay on the JVM (the AOT-cache runbook whose
+  extracted-form and two-condition lines fail, and the three-site form
+  review whose middle site blocks itself - a build-time-frozen form
+  cannot serve a constraint that wants boot-time deciding; the
+  flag-free regular run is what keeps it). No delta-table version
+  number or pin was made an asked-for recall item; facts were checked
+  against the doc's jar/page reads and the resolved lab-12 solution.
+  [Answer](issues/61-m12-quiz-native-images-and-packaging.md)

@@ -567,3 +567,273 @@ against every Solution module at once with
 to see how small the packaging story is once the artifact owns its
 build-time decisions - then M13 is where every Module's surface deploys
 as one.
+
+## Quiz
+
+Five questions about the delta table above and the packaging arithmetic
+it equips you to review. Answer first; the answers say why, not just
+what.
+
+1. **About the Ahead-of-time processing row: the library's upgrade memo
+   settles the AOT work in one sentence - "process-aot in the build,
+   `spring.aot.enabled=true` on the launch line" - and carries three
+   promises. (1) "Under the switch the container makes the same
+   decisions it always made at boot - which beans exist, which
+   conditions hold, which profile is in - just carried out from the
+   build's recorded answers instead of a fresh reflective walk." (2)
+   "The consequence is only speed, so the launch line doubles as the
+   safety valve: drop the flag and the same jar goes back to deciding
+   everything at boot, exactly as before the AOT work." (3) "process-aot
+   is the native-image step: the library is not building a native
+   image, and nobody on this team holds a GraalVM distribution, so the
+   goal stays out of the build." Which promise survives, what does each
+   of the others lose?**
+
+   Promise (2) survives, and it is the promise a reader primed by
+   promise 1's collapse will wrongly reject. The flag gates the
+   initializer, not the artifact: on a jar whose build ran the walk,
+   dropping `spring.aot.enabled` is a supported regular run, and Boot's
+   own failure analyzer is the evidence - the two sentences
+   `AotInitializerNotFoundFailureAnalyzer` carries include "If you want
+   to run the application in regular mode, remove the system property
+   'spring.aot.enabled'". Under a flag-free boot the reflective startup
+   path applies again and the conditions re-evaluate against the
+   runtime environment - the *behaviour* the flag dropped returns; what
+   the drop surrenders is the startup the form exists for.
+
+   Promise (1) fails exactly where the row's thesis sits: ahead-of-time
+   processing is "your application's container, walked through once at
+   build time, so its decisions can be harvested", and the how-to
+   page's own sentence is that the processing "evaluates `@Conditional`
+   annotations based on the environment at build time". Under the
+   switch the container does not decide at boot; it *plays back* - the
+   run's entry goes through the generated
+   `ApplicationContextInitializer` Boot applies instead of the
+   reflective startup path, and the lab's diagnostics make the playback
+   visible: the switched boot prints "Starting AOT-processed", a
+   reflective boot never does. What froze with the build: beans created
+   while ahead-of-time processing ran "are then always created when
+   running the application and can't be switched off" - the
+   `@ConditionalOnProperty`/`.enabled` feature-flag habit stops being a
+   runtime switch on an AOT boot - and a profile name that gets through
+   the build mis-spelled *is* the deployment, which is why a build-time
+   profile rides the `process-aot` execution's own configuration
+   (`<profiles>production,eu</profiles>`, the how-to page's snippet),
+   while profiles that only set properties which do not influence
+   conditions survive freely.
+
+   Promise (3) is backwards twice over. The walk is not GraalVM's step;
+   it is shared by every AOT form, and the JVM form is a documented
+   deployment form of its own - the AOT-optimized jar of the
+   `mvn -Pnative package` build, a jar never asked to compile native,
+   run under the one flag. What the goal needs is to ride the *same
+   build as the repackage* (its output has to land before the repackage
+   - the default phase it binds in is prepare-package), which the
+   starter-parent's `native` profile is one documented way to get and a
+   module's own binding is the other: the lab's solution is the working
+   proof, its one packaging change the process-aot execution on the
+   spring-boot-maven-plugin, and its packaged jar boots on the same
+   standard JDK the course's build runs. The version-25 GraalVM
+   distribution is the prerequisite of the native *compile*
+   (`mvn -Pnative native:compile-no-fork`), not of the walk - skipping
+   the goal for want of the distribution throws away the JVM's cheapest
+   form to avoid a dependency the JVM form never has.
+
+2. **About the same row one level down: the build has the walk, and the
+   reviewer reads the library's Boot 2 registration habits for what the
+   walk will not harvest. It finds two: one configuration hands the
+   container a finished object straight onto the `BeanFactory`
+   (`registerSingleton(...)`), and one `@Bean` method is backed entirely
+   by a lambda supplier (`registerBean(..., () -> ...)`). A colleague
+   defends both: "the AOT engine walks bean definitions, so both are
+   recorded like every other bean - and where GraalVM needs to see a
+   type, one `RuntimeHintsRegistrar` per class covers the rest of the
+   story." Name what the walk leaves invisible, why the colleague's
+   registrar does not close that gap, and the shape the framework names
+   instead.**
+
+   The colleague is right about the mechanism and wrong about its
+   reach. Right: the walk is bean-definition-shaped - Framework's
+   javadoc sentence is that the AOT refresh "only creates bean
+   definitions, not bean instances". Wrong: Framework's AOT chapter
+   states the reach limit as exactly two sentences, quoted in the
+   Module: "Bean definitions with instance suppliers (lambdas or method
+   references) cannot be transformed ahead of time", and "Beans
+   registered as singletons (using `registerSingleton`...) cannot be
+   transformed ahead of time either". Both habits the reviewer found
+   are those two sentences: the finished-object registration and the
+   supplier-backed definition are invisible to the build - not
+   transformed into the generated `...__BeanDefinitions` sources the
+   initializer replays. The registration a Boot 2 codebase did
+   habitually straight onto the `BeanFactory` is precisely the pattern
+   the Module cites as the casualty.
+
+   The `RuntimeHintsRegistrar` does not close the gap because hints are
+   a different ledger. What the walk records into the hint files is
+   *reachability* - reflection, resources, proxies, the five JSON files
+   under `META-INF/native-image/{groupId}/{artifactId}/` - consumed at
+   build time by the AOT engine so GraalVM can see through the
+   container. A registrar's `hints.reflection().registerType(...)` -
+   the doc's own example registers the [Reservation](../GLOSSARY.md)
+   hold-limit record, `ReservationRules`, with
+   `INVOKE_DECLARED_METHODS` - makes a *method call* findable; it does
+   not produce a *bean definition* that can be transformed, and the
+   supplier problem is a definition problem. One API, two ledgers, is
+   the confusion the review strikes: the hint family (the registrar,
+   `@ImportRuntimeHints`, and the annotation siblings
+   `@Reflective`/`@RegisterReflection`/`@RegisterReflectionForBinding`
+   beside the hints model) covers "GraalVM cannot reach my type", never
+   "the build cannot walk my registration".
+
+   The shape the framework names instead is
+   `BeanDefinitionRegistry`-based registration through an
+   `ImportBeanDefinitionRegistrar` - definitions that live where the
+   walk looks, so they are transformed into the playback like any
+   other. The pattern's cost is honesty about the diff: the Boot 2
+   block did not merely register *late*, it registered in a place the
+   build cannot read, and the migration moves the registration, not
+   the class.
+
+3. **About the native-image cost paragraph: a platform memo files four
+   sentences about what the native line costs; one of the four is
+   mis-filed across the build/run ledger. (1) "The startup the docs'
+   own sample prints - 0.08 seconds - has its price on the build side:
+   the whole-program analysis makes the compute a line in CI's
+   packaging budget, where it never was." (2) "The pin jump 0.10.6 -> 1.1.8
+   shows in the diff as one property; the machine change it drags is a
+   swapped Java." (3) "The build wants a machine: Docker memory of 'at
+   least 8GB' is the macOS recommendation, the WSL 2 backend on
+   Windows." (4) "Since the image must be built where it runs, the run
+   fleet installs the version-25 GraalVM distribution beside the
+   service." Which sentence is mis-filed, and what does the run
+   actually receive?**
+
+   Sentence (4), and the mis-filing is its premise: nothing couples the
+   build machine to the run machine. The product is "a complete,
+   platform-specific executable" - the docs' sentence continues "You do
+   not need to ship a Java Virtual Machine in order to run a native
+   image" - so the run fleet installs nothing at all. The version-25
+   distribution (Liberica Native Image Kit included; the how-to page
+   installs `25.r25-nik` through SDKMAN!) is the *build* machine's
+   requirement, because `native-image` ships with a GraalVM
+   distribution and not with the standard JDK the course already uses -
+   and the artifact is built once by the Native Build Tools
+   (`mvn -Pnative native:compile-no-fork`, or `build-image` for the
+   container form) and shipped. The install step lands beside sentence
+   (3)'s machine cost, which it inherits: both are requirements the
+   *build* places — the 8GB Docker memory box a requirement of the tool
+   run, never of the artifact's runtime footprint.
+
+   The other three survive because their filing is the Module's own.
+   (1): the 0.08 seconds the sample prints are bought per build -
+   `native-image` performs "statically analyzing your application code
+   from its main entry point", unreachable code dropped - a same-order
+   block of work on top of a JVM `package` that already spends minutes,
+   which is why the Module's honest paragraph says the savings land in
+   CI's packaging budget, a line that never existed before. (2): the
+   changed property is the *visible half* of a change whose other half
+   is exactly the shape a review misses - the POM diff shows one
+   version, the machine running the build shows a swapped Java - and
+   with the pin at 1.1.8 (from 3.5.16's 0.10.6) the distribution floor
+   moves to version 25. (3): the ledger of commitment rides with all
+   three - conditions evaluated, profiles baked in, "reflection
+   legitimate only where the hints recorded it" - so an
+   environment-sized behavioural difference cannot exist in the
+   artifact, which is the price the run side was already always going
+   to pay for the executable that needs no JVM.
+
+4. **About the AOT-cache row: the library stays on the JVM and ops
+   writes the cache runbook as four lines. (i) "Extract first: `java
+   -Djarmode=tools -jar my-app.jar extract`; the training run that
+   follows executes in the extracted directory." (ii) "Train with `java
+   -XX:AOTCacheOutput=app.aot -Dspring.context.exit=onRefresh -jar
+   my-app.jar`; the flag ending the run at refresh is what keeps the
+   cache honest: the run quits with every non-lazy singleton
+   instantiated and `afterPropertiesSet` invoked, while the lifecycle
+   has not started and `ContextRefreshedEvent` has not yet published."
+   (iii) "The cache file deploys beside the plain nested jar; ops
+   re-trains only when the Java version moves." (iv) "The feature is
+   the JVM's - the packaging page says 'Spring Boot supports the AOT
+   cache for Java 25 and above', and on an earlier runtime the page
+   routes you to its CDS section instead." Which line fails, and what
+   are its two separate failures?**
+
+   Line (iii), and its two failures are the deployment matrix's two
+   posted conditions, each of which the line halves. First: the cache
+   file must be used with the *extracted* form - the page's own
+   sentence is "You have to use the cache file with the extracted form
+   of the application, otherwise it has no effect" - because the
+   cache's class-path requirements are the extracted layout's `lib/`
+   shape, the very layout the efficient-deployments page calls "AOT
+   cache (and CDS) friendly"; a cache riding a nested jar is a file
+   that is simply never read. Second: the retraining trigger is two
+   conditions, not one - the cache is usable "as long as the
+   application is not updated *and* the same Java version is used" -
+   so retraining on Java moves alone ships a cache that mismatches the
+   very first deploy after any application change.
+
+   The other three lines are the Module's content, not luck. (i): the
+   extract is not ceremony - the training run runs against the
+   extracted form, the same form the cached run later serves. (ii): the
+   exit point is Framework's own statement, and it is the moment a
+   startup-optimizing cache should retain: "all non-lazy initialized
+   singletons have been instantiated, and
+   `InitializingBean#afterPropertiesSet` callbacks have been invoked;
+   but the lifecycle has not started, and the `ContextRefreshedEvent`
+   has not yet been published" - the beans, not the running lifecycle.
+   Without the flag the run starts the server and serves forever,
+   nothing ends, no cache is written. (iv): the attribution is a jar
+   and a JEP, not tribal knowledge - "The ahead-of-time cache is a JVM
+   feature introduced in Java 24 via JEP 483" (Framework's Integration
+   chapter), sharpened by JDK 25's addition of method profiling
+   information, which is why the feature needs Java 25 and why the
+   site's pin being exactly 25 is the *requirement met*, not
+   coincidence. And the lab's third diagnostic is the runbook's
+   destination: the combined run - the cache on `-XX:AOTCache=` beside
+   `-Dspring.aot.enabled=true` on the extracted jar - is the
+   deployment matrix's cheapest startup of all.
+
+5. **About the deployment matrix: the review assigns the library's three
+   sites, each with one constraint and the form chosen for it. Site
+   one: "the run fleet is allowed no JVM at all" - the native image.
+   Site two: "profiles arrive from the environment every few weeks and
+   must keep deciding at boot" - the AOT-processed jar under
+   `spring.aot.enabled=true`. Site three: "the JDK is pinned at 25,
+   restarts are the cold-start pain, and no native build is in CI's
+   budget" - the AOT cache trained on the extracted form. Which
+   assignment holds, and what does each of the others block or
+   misattribute?**
+
+   Site one holds: the native image is the only form whose run needs
+   no JVM at all - "a complete, platform-specific executable. You do
+   not need to ship a Java Virtual Machine in order to run a native
+   image" - and the machinery it does need (the version-25
+   distribution, the 8GB memory box) binds the *build* side, which
+   question 3 files there. The site also accepts the ledger that comes
+   with the form: an environment-sized behavioural difference cannot
+   exist in an artifact that fixed its environment at build time.
+
+   Site two blocks itself. Under the switch, the conditions were
+   decided at build time against the build-time environment (the
+   how-to's "evaluates `@Conditional` annotations based on the
+   environment at build time"), and the frozen half is exactly what
+   the constraint wants kept fluid: beans created while ahead-of-time
+   processing ran are then "always created when running the
+   application and can't be switched off". A profile that arrives
+   weeks later decides nothing the artifact will honour. The form
+   that keeps boot-time deciding is the flag-free regular run - even
+   on the same AOT-packaged jar, the reflective startup path applies
+   once `spring.aot.enabled` is gone (the analyzer's own sentence
+   names the switch) - and what the site thereby gives up is the
+   startup the AOT work was bought for.
+
+   Site three: the form holds, the memo's implied attribution fails.
+   The cache is native to the JVM, not to GraalVM - "The ahead-of-time
+   cache is a JVM feature introduced in Java 24 via JEP 483",
+   sharpened by JDK 25's method profiling information - which is why
+   the page gates it at "Java 25 and above": the site's pin is not
+   luck but the requirement met. And the budget constraint is honored
+   by the form's shape: a training run is a vanilla `java` invocation
+   against the extracted form, `mvn -Pnative` never asked for, no
+   GraalVM on any machine - the one 4.x-class form whose entire
+   toolchain is the JDK the course already builds with.
