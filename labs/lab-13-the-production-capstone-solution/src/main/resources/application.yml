@@ -1,0 +1,114 @@
+spring:
+  application:
+    name: library-lab
+  threads:
+    virtual:
+      # The requests ride the JDK's cheap threads. The switch is the
+      # property and the property alone - it flips three beans at once
+      # (Tomcat's request executor, the application task executor and the
+      # scheduler), takes no Java, and its default is still false in 4.1.1,
+      # so turning it on is this application's decision, not a default it
+      # inherits. What the switch is observed on is the management socket's
+      # /actuator/threaddump, exposed one line further down: no idle
+      # http-nio-...-exec- guard pool waits warm, and the virtual
+      # tomcat-handler- threads are listed by the dump endpoint never. The
+      # connector caps are untouched: max-connections and accept-count are
+      # still what bounds arriving work, which is why the retry and the
+      # timeout below are policy, not decoration.
+      enabled: true
+  datasource:
+    # The lab rig's engine, the default: an H2 in memory, created fresh at
+    # every boot and shaped by the migration before anything reads it. One
+    # configuration, two engines: point this url at a PostgreSQL and the same
+    # migration is taken there unchanged.
+    url: jdbc:h2:mem:library
+    username: sa
+  jpa:
+    hibernate:
+      # The schema belongs to the migration, not to Hibernate: Flyway
+      # creates, Hibernate validates. Anything looser - update, create-drop -
+      # would let Hibernate guess a table it was never told about.
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration
+  http:
+    clients:
+      # A service that does not answer is a failure, not a hang. These are
+      # the 4.1 spellings - the plural, the singular spring.http.client.*
+      # having been deprecated since 4.0 with its replacement named - and
+      # the values ride the HttpClientSettings bean the client
+      # auto-configuration publishes: the injected RestClient.Builder's
+      # configurer carries them, so the availability client built from that
+      # builder times out the same way without anyone wiring a factory.
+      connect-timeout: 1s
+      read-timeout: 2s
+  lifecycle:
+    timeout-per-shutdown-phase:
+      # The drain window is a decision, not the thirty seconds nobody
+      # discussed: one in-flight borrow is one bounded availability read
+      # (three attempts at the most, each under the read timeout above,
+      # the backoff a few hundred milliseconds) plus one transaction -
+      # seconds. Ten is what this application can actually promise, and
+      # every drain runs inside it; the drain itself is 4.1.1's default and
+      # was 3.4's - the flip one generation before this stack. The bounds
+      # whose numbers are decisions - this window, the replay geometry
+      # under library.availability and the client timeouts above - all
+      # arrive from the environment at boot, so a deployment names them
+      # without a rebuild.
+      10s
+
+management:
+  server:
+    # The management surface is a different socket from the public API's:
+    # with this line the main context serves no actuator path at all - a
+    # request for /actuator/health on the API's port earns the 404 any
+    # unknown path earns - and the two ports the processes now own separate
+    # what a monitor may reach from what a stranger's ingress reaches. Zero
+    # asks the environment for the management port the way the rest of this
+    # lab's socket numbers are asked for; a deployment that must pin the
+    # number for its monitor overwrites exactly this line.
+    port: 0
+  endpoints:
+    web:
+      exposure:
+        # One step past the M09 surface (health, metrics): threaddump, the
+        # read that observes what the virtual-thread switch above actually
+        # swapped - with the flag on, no idle tomcat worker of either
+        # spelling is listed. Everything else stays unexposed on the web:
+        # an include=* line would hand env, configprops, heapdump and
+        # httpexchanges to anyone who reaches the management port.
+        include: "health,metrics,threaddump"
+
+library:
+  availability:
+    # Where the availability service lives. The diagnostics hand the
+    # application a WireMock server's URL instead.
+    base-url: http://localhost:9999
+    # The replay geometry: the bounds whose numbers are decisions, arriving
+    # from the environment at boot rather than living only in the annotation
+    # below. These keys sit beside base-url in one configuration namespace,
+    # and the checker's @Retryable reads them through its String variants -
+    # maxRetriesString and kin carry ${...} placeholders, so the numbers
+    # resolve against the environment at every boot, the same way any boot's
+    # command line (-Dlibrary.availability.max-retries=0) outranks this yml
+    # and reshapes the replay without a rebuild. Each value is the jar's own
+    # reviewed geometry, written here so a deployment that reads the file
+    # sees the policy it inherits: two retries - three attempts in total, a
+    # fourth ask being an outage, not a blip; 100 and 50 in milliseconds -
+    # the base delay landing inside the blip and the jitter keeping
+    # simultaneous replays out of lockstep; a multiplier of 2 growing each
+    # replay's delay; and the 1000ms cap this schedule never reaches. The
+    # placeholder's default in the annotation keeps the same policy when
+    # the keys are absent, so a stripped yml boots shaped, never unbounded.
+    max-retries: 2
+    delay: 100
+    jitter: 50
+    multiplier: 2
+    max-delay: 1000
+  loan:
+    # How long a loan lasts. The application.yml is where a default belongs:
+    # it is visible to whoever deploys it, and it can be changed without a
+    # rebuild.
+    period: 14d
+    # How many loans a member may hold at once.
+    limit: 3
