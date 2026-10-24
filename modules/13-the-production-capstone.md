@@ -635,8 +635,8 @@ why, not just what.
    replay may carry is what `includes` is for, and placeholders cannot
    express it.
 
-   The same arithmetic is why the drain window is line one of the
-   assembled yml, not a constant: `spring.lifecycle.timeout-per-shutdown-phase:
+   The same arithmetic is why the drain window is a line of the assembled
+   yml, not a constant: `spring.lifecycle.timeout-per-shutdown-phase:
    10s` is a decision with a length the deployment can name. The
    diagnostics make all of it executable: bounds spelled on one command
    line against a real boot, each read back on the wire - including a
@@ -668,10 +668,10 @@ why, not just what.
    deployment that does this carries a database whose vocabulary the
    application no longer recognises, hidden underneath a healthy boot,
    which is the deployment shape the capstone's cost paragraph walks.
-   And the convergence is unrepeatable by construction: the migration is
-   one script with standard types, run unchanged by H2 and PostgreSQL,
-   while a Hibernate-generated fix-up is written by whichever engine
-   happened to be running, remembered only by the schema it mutates.
+   And the convergence is unrepeatable by construction: each migration
+   script is standard SQL, run unchanged by H2 and PostgreSQL, while a
+   Hibernate-generated fix-up is written by whichever engine happened to
+   be running, remembered only by the schema it mutates.
 
    "`validate` is redundant" is backwards: the validator never wrote a
    schema, so nothing about the migration owning it removes it - it is

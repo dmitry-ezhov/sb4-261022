@@ -71,3 +71,18 @@ established five-question format.
   back on the wire, the publish in the boundary's handler and the
   checker's recovery). Doc edit is the resolution; no code changed, so no
   gate run applies. Map entries appended (ticket 65's pointer backfilled).
+- **2026-10-25 · agent** — Code-review (two axes, HEAD~1 base): both axes
+  green. The Spec axis cross-checked the quiz's load-bearing facts against
+  the M13 doc and the lab records and found no inconsistencies; the
+  Standards axis verified the ticket-file, authoring-template and
+  register conventions against the sibling quizzes and found nothing to
+  fix. Two wording notes were applied and committed: question 4's answer
+  now says "each migration script is standard SQL" (the lab holds V001
+  and V002; the loose "one script" miscounted against the doc's own
+  "the V001 and V002 scripts"), and question 3's "line one of the
+  assembled yml" became "a line of the assembled yml" (the drain window
+  is not the excerpt's first line). One housekeeping judgement call
+  answered, no change: the backfilled ticket-65 map pointer rides this
+  ticket's commit, disclosed here, per the tracker's map-pointer
+  convention and the precedent of ticket 56 backfilling ticket 55's
+  pointer.
