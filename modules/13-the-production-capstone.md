@@ -723,3 +723,138 @@ why, not just what.
    is the patch's correction: "readiness is the routing question, and the
    refusal question was already answered."
 
+## Checklist
+
+What a reviewer applies to a solution of this Lab to judge it
+production-shaped rather than merely working. Every item is observable -
+checkable by reading the change or running a command - and none of them
+repeats a gate the build already enforces. The capstone's one addition
+to the shared shape: the change the items judge is small - the Lab says
+how small - and its meaning is the assembled application around it, so
+the items read both.
+
+- **The outage is published as state, on the two moments the process
+  already knows, and nothing in the change teaches the probe to ask the
+  dependency.** The refusal sits where the process learns the fact:
+  `ReadinessState.REFUSING_TRAFFIC` rides the boundary's `502` handler,
+  the moment the spent budget knows the availability service stopped
+  answering, and `ReadinessState.ACCEPTING_TRAFFIC` rides the checker on
+  every read that answers, so the recovery is discovered on the same
+  wire the outage was and moves the state back the same way it moved
+  out. Around the move there is nothing to improve: no custom health
+  indicator re-asking the availability service inside the probe, no
+  boolean field the outage writes and the recovery reads, no watcher
+  thread deciding on its own clock - publishing on the shared event is
+  the move because every listener, the read probe above all, reads the
+  same thing without being told how the fact was learned, which is what
+  makes the routing answer and the refusal answer one story by
+  construction. Verified by reading the two publish sites in the diff,
+  and by running the diagnostics against both halves of the pair - red
+  on the Start module, whose readiness probe answers `UP` for the whole
+  outage because nobody published (the diagnostic's own patience gives
+  the probe every chance to move first), green on the Solution module,
+  where `OUT_OF_SERVICE` and the recovery's `UP` both arrive inside it.
+- **The publish moves readiness and only readiness, and the outage
+  changes no surface that reads a different question.** Liveness stays
+  `UP` through the refusal - a restart is the platform's repair for a
+  broken process, never for a broken dependency; the
+  [Title](../GLOSSARY.md) catalogue keeps its public `200`s; the
+  borrows keep answering their `502` `application/problem+json`; the
+  two counters keep counting; and the recovery borrow lands `201`
+  exactly like every other borrow, in the name of the Authentication
+  the chain answered. A solution whose outage also closed the catalogue,
+  moved liveness or turned the borrows down is re-answering questions
+  the publish was never asked for - the extra `503`'s shape, the quiz's
+  own finding - and the item refuses it there. Verified by running the
+  readiness diagnostics, which read each of those surfaces off the wire
+  during one outage, in order, and by reading the assertions, whose
+  failure messages name the surface and the question it answers.
+- **The bounds are the environment's numbers, written in one
+  configuration namespace beside the base URL, and a stripped yml boots
+  shaped.** The replay geometry is no longer compiled constants: the
+  String variants (`maxRetriesString` and kin) each carry a `${...}`
+  placeholder whose default is the jar's own reviewed geometry, so a
+  boot the environment says nothing to keeps exactly the policy that
+  was reviewed, and a command line - the one property source that
+  outranks the yml - retunes the geometry without a rebuild. The two
+  half-measures this item refuses are the geometry that moved to the
+  yml but not to the String variants (the override reaches the
+  environment and reaches nothing) and the placeholder without a
+  default (a stripped yml boots unbounded). `includes` stays the
+  compiled `ResourceAccessException` - a type is not a chain of
+  property sources, and placeholders cannot express it. Verified by
+  reading the annotation and the yml's `library.availability` block,
+  and by the bounds diagnostics' override boot: a named budget of one
+  attempt lets the blipped borrow die at its `502` with the retry
+  counter at the ceiling the named budget itself owes - the failed
+  attempt's event and the exhaustion mark, not the three-attempt
+  geometry's larger spend; a named five-second read timeout keeps a
+  2.5s availability answer alive into a `201` where the jar's own two
+  seconds would have timed it dead; and a named 3s drain lands the
+  in-flight borrow across a stop - the bounds kept read back on the
+  wire, not off the source.
+- **The change answers the brief it was given, and the diff is the
+  brief.** The Lab asks four things - the outage published as state,
+  the state published not toggled, the bounds carried by the
+  environment, the review's questions stated as diagnostics - and the
+  Solution's diff against the Start module answers them in three files:
+  the two publish sites and the assembled `application.yml`. Outside
+  those files the two trees are the same bytes; the
+  [Loan](../GLOSSARY.md) boundary, the chains, the refusal map and the
+  migrations are the work the twelve Modules handed over, and a
+  solution that reformed them - a refusal-map consolidation, a better
+  outage story than asked - shipped a different Lab's answer under this
+  ticket. Verified by diffing the two modules' `src` trees and reading
+  the changed files against the Lab's four numbered moves.
+- **The operational surface is documented where a reader of the change
+  reads, without the course behind them.** A reviewer holding only the
+  Solution module can state the contract the deployment keeps: what
+  boots and on which sockets, what the two probe answers mean, which
+  refusals answer in what status, the two counters and their tag
+  discipline, the drain window's length, and the bounds, with the keys
+  a deployment names them by. No new document carries this - the
+  assembled `application.yml` is the operational checklist in executable
+  form, and each of its comments says what the line decides and where
+  its override arrives from (the reviewed geometry paragraph beside
+  `library.availability`, the drain window's provenance beside
+  `spring.lifecycle`), while the changed classes' javadoc says what the
+  outage teaches and why the recovery publishes the way the refusal
+  did. Verified by reading the yml and the two changed classes beside
+  the operational checklist - every claim the checklist makes about the
+  running application traces to a line of the change that both makes it
+  true and explains it - and by the negative: none of the change's own
+  decisions is discoverable only from code.
+- **Every earlier Module's checklist is applied to this code, in
+  Module order, and the capstone invents no thirteenth.** The review of
+  the assembled application is the twelve earlier checklists carried
+  out against one tree: M02's packaged jar read (`PackagedApplicationIT`
+  reads the manifest every run of this Lab's own build), M01's spellings
+  served by the grep set in this doc, M03's bound configuration read on
+  the yml, M04's timeouts read on the wire, M05's migration in the
+  schema the diagnostics' fresh H2 boots run, M06 and M08 in the
+  refusal map the outage kept answering, M09 in the two counters read
+  back through the management socket, M10 in the chains the outage
+  walked, M11 in the bounds and the drain, M12 in the repackage every
+  run produces. No item here is a new opinion an earlier checklist does
+  not already ask, and the one gap the Lab closes is the readiness
+  state the twelfth's walk had no item for - the earlier reviews now
+  run against a tree that answers it. Verified by walking the earlier
+  checklists' verification lines against this tree - the commands
+  those checklists name run unchanged here - and by the diagnostics,
+  which assert the claims rather than recite them.
+- **The green the change is accepted under is the strict green, and
+  the review's record says what ran.** Reviewer-applied strictness is a
+  property of the report, not a hope: the whole-module build is green
+  with every gate at full strength - `./mvnw -f labs -pl
+  lab-13-the-production-capstone-solution -am verify` - the Solution
+  module's diagnostics are green under their profile, and a
+  `-Pquality-lenient` green is named as mid-task convenience, never as
+  the run the acceptance rests on. The asymmetry the capstone reviews
+  with is its own: `./mvnw -f labs -pl
+  lab-13-the-production-capstone-start -am verify -Pdiagnostics` - red,
+  the two diagnostics stating the missing publish and the unreachable
+  geometry - then the same against the Solution module - green - and
+  CI's `./mvnw -f labs verify -Pdiagnostics-solutions` holds what the
+  local run showed. Verified by running those commands and reporting
+  the run that was made.
+

@@ -718,3 +718,21 @@ The implementation map for the feature described in
   profile mechanics) already asked, and no delta-table version or pin is
   an asked-for recall item.
   [Answer](issues/66-m13-quiz-the-production-capstone.md)
+
+- **2026-10-25 · ticket 67** — The M13 checklist landed as the
+  `## Checklist` section of `modules/13-the-production-capstone.md`,
+  seven items graded against the ticket's seven criteria: the capstone
+  move read as properties (the outage published as state on the two
+  moments the process already knows - the spent budget's `502` handler
+  refusing and the checker's landed read accepting - with the probe
+  nowhere re-pointed at the dependency; readiness the only surface the
+  outage moves; the bounds carried by the environment through the
+  String variants and a stripped yml that still boots shaped), the diff
+  equal to the brief (three files, everything outside the same bytes),
+  the operational surface documented in the assembled yml's own
+  comments and the two publish classes' javadoc, the twelve earlier
+  checklists walked in Module order against one tree with the readiness
+  state named as the gap the Lab closes, and the strict green named by
+  its commands - both asymmetry runs reported, `-Pquality-lenient`
+  never the acceptance's run.
+  [Answer](issues/67-m13-checklist-the-production-capstone.md)
