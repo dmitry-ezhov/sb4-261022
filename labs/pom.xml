@@ -46,6 +46,7 @@
     <module>lab-11-resilience-and-concurrency-start</module>
     <module>lab-11-resilience-and-concurrency-solution</module>
     <module>lab-12-native-images-and-packaging-start</module>
+    <module>lab-12-native-images-and-packaging-solution</module>
     <!-- Module entries are added by the task that authors the corresponding
          lab. Do not pre-create module directories. -->
   </modules>

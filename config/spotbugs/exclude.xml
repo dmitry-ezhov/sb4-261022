@@ -29,4 +29,20 @@
     <Bug pattern="HE_EQUALS_USE_HASHCODE,HE_INHERITS_EQUALS_USE_HASHCODE"/>
   </Match>
 
+  <!--
+    Classes the build generates, not code anyone writes in this course:
+    process-aot's generated bean definitions (__BeanDefinitions), the AOT
+    output of JPA repositories and entities (__AotRepository,
+    __Instantiator, __Accessor - written with random suffixes) and the
+    CGLIB proxies of generated bean definitions (SpringCGLIB, FastClass).
+    SpotBugs reads their generated shapes as defects - a bean-definition
+    can throw while building, the proxy's $beanFactory field is unused by
+    the proxy's own logic, the generated repository callback hands a
+    null-unannotated parameter to a JSpecify-annotated runtime API. Analyzing
+    the generator's output instead of the application is noise here.
+  -->
+  <Match>
+    <Class name="~.*(__BeanDefinitions|__AotRepository|__Instantiator.*|__Accessor.*|SpringCGLIB|FastClass).*"/>
+  </Match>
+
 </FindBugsFilter>

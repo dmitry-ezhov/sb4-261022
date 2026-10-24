@@ -315,6 +315,20 @@
               <exclude>**/*Application.class</exclude>
               <exclude>**/config/**</exclude>
               <exclude>**/*Properties.class</exclude>
+              <!-- Draws covered by the build, not by the tests, and not code
+                   anyone writes: process-aot's generated bean definitions and
+                   the AOT output of JPA repositories and entities
+                   (__BeanDefinitions, __AotRepository, __Accessor_N,
+                   __Instantiator_N) plus the CGLIB proxies that carry the
+                   same names at run time (SpringCGLIB, FastClass). The AOT
+                   walk never executes these factories by design - it only
+                   writes them - so a coverage floor over them measures the
+                   generator, not the application. -->
+              <exclude>**/*__BeanDefinitions*.class</exclude>
+              <exclude>**/*__AotRepository*.class</exclude>
+              <exclude>**/*__Accessor_*.class</exclude>
+              <exclude>**/*__Instantiator_*.class</exclude>
+              <exclude>**/*$$SpringCGLIB$$*.class</exclude>
             </excludes>
           </configuration>
           <executions>

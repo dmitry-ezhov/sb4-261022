@@ -582,3 +582,18 @@ The implementation map for the feature described in
   directory, so diagnostic scratch paths must be absolute.
   [Answer](issues/59-m12-lab-start-native-images-and-packaging.md)
 
+
+- **2026-10-24 · ticket 60** — The M12 lab's Solution module packages the
+  M11 application with one AOT binding: `process-aot` on the
+  spring-boot-maven-plugin in its default phase, so the generated
+  bean-definition sources, bytecode and hint JSON land in the jar before
+  the repackage and the boot under `spring.aot.enabled=true` plays the
+  initializer back. Two facts surfaced that shape shared build config:
+  Boot 4.1.1's `process-aot` compiles the generated classes straight into
+  the main output directory, so generator output was charged by both
+  gates - SpotBugs read its generated shapes as defects, and the JaCoCo
+  branch ratio fell to 0.033 because the AOT walk never executes what it
+  writes; both tools now exclude the generated class-name families
+  (SpotBugs by a regex in `config/spotbugs/exclude.xml`, JaCoCo in the
+  root POM's gate), which takes the module to 0.875 branch coverage.
+  [Answer](issues/60-m12-lab-solution-native-images-and-packaging.md)
