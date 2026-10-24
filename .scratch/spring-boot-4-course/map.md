@@ -392,6 +392,32 @@ The implementation map for the feature described in
   green 5/5 on the solution.
   [Answer](issues/52-m10-checklist-spring-security-7.md)
 
+- **2026-10-24 · ticket 53** — The M11 doc's seven delta rows split into
+  three kinds of change, each verified its own way: the *switches*
+  (`spring.threads.virtual.enabled` absent from 2.7.18 and present from
+  3.2, default still `false` in 4.1.1; Boot's Tomcat customizer installs
+  `VirtualThreadExecutor` with the `tomcat-handler-` prefix, read off the
+  bytecode; `server.shutdown` enumerated across six jars - `immediate`
+  through 3.3, `graceful` from **3.4**, with 4.1's own move being
+  packaging: `ServerProperties` now in `spring-boot-web-server`), the
+  *renaming* (`spring.http.clients.*` plural spellings, each singular
+  entry carrying `"deprecation": {"replacement": ..., "since": "4.0.0"}`
+  in the http-client module's shipped metadata - and the lab's own
+  application.yml already plural), and the *arrival* (no
+  `org.springframework.resilience` / `org.springframework.core.retry` in
+  the 6.2.19 jars; in 7.0.9 the `@Retryable` defaults are read off the
+  constant pool - `maxRetries` 3 -> 1 + maxRetries attempts, `delay` 1000,
+  `timeout` 0 meaning none - and the empty-`includes` semantics plus the
+  advice ordering (outside `@Transactional`, inside `@Async`) are quoted
+  from the published contract). Runtime observation turned into the Lab's
+  claim: a flag-on boot of the lab-10 app listed 22 threads in the
+  threaddump and not one `tomcat-handler-` worker - the idle guard pool
+  does not exist. The five Java snippets compile verbatim against
+  spring 7.0.9 + micrometer 1.17.1; the Lab section names
+  `lab-11-resilience-and-concurrency-start`/`-solution` (tickets 54-55)
+  and the `-Pdiagnostics` command.
+  [Answer](issues/53-m11-doc-resilience-and-virtual-threads.md)
+
 ## Fog
 
 - Whether the sibling checklists' diagnostics commands (M08, M09: `-pl
