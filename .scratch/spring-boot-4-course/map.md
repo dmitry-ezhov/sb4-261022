@@ -618,3 +618,30 @@ The implementation map for the feature described in
   number or pin was made an asked-for recall item; facts were checked
   against the doc's jar/page reads and the resolved lab-12 solution.
   [Answer](issues/61-m12-quiz-native-images-and-packaging.md)
+
+- **2026-10-24 · ticket 63** — The M13 capstone doc assembles the
+  operation the twelve Modules built: one eight-row delta table whose
+  4.1.1 cells split provenance two ways - the capstone's own fresh reads
+  (the `matchIfMissing=true` read off `AvailabilityProbesAutoConfiguration`
+  by `javap -v` on the `spring-boot-health` class file, so the probe
+  default is *on everywhere* in 4.1.1; `server.shutdown` default
+  `graceful` in `spring-boot-web-server`'s metadata; `problemdetails`
+  still default-false in `spring-boot-webmvc`'s; the plural
+  `spring.http.clients.*` spellings live with the singular
+  deprecation-tagged `since: 4.0.0` in `spring-boot-http-client`'s
+  metadata; the actuator starter's five-dependency POM; the three
+  structured-logging formatter ids listed out of the core jar) versus
+  the cells carried forward from M01-M12's tables with those Modules'
+  provenance named per row. The Lab's behavioural gap is the
+  taught-but-never-built one: M09 taught
+  `AvailabilityChangeEvent.publish(context, ReadinessState.REFUSING_TRAFFIC)`
+  and no lab ever asked the assembled application to do it, so capstone
+  lab-13 closes that gap - readiness publishing to `OUT_OF_SERVICE` when
+  the availability service stops, back on recovery, while everything
+  else (the `502` details, the retry counter, the public catalogue)
+  stays as the Modules left it. The one Java snippet compiles against
+  the lab-12-solution classpath (COMPILED_OK); the doc names the lab
+  pair and the `-pl lab-13-the-production-capstone-start verify
+  -Pdiagnostics` command, and no `labs/README.md` row was added - the
+  index row belongs to tickets 64/65 per ticket 60's decision.
+  [Answer](issues/63-m13-doc-the-production-capstone.md)
