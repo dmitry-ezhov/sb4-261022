@@ -721,7 +721,7 @@ what.
    (`mvn -Pnative native:compile-no-fork`, or `build-image` for the
    container form) and shipped. The install step lands beside sentence
    (3)'s machine cost, which it inherits: both are requirements the
-   *build* places — the 8GB Docker memory box a requirement of the tool
+   *build* places - the 8GB Docker memory box a requirement of the tool
    run, never of the artifact's runtime footprint.
 
    The other three survive because their filing is the Module's own.

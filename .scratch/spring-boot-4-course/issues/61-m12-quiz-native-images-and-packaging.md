@@ -73,3 +73,13 @@ below is what the two-pass grading produced.
   against the M12 doc's jar and page reads and the resolved lab-12
   solution (`DeploymentFormsDiagnosticsIT`, the solution POM). Doc edit
   is the resolution; no code changed, so no gate run applies.
+- **2026-10-24 · agent** — Review (code-review, two axes, HEAD~1 base):
+  both axes green. The Spec axis found no factual inconsistencies - quiz
+  claims cross-checked against the doc, the lab-12 solution's POM and
+  `DeploymentFormsDiagnosticsIT`. Three judgement-call notes from the
+  Standards axis: the "hold-limit" compound is kept, the M12 doc itself
+  (ticket-58-reviewed) having established it for `ReservationRules`, and
+  the quiz must not diverge from the doc it summarizes; the verdict-refrain
+  echoes across answers are deliberate reinforcement, the same device the
+  sibling quiz scores answers with; the one house-dash slip in question
+  3's answer was fixed and committed.
