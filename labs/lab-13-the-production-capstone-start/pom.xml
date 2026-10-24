@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.example</groupId>
+    <artifactId>labs</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>lab-13-the-production-capstone-start</artifactId>
+
+  <name>lab-13-the-production-capstone-start</name>
+  <description>
+    M13 lab (start): the lending application as the twelve Modules assembled
+    it - the requests on virtual threads, the availability call bounded and
+    retried, the two chains standing, the two counters published, the drain
+    window named, the migration on both engines, the jar packaged in the
+    forms M12 taught, process-aot included - and yet reading out states it
+    never decided: when the availability service stops answering, the
+    refusals pile up as 502 problem details, the retry counter climbs, and
+    readiness keeps answering the state Boot handed it, ACCEPTING_TRAFFIC
+    all the way through the outage. The diagnostics state the capstone's
+    asks: the outage is state the application publishes -
+    ReadinessState.REFUSING_TRAFFIC through
+    AvailabilityChangeEvent.publish while the availability service answers
+    nobody, ReadinessState.ACCEPTING_TRAFFIC when one lands again, the
+    readiness probe reading the published state so the platform routes on
+    it - and the bounds whose numbers are decisions, the replay geometry,
+    the drain window and the client timeouts, arriving from the environment
+    at boot so the deployment can name them without a rebuild. Each
+    diagnostic names the promise the assembled application is not keeping;
+    on this module they fail.
+  </description>
+
+  <properties>
+    <!--
+      Start modules ship fewer tests than their solution counterpart, so the
+      coverage floor does not apply here. Every other gate still does.
+    -->
+    <jacoco.skip>true</jacoco.skip>
+    <!-- This module's diagnostics fail by design, so the diagnostics-solutions
+         profile skips it. -->
+    <diagnostics.skip>true</diagnostics.skip>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The observability surface: pulls spring-boot-health (the health
+           endpoint and the availability-state indicators the probes answer
+           with), spring-boot-starter-micrometer-metrics (the MeterRegistry
+           wiring and the /actuator/metrics endpoint) and the endpoint
+           machinery - all as the starter's own 4.1.1 contents. Nothing the
+           probes need is configured by hand: management.endpoint.health.
+           probes.enabled defaults to true on 4.1.1
+           (@ConditionalOnBooleanProperty, matchIfMissing = true), so no
+           probe property is written anywhere in this module. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The security surface: the starter keeps Boot 2's name, but its
+           4.1.1 POM now declares the Boot-owned spring-boot-security module
+           (the auto-configuration moved to
+           org.springframework.boot.security.autoconfigure) plus
+           spring-aop, over spring-security-* 7.1.1. It is what puts the
+           chain, the authentication manager and the filter machinery on the
+           classpath - without it, /api/loans answers any caller. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The Jakarta Bean Validation implementation: the constraint on the
+           request body's one allowed field is read, so the boundary's
+           answers are real ones. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The declarative HTTP Service client: the @HttpExchange interfaces
+           and the proxy that implements them. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-restclient</artifactId>
+    </dependency>
+    <dependency>
+      <!-- JPA over Hibernate, over the JDBC half it transitively brings:
+           the Copy reads are derived from the method name, and the loan
+           store's statements over the copy and loan tables run on the engine
+           the migrations created - the @Transactional boundary's manager
+           arrives with the starter, hand-built transaction infrastructure is
+           deliberately absent. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The module that makes Flyway's migration run under Boot 4's
+           auto-configuration. A bare flyway-core configures nothing. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Flyway 12 modularised its database support out of flyway-core:
+           without this module, booting against PostgreSQL fails with
+           "Unsupported Database: PostgreSQL", while H2 runs. -->
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The second engine's driver. The migration still runs as written. -->
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The lab rig's engine, the application.yml's default. -->
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The webmvc test slice has its own starter in Boot 4; the slices
+           reach @WebMvcTest and @AutoConfigureMockMvc through it. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The security test surface: @WithMockUser and the request post
+           processors live in spring-security-test, and Boot 4 packages it
+           as this starter. spring-boot-starter-test alone leaves the
+           annotation off the classpath, and a security test that does not
+           compile tests nothing. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The shared test fixtures: a deterministic clock. -->
+      <groupId>com.example</groupId>
+      <artifactId>labs-support</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The availability service, stubbed for the wiring home. -->
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- @Container and @EnabledIfDockerAvailable: the repository tests on
+           the second engine and the diagnostics' race against it. -->
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- PostgreSQLContainer 2, at its new coordinates and its new package. -->
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- @ServiceConnection: the container test hands the application the
+           container's address without a line of configuration. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- The packaging upgrade is one binding: process-aot, in its
+                 default phase (prepare-package), so its output lands before
+                 the repackage and rides the jar. The goal walks the
+                 application's container - refreshes an ApplicationContext in
+                 AOT mode, "only creates bean definitions, not bean
+                 instances" (Framework's own javadoc sentence) - and writes
+                 target/spring-aot/main: the generated bean-definition
+                 sources, the bytecode and the hint JSON. The starter-parent
+                 binds the same goal on the native profile it ships; bound
+                 here, the jar is AOT-optimised for the plain JVM run under
+                 spring.aot.enabled=true, none of which needs GraalVM. -->
+            <id>process-aot</id>
+            <goals>
+              <goal>process-aot</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

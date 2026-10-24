@@ -41,6 +41,7 @@ whose diagnostics are green. The floor still applies to every module's ordinary
 | 10 | M10 Spring Security 7 | `lab-10-security7-start` | `lab-10-security7-solution` | none |
 | 11 | M11 Resilience & virtual threads | `lab-11-resilience-and-concurrency-start` | `lab-11-resilience-and-concurrency-solution` | none |
 | 12 | M12 Native images & packaging | `lab-12-native-images-and-packaging-start` | `lab-12-native-images-and-packaging-solution` | GraalVM (opt.) |
+| 13 | M13 The production capstone | `lab-13-the-production-capstone-start` | `lab-13-the-production-capstone-solution` | none |
 
 Lab modules are added to `labs/pom.xml` by the task that authors them. Do not
 pre-create module directories.

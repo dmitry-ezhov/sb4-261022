@@ -47,6 +47,7 @@
     <module>lab-11-resilience-and-concurrency-solution</module>
     <module>lab-12-native-images-and-packaging-start</module>
     <module>lab-12-native-images-and-packaging-solution</module>
+    <module>lab-13-the-production-capstone-start</module>
     <!-- Module entries are added by the task that authors the corresponding
          lab. Do not pre-create module directories. -->
   </modules>

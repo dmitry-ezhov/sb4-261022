@@ -544,11 +544,17 @@ The implementation map for the feature described in
 
 ## Fog
 
-- Whether the sibling checklists' diagnostics commands (M08, M09: `-pl
+- ~~Whether the sibling checklists' diagnostics commands (M08, M09: `-pl
   <module> verify -Pdiagnostics` without `-am`) resolve on a fresh clone,
   where `labs-support` is not yet in the local repository; the M10
   checklist spells `-am` after ticket 52 ran it both ways, the siblings
-  predate the observation.
+  predate the observation.~~ - answered by ticket 64 for lab 13: without
+  `labs-support`'s test jar in the local repository the per-module
+  command fails at dependency resolution before any test runs; once
+  `./mvnw -f labs -pl labs-support install` has run once, the plain
+  `-pl <module> ... -Pdiagnostics` form works exactly as spelled (tested
+  both ways), so the CI-vs-learner asymmetry is an install-once fact,
+  not a per-module one; ticket 68's index pass can say it once.
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
   fixed one. If they do, the fixture grows a second factory; the guide
@@ -645,3 +651,23 @@ The implementation map for the feature described in
   -Pdiagnostics` command, and no `labs/README.md` row was added - the
   index row belongs to tickets 64/65 per ticket 60's decision.
   [Answer](issues/63-m13-doc-the-production-capstone.md)
+
+- **2026-10-24 · ticket 64** — The M13 lab's Start module is the lab-12
+  solution carried forward byte for byte - the application the twelve
+  Modules assembled, `process-aot` included - with two surefire
+  diagnostics (evidences the exploded form carries: probe states,
+  counters, a drain - nothing packaged needed) pinning the capstone's
+  reds. The readiness diagnostic is one outage story on a real boot;
+  the bounds diagnostic applies the deployment's overrides to a real
+  boot's command line and asserts the process keeps them. Two facts the
+  prototype pass earned: the framework's `MethodRetryEvent` counter
+  answers *every exception the retry processing encounters* - a spent
+  budget of one attempt publishes two (the failed execution's own and
+  the interceptor's exhausted mark), against the three attempts' four -
+  so "no retries" and "zero counter" are different claims, and the
+  bounds diagnostic asserts the ceiling of two; and the geometry can
+  reach the environment through the annotation's String variants
+  (`maxRetriesString` and kin carry `${...}` placeholders), so the
+  Solution's shape is a bookkeeping class in the boundary plus one
+  attribute - `@EnableResilientMethods` machinery untouched.
+  [Answer](issues/64-m13-lab-start-the-production-capstone.md)
