@@ -650,34 +650,46 @@ equips you to review. Answer first; the answers say why, not just what.
    is stateless with a bearer token, `csrf.disable()` is the deliberate,
    documented exception, not a response to a Boot 4 change.
 
-3. **About the method-security section: a reviewer says
-   `@PreAuthorize("#memberId == authentication.name")` is enough to stop one
-   Member borrowing as another, so the controller can keep passing
-   `request.memberId()`. Say what the expression compares and what happens to a
-   Member who sends somebody else's id - then say why the reviewer's conclusion
-   is still the wrong one, and what the controller has to change. Name the two
-   annotation defaults that decide whether the check runs at all.**
+3. **About the chain section and the method-security section - the two layers
+   the Lab stacks on one borrow: a colleague reviews
+   `lab-10-security7-solution` and proposes two simplifications. "The URL rule
+   is redundant: `@PreAuthorize("#memberId == authentication.name")` already
+   refuses a caller who is not the [Member](../GLOSSARY.md) named in the
+   request - drop the `hasRole("MEMBER")` rule for `/api/loans/**` and let
+   `anyRequest().authenticated()` carry the surface." And: "The expression is
+   redundant: the controller passes `authentication.getName()`, so the
+   expression compares the argument with itself - it checks nothing - and the
+   annotation can go." Say what each simplification loses: which caller gets
+   through, and at which layer the refusal used to happen. Name the annotation
+   that keeps the expression live, the default that decides it, and the trap
+   in the still-compiling old annotation.**
 
-   The expression compares the use case's first argument - `#memberId`, read
-   from the compiled parameter name - with the authenticated principal's
-   `name`. With `request.memberId()` still in the controller, the left side is
-   whatever the caller put in the body and the right side is the caller's
-   authenticated name: a Member who sends their own id gets a true comparison
-   and a [Loan](../GLOSSARY.md) in their own name, and a Member who sends
-   somebody else's id gets a false comparison and a `403`. So the cross-Member
-   write is refused today - the reviewer's premise is right about that one
-   call. The conclusion is wrong because it makes the API's safety a property
-   of one annotation on one method: the request still *offers* the caller a
-   `memberId` to choose, and the next endpoint that reads the field and
-   forgets the expression - a list, a cancel, a second use case - is open. The
-   controller stops accepting the id at all: drop `memberId` from the request
-   record and pass `authentication.getName()` to the use case. The expression
-   then compares the principal with itself, and the value the caller could
-   choose is gone rather than merely checked. The two defaults:
-   `@EnableMethodSecurity`'s `prePostEnabled = true` (so `@PreAuthorize` runs
-   with no attribute) and `@EnableGlobalMethodSecurity`'s
-   `prePostEnabled = false` (so the old annotation without the attribute runs
-   nothing). That difference is why the annotation choice is not cosmetic.
+   Neither simplification is free, and each loses a different caller. The URL
+   rule and the expression answer two different questions: the rule answers
+   *may this principal call the lending API at all*, and its `403` is answered
+   before the use case runs - the diagnostics assert exactly that refusal -
+   while the expression answers *whose [Loan](../GLOSSARY.md) is this*, and it
+   reads the use case's argument. Drop the rule and an authenticated
+   principal without the Member role - the `OPERATOR`-shaped credential the
+   management chain knows - walks past `anyRequest().authenticated()`, and
+   the expression cannot stop them: method security reads arguments, not
+   authorities, and the comparison the controller arranges is true by
+   construction - the id passed is the principal's own name - so the borrow
+   lands instead of the `403` the rule answered. Drop the annotation and
+   nothing fails today: every test on the happy path still answers `201`,
+   because the controller passes only the principal's name and nothing
+   contradicts it. What is lost is the path that ever supplies a different id
+   - the next endpoint that offers the caller a `memberId` and reads it -
+   which the annotation turns into a `403` instead of a [Loan](../GLOSSARY.md)
+   in somebody else's name; without it the API's safety is one controller's
+   discipline, the contract the Module's "stop accepting the id" argument
+   refuses to trust alone. The annotation is `@EnableMethodSecurity`, whose
+   7.1.1 default is `prePostEnabled = true` - the expression is live with no
+   attribute - and the trap is the old `@EnableGlobalMethodSecurity`, present
+   in the 7.1.1 jar, still deprecated, still compiling: without the attribute
+   its `prePostEnabled` default of **false** runs nothing, so the expression
+   survives in the source, the tests on the happy path stay green, and the
+   check quietly stops existing - the quietest upgrade defect in this Module.
 
 4. **About the password section: a stored row begins `{noop}secret`, and a
    colleague says "the encoder will hash it on the next login." Explain what
