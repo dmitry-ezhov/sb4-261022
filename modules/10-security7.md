@@ -749,83 +749,128 @@ production-shaped rather than merely working. Every item is observable -
 checkable by reading the change or running a command - and none of them
 repeats a gate the build already enforces.
 
-- **The chain is a `SecurityFilterChain` bean.** The change contains no
-  `WebSecurityConfigurerAdapter`, no `authorizeRequests()`, no `antMatchers()`
-  or `mvcMatchers()`, and no `and()`. Those are the four searches that answer
-  in seconds, and any hit is a Boot 2 fragment that survived the upgrade by
-  not being compiled.
-- **Every configurer call uses the `Customizer` form.** `csrf(...)`,
-  `formLogin(...)`, `httpBasic(...)` and `oauth2ResourceServer(...)` each take
-  a lambda or `Customizer.withDefaults()`; no no-arg overload is called,
-  because 7.1.1 has none. `authorizeHttpRequests(...)` is the only
-  authorization entry point.
-- **The only matcher class named is `PathPatternRequestMatcher`.** The diff
-  contains no `AntPathRequestMatcher` and no `MvcRequestMatcher` - they are
-  not in the 7.1.1 jar - and a `securityMatcher` that needs an explicit
-  matcher builds it with `PathPatternRequestMatcher.withDefaults()`.
-- **The public surface is exactly the surface that should be public.** The
-  [Title](../GLOSSARY.md) catalogue's read endpoints and `/actuator/health/**`
-  are permitted; `/api/loans/**` requires the `MEMBER` role; every other
-  actuator endpoint is not public, and `anyRequest().authenticated()` closes
-  the chain. The M09 never-list still holds: the management surface is not
-  re-exposed by a convenience `permitAll`.
-- **The Member is the authenticated principal.** The borrow request carries
-  the [Copy](../GLOSSARY.md)'s barcode, not a `memberId`; the controller
-  passes `authentication.getName()`; and the use case's
-  `@PreAuthorize("#memberId == authentication.name")` is a second lock, not
-  the only one. A request with no authentication answers `401`; a principal
-  without the Member role answers `403`; a body that still carries another
-  Member's id is ignored, and the [Loan](../GLOSSARY.md) lands on the
-  authenticated Member.
-- **Method security is switched on and the old annotation is not used.**
-  `@EnableMethodSecurity` is on a configuration class; there is no
-  `@EnableGlobalMethodSecurity` in the change (it is present in 7.1.1 but
-  deprecated, and its `prePostEnabled` default is false). The expression's
-  parameter names compile because this course's root POM sets
-  `maven.compiler.parameters=true`.
-- **The [Loan limit](../GLOSSARY.md) counts the authenticated Member's
-  [Active loans](../GLOSSARY.md).** The
-  count is keyed by the principal's name, not by a request field and not by a
-  global total; the M08 boundary still wraps the count and the write, and the
-  M09 metric is still published where the [Loan](../GLOSSARY.md) is issued.
-- **CSRF is on for every session- or cookie-authenticated chain, and off only
-  where the chain is stateless and token-authenticated.** The exception is
-  written down in the change, next to the `STATELESS` line that justifies it.
-  If a `CookieCsrfTokenRepository` is configured, it uses
-  `setCookieCustomizer` - the four individual cookie setters are gone - and
-  `csrf.spa()` is used for a single-page application rather than a hand-rolled
-  token dance.
-- **Passwords are stored with an algorithm prefix.** A `PasswordEncoder` bean
-  is declared; no plaintext password sits in `application.properties` or in a
-  migration; `{noop}` appears nowhere outside the generated development
-  principal; and a stored `{bcrypt}` value is what the encoder produced, not a
-  value copied from a Boot 2 `BCryptPasswordEncoder` row without its prefix.
-- **The resource-server spelling is 4.1.1's.** The POM names
-  `spring-boot-starter-security-oauth2-resource-server`, not the deprecated
-  `spring-boot-starter-oauth2-resource-server`; the chain calls
-  `oauth2ResourceServer(oauth2 -> oauth2.jwt(...))`, not the removed no-arg
-  form; and the token's authorities are mapped deliberately when the claim is
-  not `scope`.
-- **The test dependency is the security one.** `spring-boot-starter-security-test`
-  is in test scope, so `@WithMockUser` is on the classpath; the tests assert
-  the behaviour - `401` unauthenticated, `403` for a principal without the
-  Member role, `201` for the owner's borrow, and, on any session chain the
-  change keeps, `403` for a `POST` without a CSRF token - not the arrangement
-  of the configuration classes.
-- **Boot 4 imports are the Boot 4 packages.** Any reference to Boot's security
-  auto-configuration uses `org.springframework.boot.security.autoconfigure.*`,
-  not `org.springframework.boot.autoconfigure.security.servlet.*`; the
-  starter name `spring-boot-starter-security` is unchanged, which is why the
-  application boots while a hand-written old import does not.
-- **The vocabulary is the glossary's in the names, not just in the prose.**
-  The principal is a [Member](../GLOSSARY.md), the thing borrowed is a
-  [Copy](../GLOSSARY.md), the row is a [Loan](../GLOSSARY.md), and the limit
-  is the [Loan limit](../GLOSSARY.md) - not "user", "book" or "checkout" - so
-  the authorization rule, the error message and the test names all speak the
-  same language as the domain.
-- **The diagnostics guarantee is proved by a failing-then-passing run.** Run
-  it both ways and report what ran:
-  `./mvnw -f labs -pl lab-10-security7-start verify -Pdiagnostics` (red - the
-  Start module authenticates nobody), then the same against the `-solution`
-  module (green - authentication, ownership and the per-Member limit hold);
-  the asymmetry is the requirement, stated exactly as M08's and M09's ran.
+- **Access is denied unless a rule grants it, and both walks are ordered.**
+  The change's rule lists are lists of grants and every walk ends closed:
+  the management chain permits `/actuator/health/**` and requires
+  `OPERATOR` of every other endpoint, the API chain permits the
+  [Title](../GLOSSARY.md) catalogue's reads and requires `MEMBER` on
+  `/api/loans/**`, and `anyRequest().authenticated()` closes it - the
+  [Reservation](../GLOSSARY.md) surface is answered by that last rule,
+  not by being named. The two chains are ordered explicitly, and the
+  order is load-bearing: the management chain claims `/actuator/**` with
+  a `securityMatcher` (the matcher built from
+  `PathPatternRequestMatcher.withDefaults()` - the one matcher class
+  7.1.1 still has) at `@Order(1)` and the no-matcher API chain walks
+  last; without the order the no-matcher chain would answer every
+  surface, the management one included. Verified by reading both rule
+  lists' last lines and by running the diagnostics, which read the
+  grant list off reality: health answers a stranger `200`, the same
+  stranger's read of metrics is refused, and an unauthenticated
+  reservation call is refused with `401`.
+- **Both refusals are asserted, as two different answers of the real
+  chains.** The tests ride the change's own `SecurityConfiguration` - the
+  slice imports it, and `spring-boot-starter-security-test` is in test
+  scope, without which `@WithMockUser` is not on the classpath at all -
+  so the two refusals are the product's, not a test
+  rig's rules: an unauthenticated borrow answers `401` (authentication
+  missing) and a principal *without* the [Member](../GLOSSARY.md) role
+  answers `403` (a qualifying identity that does not qualify, earned by a
+  caller who did authenticate), both before the controller runs - a
+  [Copy](../GLOSSARY.md) mapped and the use case consulted on neither.
+  Between them sits the passing case: the `201` the owner's borrow
+  earns. And on any session- or cookie-authenticated chain the change
+  keeps, a `POST` without a token answers `403` even authenticated -
+  CSRF's filter refuses before authorization reaches it. Verified by
+  reading the test tree at the tier whose slice carries the real chain.
+- **The [Member](../GLOSSARY.md) is the authenticated principal, and the
+  domain is the second lock.** Nothing the request carries names a
+  Member: `LoanRequest` keeps the [Copy](../GLOSSARY.md)'s barcode and
+  nothing else, the controller passes `authentication.getName()`, and a
+  body that still names another Member is ignored - the
+  [Loan](../GLOSSARY.md) lands on the caller, and the
+  [Loan limit](../GLOSSARY.md) counts that Member's
+  [Active loans](../GLOSSARY.md). The use case's
+  `@PreAuthorize("#memberId == authentication.name")` is the second
+  lock, not the only one: it refuses a path that ever supplies a
+  different id with `403` before the boundary's transaction opens - and
+  it reads arguments, not authorities, so the rule-less `403` for the
+  wrong role can only have come from the chain. Verified by running the
+  diagnostics, whose messages name the row's owner and the limit's
+  count, and by reading where each refusal's rule lives - the chain for
+  the role, the use case for the id.
+- **Method security is enabled by the annotation whose defaults run
+  something.** `@EnableMethodSecurity` names no attribute - its
+  `prePostEnabled` default is already `true` - while a compiling change
+  can still carry `@EnableGlobalMethodSecurity`: it is in the 7.1.1 jar,
+  deprecated, and attribute-less its default answers `false`, so the
+  expression survives in the source and runs nothing. That is the one
+  upgrade defect in this area no compiler refuses, which is why the
+  reviewer's search is the annotation and nothing besides - the deleted
+  names (`WebSecurityConfigurerAdapter`, `authorizeRequests()`, `and()`,
+  the no-arg configurers, the gone matcher classes) are not in the
+  7.1.1 jar at all, and compilation against it already refuses them
+  all. The expression's named parameter compiles because this course's
+  root POM sets `maven.compiler.parameters=true`. Verified by reading
+  the annotation's home and the diff for the one name that survives.
+- **CSRF is a decision, not a default.** It stays on for every session-
+  or cookie-authenticated chain and is off only where the chain is
+  stateless and token-authenticated - `STATELESS` and the disable
+  written in the same block, one argument, because a credential the
+  client's code attaches on every request leaves nothing ambient for a
+  browser to borrow. Where the change keeps CSRF on for a browser
+  application, `csrf.spa()` is the switch, not a hand-assembled
+  repository; where a `CookieCsrfTokenRepository` is configured, its
+  attributes go through `setCookieCustomizer` - 7.x removed
+  `setCookieHttpOnly`, `setCookieDomain`, `setSecure` and
+  `setCookieMaxAge`, keeping only the name and path setters. The
+  exception is written down in the change, next to the line that
+  justifies it. Verified by reading.
+- **No secret is hard-coded or logged.** A `PasswordEncoder` bean is
+  declared, and every stored credential is a value it produced - the
+  `{bcrypt}` prefix names the algorithm the comparison uses, `{noop}`
+  appears nowhere except a generated development principal deleted
+  before production, and no credential sits in an `application.yml` or
+  a migration row that no rotation can reach. The principal store is
+  also the log check: Boot's own generated principal prints its
+  password on a warn line - `Using generated security password:` - and
+  an application whose `UserDetailsService` bean is its own store is
+  the change that stops the line from existing at all. Verified by
+  reading the stored values and by grepping one boot log for the line.
+- **A resource server, where the change adds one, is spelled 4.1.1's.**
+  The starter is `spring-boot-starter-security-oauth2-resource-server`
+  - the old `spring-boot-starter-oauth2-resource-server` still resolves,
+  deprecated - the configurer is
+  `oauth2ResourceServer(oauth2 -> oauth2.jwt(...))`, whose no-arg form
+  compilation refuses with the rest of the deletions, and the
+  deliberate part is the authorities mapping: `scope` becomes
+  `SCOPE_...` by default, so a token whose claim is named something
+  else carries the converter, or the rule reads a claim nobody sends.
+  Verified by reading.
+- **Where the change names an auto-configuration class, in Java or in a
+  property, the name is the 4.1.1 one.** The security
+  auto-configurations live in `spring-boot-security` under
+  `org.springframework.boot.security.autoconfigure.*`; the 3.5.16
+  spellings under `org.springframework.boot.autoconfigure.security.servlet.*`
+  are not in 4.1.1's jars, so a Java import of one fails compilation -
+  but a class name inside an `application.yml` compiles against
+  nothing, which is why the one search the diff also needs is every
+  printed FQCN in the resources: a `spring.autoconfigure.exclude` (and
+  any other class-named property) answered with a 4.1.1 package.
+  Verified by reading the diff twice - once for the imports, once for
+  the property strings.
+- **The vocabulary is the glossary's in the names, not just in the
+  prose.** The principal is a [Member](../GLOSSARY.md), the thing
+  borrowed is a [Copy](../GLOSSARY.md), the row is a
+  [Loan](../GLOSSARY.md), and the limit is the
+  [Loan limit](../GLOSSARY.md) - not "user", "book" or "checkout" - so
+  the authorization rule, the error message and the test names all
+  speak the same language as the domain. Verified by reading the names.
+- **The diagnostics guarantee is proved by a failing-then-passing run.**
+  Run it both ways and report what ran:
+  `./mvnw -f labs -pl lab-10-security7-start -am verify -Pdiagnostics`
+  (red - the Start module authenticates nobody: five diagnostics, each
+  message naming the missing grant or refusal), then the same against
+  the `-solution` module (green - the grants, both refusals, the row's
+  owner, the per-Member limit and the guarded management socket hold);
+  the asymmetry is the requirement, stated exactly as M08's and M09's
+  ran.

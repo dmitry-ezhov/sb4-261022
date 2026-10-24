@@ -369,6 +369,29 @@ The implementation map for the feature described in
   the quietest upgrade defect in the Module.
   [Answer](issues/51-m10-quiz-spring-security-7.md)
 
+- **2026-10-24 · ticket 52** — The M10 checklist graded against its
+  criteria and rebuilt where the criteria failed. The draft's first three
+  items searched the diff for *deleted* names - `WebSecurityConfigurerAdapter`,
+  `authorizeRequests()`, the no-arg configurers, the gone matcher classes -
+  states compilation against the 7.1.1 jar already refuses (`javap`:
+  `HttpSecurity` has only `Customizer` overloads), so they became checks the
+  compiler cannot do: default-deny with the load-bearing `@Order`, the live
+  `@EnableGlobalMethodSecurity` trap, and the old FQCNs in property form -
+  the jar read showed
+  `org.springframework.boot.autoconfigure.security.servlet.*` absent from
+  4.1.1 entirely, so a class name inside an `application.yml` compiles
+  against nothing. The criteria's open halves landed: unnamed paths closed
+  *as observed* (health `200`, metrics refused, reservation `401`), and the
+  secrets item finally says *logged* - the generated principal's password
+  on one warn line (`javap` of `UserDetailsServiceAutoConfiguration`),
+  stopped by an own-store `UserDetailsService` bean. Two jar-grade
+  corrections: the cookie repository's four removed setters named exactly
+  (httpOnly, domain, secure, maxAge; name and path survive), and the
+  resource-server spellings bind only where the change adds one. The
+  two-way diagnostics run confirmed the asymmetry: red 5/5 on the start,
+  green 5/5 on the solution.
+  [Answer](issues/52-m10-checklist-spring-security-7.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
