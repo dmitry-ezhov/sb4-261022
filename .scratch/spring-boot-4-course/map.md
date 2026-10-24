@@ -507,6 +507,41 @@ The implementation map for the feature described in
   solution.
   [Answer](issues/57-m11-checklist-resilience-and-virtual-threads.md)
 
+- **2026-10-24 · ticket 58** — The M12 doc's eight delta rows split
+  into three kinds of change, each verified against artifacts its own
+  way: the *removals* (all six plugin descriptors read -
+  `executable`/`embeddedLaunchScript` gone from the 4.1.1 repackage
+  mojo with `loaderImplementation`, the latter having arrived in 3.2;
+  `spring-boot-loader-classic` present at 3.5.16 and absent at
+  2.7.18/4.1.1 while `org.springframework.boot.loader.launch.
+  PropertiesLauncher` still ships in the 4.1.1 loader jar; `layertools`
+  renamed `tools` in 3.3, the tool artifact absent at 3.2.12 and
+  present from 3.3.13, with the verb set `extract`/`list-layers`/
+  `help` confirmed by running `help` against the real 4.1.1 lab-11
+  artifact), the *source-invisible version jump* (`native-build-tools-
+  plugin.version` 0.10.6 in 3.5.16's dependencies POM -> 1.1.8 in
+  4.1.1's; the GraalVM Native Image Kit floor is version 25, quoted
+  from the how-to), and the *expansion* (`process-aot`/`process-test-
+  aot` from 3.0; Framework 7.0.9 consolidates the 6.2.19 per-family
+  hint writers into `RuntimeHintsWriter` and adds `LambdaHint` - the
+  comm diff of both jars; the 3.5 "Class Data Sharing" packaging page
+  becomes "AOT Cache", its 3.5 URL 302-redirecting and its 4.1 text
+  reading "supports the AOT cache for Java 25 and above"; the
+  buildpack default builder enumerated per release from the
+  buildpack-platform bytecode: `jammy-base` -> 3.4 `jammy-java-tiny` ->
+  3.5/4.1 `noble-java-tiny`). Jar-grade corrections along the way: the
+  AOT hint annotation package `org.springframework.aot.hint.annotation`
+  lives in **spring-core** (javap-verified; `ImportRuntimeHints` alone
+  is spring-context), and `spring.context.exit` enters Framework 6.1
+  (carried by `DefaultLifecycleProcessor` in 6.1.14 and 6.2.19,
+  absent from 6.0.23) - so the training-run switch predates Framework
+  7. The row's strictest jar read: 4.1.1's `spring-boot` jar (846
+  classes) carries `spring.aot.enabled` in exactly one class,
+  `AotInitializerNotFoundFailureAnalyzer`, whose constant pool names
+  the switch twice. The two Java snippets compile against the 7.0.9
+  classpath; the doc-tickets 61/62 own the quiz and checklist.
+  [Answer](issues/58-m12-doc-native-images-and-packaging.md)
+
 ## Fog
 
 - Whether the sibling checklists' diagnostics commands (M08, M09: `-pl
@@ -518,3 +553,10 @@ The implementation map for the feature described in
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
   fixed one. If they do, the fixture grows a second factory; the guide
   already lists what the module holds.
+
+- The lab index's row 12 still reads `lab-12-capstone-*` with the Infra
+  column "Docker" - a stale entry from before the M12 tickets named the
+  pair `lab-12-native-images-and-packaging-start`/`-solution` (58's
+  doc names those); the row belongs to the M12/M13 lab tickets to
+  correct, since the aggregator listing is authored by the ticket that
+  creates the modules.
