@@ -500,3 +500,226 @@ same checklist: every line of the assembled `application.yml`, every
 counter, every refusal, every form - each one an answer the build
 verifies.
 
+## Quiz
+
+Five questions about the eight rows read as one deployment, and the
+operational checklist they assemble into. Answer first; the answers say
+why, not just what.
+
+1. **About the attribution: the library's upgrade memo lists what the jump
+   to 4.1.1 "delivers with no one writing configuration", in four
+   sentences. (1) "The availability-probe endpoints answer about the
+   process on every platform." (2) "Graceful shutdown drains in-flight
+   requests on stop." (3) "The library's typed refusals come back as
+   `application/problem+json`." (4) "The retry and bulkhead annotations
+   replace the spring-retry artifact." Which sentences survive as filed,
+   what actually owns each of the others, and why does the wrong filing
+   survive a straight 2.7 to 4.1.1 upgrade?**
+
+   Sentence (1) survives, and it is the memo's one correctly-filed Boot 4
+   claim. `AvailabilityProbesAutoConfiguration` in the new
+   `spring-boot-health` module is
+   `@ConditionalOnBooleanProperty("management.endpoint.health.probes.enabled",
+   matchIfMissing = true)` - the module's own `javap -v` read of the 4.1.1
+   class file - so liveness and readiness answer on every platform, and an
+   upgrading application *gains* two answering endpoints it never
+   configured. That and the AOT jar as a documented JVM deployment form
+   are the two behaviour flips this table carries; everything else the
+   memo lists inherits from somewhere else.
+
+   Sentence (2) describes something true with the wrong release on it.
+   The drain is real - `ServerProperties` in the new `spring-boot-web-server`
+   module carries the `graceful` default (the fresh metadata read) - but
+   the flip is Boot 3.4's, one generation earlier: the delta table's 3.5
+   column already reads `graceful`, and this is exactly the misattribution
+   M11's post-mortem sentence modelled ("Boot 4 finally turned graceful
+   shutdown on for us"). A memo of record that blames 4.1.1 will be the
+   note an incident opens when a reviewer asks "when did this behaviour
+   arrive", and the jars can answer a release the memo never names.
+
+   Sentence (3) is false on both counts. The switch predates Boot 4 -
+   `spring.mvc.problemdetails.enabled` arrived in 3.0 - and it still
+   defaults **false** on 4.1.1 (the fresh metadata read of the
+   `spring-boot-webmvc` jar). Nothing is delivered: the assembled
+   application answers `application/problem+json` because its handler
+   maps one method per typed refusal with the status attributed there -
+   a decision, not a delivery, which is item 5 of the operational
+   checklist.
+
+   Sentence (4) misfiles the *layer*, not just the release. The
+   annotations are the Framework's - `@EnableResilientMethods`,
+   `@Retryable`, `@ConcurrencyLimit` in `org.springframework.resilience.annotation`,
+   7.0.9, resolved by jars the build already pulls, zero extra
+   dependencies, the programmatic `RetryTemplate` beside them in
+   spring-core. Boot 4's contribution to the area is the packaging move
+   M09-M12 kept finding, not the annotations.
+
+   The memo survives a review because a straight 2.7 to 4.1.1 upgrade
+   never sees an intermediate release note: every drift since 2.7 lands
+   with the newest major, and half the habits above moved one generation
+   before Boot 4 anyway. The delta table is the attribution - the receipt
+   the upgrade note is owed, and the reason "blames Boot 4" is a
+   reproducible defect rather than an opinion.
+
+2. **About the refusal-map item: a consolidation PR rewrites the
+   assembled handler - one method per typed refusal, statuses attributed -
+   into a single `@ExceptionHandler(Exception.class)` method, reasoning
+   "the method inspects the exception and keeps each answer's status, and
+   one handler covers what nobody mapped." What happens to the four
+   answers the map serves - 409 for the [Loan
+   limit](../GLOSSARY.md) and the gone [Available copy](../GLOSSARY.md),
+   404 for an unknown [Copy](../GLOSSARY.md), 400 for the refused
+   binding, 502 for the spent retry budget - and what is the review's
+   grep for `@ExceptionHandler` catching?**
+
+   The premise fails where the statuses live. A domain exception carries
+   no status: `LoanLimitExceededException` was never told it is a `409`,
+   and the per-type handler method is precisely where the status is
+   *chosen* - one decision per refusal, each answering
+   `application/problem+json` with the title of its refusal. A method on
+   `Exception.class` cannot "inspect the status" out of an exception that
+   does not have one; its inspection either re-implements the map as an
+   instanceof chain - the same code minus the thing the review greps for -
+   or answers everything with one status and one title, in which case a
+   [Member](../GLOSSARY.md) at the [Loan limit](../GLOSSARY.md) and an
+   outage's spent budget wear the same sentence.
+
+   The second half of the grep is the deeper catch. With the catch-all
+   standing, an exception nobody anticipated stops being nobody's
+   failure: it now receives the application's own problem-detail
+   vocabulary, drafted by a method that never decided what it should say -
+   the `@ExceptionHandler(Exception.class)` swallowing what nobody
+   anticipated, exactly the shape the checklist's item 5 refuses. The
+   unowned failure should keep meeting the default error handling, where
+   its news - the stack trace, the unowned body or status - is legible as
+   *nothing designed it*.
+
+   The binding refusal is the one answer the framework itself owns:
+   Framework 6.1 moved binding failures to the dispatch level, where the
+   failure type answers `400` through its own `ErrorResponse` contract,
+   before the handler's code runs. Under the catch-all it is re-decided
+   like every other refusal by a method that cannot know the type had a
+   status of its own - so the claim "keeps each answer's status" is false
+   even for the one refusal the framework attributed.
+
+3. **About the bounds item: the deployment's change-request form carries
+   one line: "the availability retry geometry is annotation code -
+   `maxRetries = 2, delay = 100, multiplier = 2, maxDelay = 1000` -
+   annotation values are compile-time constants, so every retune of the
+   outage response is a rebuild, a re-tag and a redeploy." What does the
+   lab's jar hold in the annotation and what in the environment, what does
+   a stripped `application.yml` boot with, and what one thing about the
+   retried call stays a compiled reference?**
+
+   The numbers left the annotation. The lab's solution writes them in the
+   String variants the annotation carries for exactly this -
+   `maxRetriesString` and kin - and each String holds a `${...}`
+   placeholder: `${library.availability.max-retries:2}`,
+   `${library.availability.delay:100}`, `${library.availability.jitter:50}`,
+   `${library.availability.multiplier:2}`,
+   `${library.availability.max-delay:1000}`, resolved against the
+   environment at proxy build time. The change-request's premise - "the
+   geometry is annotation code" - was true of the *long* attributes and
+   false of the jar as built: the keys live in the assembled
+   `application.yml` beside `library.availability.base-url`, each value
+   the jar's own reviewed geometry written where a deployment reads the
+   policy it inherits, and a property source outranks the yml - one
+   command line names the new numbers, no rebuild, which is what the
+   Lab's third move asks the override to prove.
+
+   The stripped yml is not an unbounded boot: each placeholder's default
+   is the jar's reviewed geometry, so a boot with the keys absent starts
+   shaped, never unbounded. What stays compiled: `includes` - the
+   `ResourceAccessException` reference, the one wire failure a replay may
+   carry. A type is not a chain of property sources; narrowing what a
+   replay may carry is what `includes` is for, and placeholders cannot
+   express it.
+
+   The same arithmetic is why the drain window is line one of the
+   assembled yml, not a constant: `spring.lifecycle.timeout-per-shutdown-phase:
+   10s` is a decision with a length the deployment can name. The
+   diagnostics make all of it executable: bounds spelled on one command
+   line against a real boot, each read back on the wire - including a
+   deployed five-second read timeout that keeps a 2.5s answer alive into
+   a `201` where the jar's own two-second default would have timed it
+   dead.
+
+4. **About the schema row: at the rehearsal boot for the capstone's first
+   release, `ddl-auto: validate` refuses the start - an entity mapping
+   does not match the database, and the deployment stops before serving.
+   The deployment memo reacts with two lines: "set the server profile to
+   `update`, a boot converges the database and the gate never fires
+   again", and "once the migrations own the schema, `validate` is
+   redundant - drop it." What did the rehearsal's refusal just buy, what
+   does each line of the memo bury, and where does the next schema change
+   belong?**
+
+   The refusal bought the cheap wrong answer, and the cost paragraph
+   prices why it is worth keeping: it surfaced the divergence on the
+   *first boot after the change*, before the process serves - one of the
+   few places where the wrong answer is fast. Under the convergence line
+   the divergence is not gone - it waits for the [Loan](../GLOSSARY.md)
+   whose query reads the column, at the worst hour a schema mismatch can
+   arrive: mid traffic.
+
+   "Set the profile to `update`" buries the gate under convergence by
+   guess. Hibernate writes what it thinks the schema is, the boot turns
+   green, and the database's words drift from the migration's - the
+   deployment that does this carries a database whose vocabulary the
+   application no longer recognises, hidden underneath a healthy boot,
+   which is the deployment shape the capstone's cost paragraph walks.
+   And the convergence is unrepeatable by construction: the migration is
+   one script with standard types, run unchanged by H2 and PostgreSQL,
+   while a Hibernate-generated fix-up is written by whichever engine
+   happened to be running, remembered only by the schema it mutates.
+
+   "`validate` is redundant" is backwards: the validator never wrote a
+   schema, so nothing about the migration owning it removes it - it is
+   the mechanism that makes the ownership claim checkable at every boot
+   instead of at every incident. The migration owns the schema's full
+   state; the gate refuses Hibernate's guesses; a migration-boot process
+   validates before it serves. What both memo lines avoid doing is the
+   actual work: author the change as the next migration, run before any
+   read, on both engines, in the columns' own vocabulary -
+   `member_id`, `copy_id`, `barcode` are the words an incident is
+   written in.
+
+5. **About the Lab's move: the availability outage hits, and a colleague
+   ships a patch titled "consistent surfaces": the same boundary that
+   publishes `ReadinessState.REFUSING_TRAFFIC` also makes the
+   [Title](../GLOSSARY.md) catalogue answer 503 for the length of the
+   outage, "so what the platform routes and what the
+   [Member](../GLOSSARY.md) reads say the same thing." List the surfaces
+   the assembled application answers during one outage, then judge the
+   patch: what did the publish buy, and what does the extra `503` cost?**
+
+   The surfaces, each answering its own question: the
+   [Title](../GLOSSARY.md) catalogue keeps answering - its reads are
+   public by the API chain's enumeration, and the outage broke the borrow
+   path's availability client, not the catalogue's database; the borrows
+   keep answering their `502` problem details - the refusal question the
+   outage raises, already answered; `library.availability.retried` keeps
+   counting - the outage's signature read beside the borrows that failed;
+   liveness keeps answering `UP` - a restart is the platform's repair for
+   a broken process, never for a broken dependency; readiness moves to
+   `OUT_OF_SERVICE`.
+
+   The publish is right because it is a sentence about *itself*:
+   `AvailabilityChangeEvent.publish(context, ReadinessState.REFUSING_TRAFFIC)`
+   is state, not a toggle, so every listener - the read probe above all -
+   reads the same thing, and when one read of the availability service
+   lands, the recovery publish moves the state back the same way. That is
+   the whole move: the process says which question it wants the platform
+   to keep answering.
+
+   The patch's 503 is the routing question re-answered on the client's
+   surface. Readiness tells the platform whether to route; the catalogue's
+   `200`s tell the [Member](../GLOSSARY.md) what still works. The outage
+   takes nothing from the catalogue, so the 503 withholds capability the
+   outage never touched, and it puts the outage's news in the one body
+   whose reader the outage's answer was never for - the
+   [Member](../GLOSSARY.md)'s question was the refusal question, answered
+   at `502` since before this Module existed. The capstone's own sentence
+   is the patch's correction: "readiness is the routing question, and the
+   refusal question was already answered."
+

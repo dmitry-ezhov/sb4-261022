@@ -676,3 +676,45 @@ The implementation map for the feature described in
   Solution's shape is a bookkeeping class in the boundary plus one
   attribute - `@EnableResilientMethods` machinery untouched.
   [Answer](issues/64-m13-lab-start-the-production-capstone.md)
+
+- **2026-10-25 · ticket 65** — The M13 lab's Solution module makes the
+  assembled application tell the platform one sentence: the boundary's
+  `502` handler for the spent availability budget publishes
+  `ReadinessState.REFUSING_TRAFFIC` through `AvailabilityChangeEvent` (the
+  spent budget is exactly the moment the dependency stopped answering),
+  and the checker publishes `ACCEPTING_TRAFFIC` on every read that lands,
+  so recovery is discovered by the same wire the outage was; the retry
+  geometry moved from compiled annotation attributes to the String
+  variants carrying `${...}` placeholders (`library.availability.*`,
+  defaults written in the placeholder), resolved against the environment
+  at proxy build time, with `includes` staying the compiled wire-failure
+  type. Diagnostics 2/2 red on Start, green on Solution; strict module
+  build green with coverage 90/87; both repository seams green.
+  [Answer](issues/65-m13-lab-solution-the-production-capstone.md)
+
+- **2026-10-25 · ticket 66** — The M13 quiz graded against its two named
+  targets before landing: *the trade-offs reviewed in one pass* is
+  question 1, the attribution memo (of four "delivered by 4.1.1 with no
+  configuration" sentences, one survives as filed - the probe default,
+  one of the two behaviour flips Boot 4 carries, one names the wrong
+  release (graceful shutdown, Boot 3.4's flip), and two name the wrong
+  owner twice-over: the problem-details switch predates Boot 4 by two
+  generations and still defaults false on 4.1.1, and the resilience
+  annotations are Framework 7's, resolved by jars the build already
+  pulls), and *what to check before the application meets a user* is four
+  questions on the operational checklist: what the refusal-map
+  consolidation into an `Exception.class` catch-all loses (the per-type
+  methods are where statuses are chosen, and the catch-all re-dresses
+  unowned failures), which bounds ride the environment (the String-variant
+  placeholders, the shaped stripped yml, `includes` as the one compiled
+  reference), what the rehearsal boot's `validate` refusal bought (the
+  fast wrong answer, versus the two memo lines that bury it), and which
+  of the outage's five surfaces the "consistent surfaces" patch changes
+  wrongly (the extra `503` re-answers the routing question on the
+  Member's surface). Each question was checked against the sibling
+  quizzes' ground: no question re-asks what M05 q2 (the flyway starter
+  trap), M06 q3 (the deleted handler), M09 q2-q3 (the probe split, the
+  tag two ways), M11 q5 (the graceful attribution) or M12 q1 (the frozen
+  profile mechanics) already asked, and no delta-table version or pin is
+  an asked-for recall item.
+  [Answer](issues/66-m13-quiz-the-production-capstone.md)
