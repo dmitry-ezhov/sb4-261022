@@ -117,7 +117,7 @@ and your commit messages.
 | B — Data & testing | M05–M08 | ~12.5h |
 | C — The platform | M09–M13 | ~16h |
 
-Roughly 38 hours in total. Each module is written to be taken in one sitting of
+Roughly 38.5 hours in total. Each module is written to be taken in one sitting of
 two to four hours; the labs are where the time goes. The full module table,
 with every lab and its infrastructure, is in the
 [repository README](../README.md#module-table).

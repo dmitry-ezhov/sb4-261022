@@ -745,8 +745,10 @@ The implementation map for the feature described in
   ADR 0006 and a dated note in the spec's Further Notes. The README's module
   table now matches what is built: M01-M13, every doc path as authored and
   linked, row 12's stale `lab-12-capstone-*` replaced with
-  `lab-12-native-images-and-packaging-*`, M12 infra GraalVM (opt.), the
-  hybrid twelve-row title split into the two real ones, and the total re-run
-  to ~38h; the welcome doc's pacing table and the glossary's *Module*
-  definition agree. All relative links re-checked resolving.
+  `lab-12-native-images-and-packaging-*`, row 12's infra GraalVM (opt.),
+  row 13's (checked in the POMs and the `@EnabledIfDockerAvailable` guard)
+  Postgres (opt.), the hybrid twelve-row title split into the two real
+  ones, and the total re-run to ~38.5h; the welcome doc's pacing table and
+  the glossary's *Module* definition agree. All relative links re-checked
+  resolving.
   [Answer](issues/68-course-index-and-documentation-pass.md)

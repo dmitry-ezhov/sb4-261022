@@ -33,7 +33,9 @@ The index pass and the naming decision, both done:
   an M13 row, and the twelve-Module "Native images & the production
   capstone" hybrid title split into the two titles the modules actually
   carry. Docs are linked now that every one exists, M12's infra states
-  GraalVM (opt.) to match the lab index, and the total reads ~38h with
+  GraalVM (opt.) and M13's Postgres (opt.) - both to match the lab index,
+  M13's lab being `@EnabledIfDockerAvailable` over PostgreSQL exactly like
+  M05/M07/M08's - and the total reads ~38.5h with
   Track C as M09–M13 in the Tracks table.
 - **The pacing tables match.** `modules/00-welcome.md`'s suggested-pacing
   table says C is M09–M13 at ~16h and the course ~38h, and points at the
@@ -70,3 +72,15 @@ The index pass and the naming decision, both done:
   seams were not re-run here; ticket 69 (which audited both seams on
   2026-10-22 and re-verified the versions table) re-checks them from a
   clean tree.
+- **2026-10-25 · agent · review pass** — Two-axis review of the index pass
+  (standards, spec) found the tree conforming on the standards axis and
+  three newsletter-grade corrections on the spec axis, all applied: M13's
+  infra is now Postgres (opt.) in both indexes, not "none" - the lab-13
+  POMs pull Testcontainers' PostgreSQL and `@EnabledIfDockerAvailable`
+  guards the containers, exactly the optional shape M05/M07/M08 declare -
+  and the course total reads ~38.5h (10 + 12.5 + 16) in the README and
+  the welcome doc rather than the previously written ~38. The reviewer's
+  two flagged-but-kept items: the module table carries Track in the
+  ranges table rather than a per-row column (the shape the acceptance
+  audit accepted), and the spec's Further Notes close with a forward
+  pointer to ticket 69, which stays true when that ticket resolves.

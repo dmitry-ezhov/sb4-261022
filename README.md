@@ -50,9 +50,9 @@ that the earlier ones extend.
 | M10 | Spring Security 7 | [`modules/10-security7.md`](modules/10-security7.md) | `labs/lab-10-security7-*` | ~3.5h | none |
 | M11 | Resilience and virtual threads | [`modules/11-resilience-and-virtual-threads.md`](modules/11-resilience-and-virtual-threads.md) | `labs/lab-11-resilience-and-concurrency-*` | ~3h | none |
 | M12 | Native images and packaging | [`modules/12-native-images-and-packaging.md`](modules/12-native-images-and-packaging.md) | `labs/lab-12-native-images-and-packaging-*` | ~4h | GraalVM (opt.) |
-| M13 | The production capstone | [`modules/13-the-production-capstone.md`](modules/13-the-production-capstone.md) | `labs/lab-13-the-production-capstone-*` | ~3h | none |
+| M13 | The production capstone | [`modules/13-the-production-capstone.md`](modules/13-the-production-capstone.md) | `labs/lab-13-the-production-capstone-*` | ~3h | Postgres (opt.) |
 
-Total: roughly 38 hours of learner time.
+Total: roughly 38.5 hours of learner time.
 
 ## The build
 
