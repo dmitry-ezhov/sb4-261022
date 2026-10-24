@@ -110,7 +110,7 @@ a plain `verify`.
 
 ## Verified versions
 
-Checked on 2026-10-24 against the versions actually resolved by the build.
+Checked on 2026-10-25 against the versions actually resolved by the build.
 
 | Component | Version |
 |---|---|

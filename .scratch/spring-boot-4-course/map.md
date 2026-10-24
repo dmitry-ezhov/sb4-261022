@@ -752,3 +752,17 @@ The implementation map for the feature described in
   the glossary's *Module* definition agree. All relative links re-checked
   resolving.
   [Answer](issues/68-course-index-and-documentation-pass.md)
+
+- **2026-10-25 · ticket 69** — The final audit closed on the clean tree at
+  `ca37f9f`: `./mvnw -f labs clean verify` green across 27 modules with all
+  seven gates executing - this time including the Checkstyle gate ticket 70
+  wired - and `./mvnw -f labs verify -Pdiagnostics-solutions` green on all
+  17 diagnostics classes with the Postgres containers real; the red-on-Start
+  asymmetry re-proven on lab-05. The verified-versions table re-confirmed
+  row by row from the resolved classpath, the wrapper and the build log
+  (Boot 4.1.1, Framework 7.0.9, Security 7.1.1, Jackson 3.1.5/`tools.jackson`,
+  Testcontainers 2.0.5, JDK 25.0.4.1, Maven 3.10.0, every plugin version) and
+  re-dated to 2026-10-25. Every specification criterion holds but one: US 28
+  and M01's "the course code is too" - no lab source carries a JSpecify
+  annotation, tracked as ticket 71, the repo's last open claim-gap.
+  [Answer](issues/69-final-audit-against-the-specification.md)
