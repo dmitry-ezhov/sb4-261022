@@ -837,3 +837,158 @@ what.
    against the extracted form, `mvn -Pnative` never asked for, no
    GraalVM on any machine - the one 4.x-class form whose entire
    toolchain is the JDK the course already builds with.
+
+## Checklist
+
+What a reviewer applies to a solution of this Lab to judge it
+production-shaped rather than merely working. Every item is observable -
+checkable by reading the change or running a command - and none of them
+repeats a gate the build already enforces.
+
+- **The packaged forms are the boots a review judges, and a switched
+  boot proves its playback, not merely an answer.** The Lab's
+  diagnostics are failsafe's, run after the package phase, and each one
+  *launches* the form it judges as a process: the packaged jar booted
+  plainly and again under `-Dspring.aot.enabled=true` from the entrance
+  the build wrote into `target/`, the extracted form - reached with the
+  tools jarmode's own command, `java -Djarmode=tools -jar ... extract` -
+  booted the same two ways against the run the packaging page calls
+  faster and recommended in production, and the AOT cache trained with
+  the page's own training line (`-XX:AOTCacheOutput=app.aot
+  -Dspring.context.exit=onRefresh`, against the extracted form, because
+  a cache is usable only there) and served from the combined form the
+  page names in one sentence, the cache on the run beside the switch on
+  the boot. Under the switch every answering boot is read further, for
+  the line an AOT-processed boot prints and a reflective one never
+  does - `Starting AOT-processed` - because a boot that answers under
+  the flag without naming the playback is the reflective startup
+  wearing a switch nobody honoured, the state the diagnostics' own
+  second read exists to refuse. Verified by running the diagnostics on
+  both halves of the pair - red on the Start module, where the switched
+  boots recruit nothing and the analyzer answers in its own words, and
+  green on the Solution module - the asymmetry being the point.
+- **The AOT work is one binding where the build can see it, and the
+  decisions it freezes are written down, not discovered at review
+  time.** The whole move is one `<execution>` on the
+  spring-boot-maven-plugin - the `process-aot` goal, in its default
+  phase, prepare-package, so its output (the generated
+  `__BeanDefinitions` sources, the bytecode, the hint JSON) lands
+  before the repackage and rides the packaged jar. Nothing substitutes
+  for it: no hand-written initializer, no CI-only invocation the POM
+  does not carry, and never `spring.aot.enabled=true` dropped into the
+  application's own `application.yml` - the switch is a *run* flag,
+  `java -Dspring.aot.enabled=true -jar`, and the flag-free boot is the
+  supported regular mode, the analyzer's own second sentence. The
+  ledger the binding freezes is then read against the closed world the
+  doc quoted in one holdable sentence: beans created while
+  ahead-of-time processing runs are then "always created when running
+  the application and can't be switched off" - so a `.enabled`-shaped
+  feature switch the deployment must keep flipping survives only by
+  staying off the AOT path, a build-time profile rides the execution's
+  own `<profiles>` configuration where it must, and where the change's
+  code asks GraalVM to see a type the walk would not record, it
+  registers through the API the Module taught and the registration is
+  proved where it lands: the metadata under
+  `META-INF/native-image/{groupId}/{artifactId}/` inside the packaged
+  jar - one consolidated `reachability-metadata.json` at 4.1.1, where
+  the 3.x line wrote five separate JSON files - listed with `unzip -l`
+  and read down to the entry the registrar or the
+  `@RegisterReflectionForBinding` annotation was supposed to produce. A
+  registration no generated file records is a claim, not a
+  registration. Verified by reading the module POM, the diff and the
+  metadata file, beside the switched boots the diagnostics already ran.
+- **Every removed regime stays removed: the diff carries no Boot 3
+  carry-over back in, and the extraction is the tools jarmode's
+  spelling with `layertools` nowhere.** The greps are the item, and
+  each pattern has a name the delta table gave it: `layertools` (the
+  jarmode's pre-3.3 name - the rename means `tools` is the only current
+  spelling, in an extract command and in a Dockerfile entry alike),
+  `loaderImplementation` and `spring-boot-loader-classic` (the classic
+  loader regime, closed in 4.1 - the param is gone from the repackage
+  mojo and Central publishes no artifact at the version), and
+  `executable` with the launch-script params (the fully executable jar
+  stopped being a feature of the jar; an init system pointed at one is
+  struck, not reconfigured). Each is a line the review deletes, and the
+  one counter-example that might be raised is not one:
+  `PropertiesLauncher` surviving in the 4.1.1 loader jar is the
+  launcher, not the choice behind it. Verified by grepping the diff and
+  the module's POMs - each pattern set answers nothing.
+- **The native build is scripted, pinned and whole - reproducible by
+  construction, with every input named where the build is taught.** The
+  artifact's build is not a set of lines a CI file improvises: the
+  starter-parent's own `native` profile binds `process-aot` with the
+  Native Build Tools, the plugin is declared versionless because the
+  dependencies POM's managed pin answers it (1.1.8 at 4.1.1, up from
+  3.5.16's 0.10.6 - the property the POM diff shows), and the GraalVM
+  distribution floor the build requires, version 25, is named wherever
+  the build is documented, because the pin jump's other half is a
+  swapped Java and exactly the half a review is likeliest to miss. The
+  reproducibility claim is then structural rather than aspirational:
+  the image is compiled whole-program from the inputs the artifact
+  carries, every condition and profile evaluated once at build time, no
+  incremental half-state to drift - a changed input rebuilds, an
+  unchanged one rebuilds the same - and the run side asks nothing back
+  of the machine that built it, the product being "a complete,
+  platform-specific executable. You do not need to ship a Java Virtual
+  Machine in order to run a native image". Verified by reading the
+  build's profile and the versionless plugin declaration, and by
+  grepping the diff for what would break the claim - a hand-pinned
+  `native-maven-plugin` version beside the managed one, or an
+  undocumented `-H:`/`-Ob` flag nobody can explain a year later - with
+  the honest boundary the diagnostics state kept in view: they depend
+  on none of the native build, and the change does not pretend
+  otherwise.
+- **Each form is the artifact's smallest honest one: nothing rides
+  along that the run never reads, and no second build path is
+  improvised beside the buildpacks'.** Three negative readings about
+  cargo: a native image ships no JVM beside the executable, so no run
+  fleet step answers "which JDK there?"; a JVM container image is the
+  `build-image` goal's product, built by the buildpacks against the
+  pinned builder (the 4.1.1 default reads `builder-noble-java-tiny`,
+  the bytecode-read default that moved twice inside Boot 3), so no
+  Dockerfile of the change's own hand-copies jar-and-JDK into a second
+  container; and the test-scoped jars the module depends on - WireMock,
+  the Testcontainers pair - ride no runtime form, while a jar labelled
+  `Spring-Boot-Jar-Type: development-tool` is excluded by the consuming
+  build rather than carried along. What an image *does* spread is
+  readable before it exists: the jar's `layers.idx`, listed by the
+  tools jarmode's `list-layers` verb, is the index the Paketo Spring
+  Boot buildpack honours, so a layer decision made at build time rides
+  the index into the image without container plumbing. Verified by
+  reading the image form's provenance (a `build-image` mojo, and no
+  second mechanism), running `java -Djarmode=tools -jar
+  target/<artifact>.jar list-layers` against the packaged jar, and
+  grepping the diff for the hand-rolled `COPY` of a second build path.
+- **The price the adopted form pays at build time is written down next
+  to the startup it buys, and the Module's own cost paragraph is the
+  measure.** The doc the change arrives with names the ledger before
+  anyone else has to: the compute becomes a CI budget line it never was
+  (native-image's work is "statically analyzing your application code
+  from its main entry point", so the 0.08-second startup of the docs'
+  sample is bought per build, not per boot), the machine wants what the
+  docs pin (Docker memory of "at least 8GB" recommended on macOS, the
+  WSL 2 backend on Windows), and the JVM forms name their recurrent
+  costs in retraining terms, the cache trained against the extracted
+  form and usable only "as long as the application is not updated and
+  the same Java version is used" - a retrain trigger of either, not of
+  neither. A packaging memo that argues from the startup numbers while
+  leaving the build minutes and the memory box unnamed is reviewed
+  against exactly the sentence it omitted, and the omission is a
+  finding, not a style note. Verified by reading the change's doc side
+  by side with the cost paragraph this Module carries - every figure
+  the change cites exists here at the same measure.
+- **The packaging work packages the application it was handed: the
+  domain bytes are the Start module's, and the vocabulary rides along
+  untouched.** The [Loan](../GLOSSARY.md) limit, the
+  [Copy](../GLOSSARY.md) guard and the [Reservation](../GLOSSARY.md)
+  surface the packaged boots answer on are the bytes the Start module
+  carried forward - a solution that reformed the domain was solving a
+  different lab, however healthy its POM. Packaging is the one Module
+  whose landing zone is the build, and the review says so: the
+  [Member](../GLOSSARY.md) who borrows and the [Title](../GLOSSARY.md)
+  being held are the tests' subjects also here, but only as the
+  passengers the forms carry. Verified by diffing the two modules'
+  `src/main` trees against each other and finding no difference - the
+  Solution is written from scratch, and that is precisely why the
+  forests should match - and by the diagnostics, which boot that
+  unchanged domain through all three forms.
