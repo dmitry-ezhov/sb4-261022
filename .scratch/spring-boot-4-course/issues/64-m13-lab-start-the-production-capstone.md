@@ -48,23 +48,35 @@ boot, and each failure message names the move that is missing:
      through all of it, and the unauthenticated reads prove the probe is
      the M10 public surface it must stay.
 2. `BoundsDiagnosticsTest.theBoundsTheDeploymentSuppliesAreTheOnesTheProcessKeeps`
-   - one self-booted `SpringApplicationBuilder` run with the deployment's
-     overrides spelled on its command line (the property source that
-     outranks the jar's yml): `library.availability.max-retries=0`, a
-     budget of one attempt, and `spring.lifecycle.timeout-per
-     -shutdown-phase=3s`. The booted environment is first read back
-     (green: the overrides reached it), the wire blip the default geometry
-     carries a borrow through then proves the geometry (red on the Start
-     module: the borrow answers `201`, so the compiled `@Retryable`
-     numbers, not the environment, decided), and the counter read bounds
-     what a budget of one attempt may publish: two `MethodRetryEvent`s -
-     the failed execution's own and the interceptor's exhausted mark -
-     against the four of the compiled geometry of three attempts. The
-     drain half holds a borrow across a stop beneath it: the
-     deployment-named window is the one the drain keeps, the row landing
-     inside it. The message names the mechanism the Lab's move rides:
-     the annotation's String variants (`maxRetriesString` and kin) carry
-     `${...}` placeholders, so the geometry binds as configuration
+   - one self-booted `SpringApplicationBuilder` run with all three bounds
+     the M13 doc's point 3 names spelled on its command line (the property
+     source that outranks the jar's yml): `library.availability.max-retries=0`,
+     a budget of one attempt; `spring.http.clients.connect-timeout=500ms` and
+     `spring.http.clients.read-timeout=5s`, the client timeouts every built
+     client inherits; and `spring.lifecycle.timeout-per-shutdown-phase=3s`.
+     Every override is first read back off the booted environment (green:
+     the values reached it), then each bound is kept on a wire read of its
+     own. The wire blip the default geometry carries a borrow through
+     proves the geometry (red on the Start module: the borrow answers
+     `201`, so the compiled `@Retryable` numbers, not the environment,
+     decided), and the counter read bounds what a budget of one attempt
+     may publish: two `MethodRetryEvent`s - the failed execution's own and
+     the interceptor's exhausted mark - against the four of the compiled
+     geometry of three attempts. The read timeout is kept on its own wire
+     read, where the Start module's story differs in kind: the client
+     timeouts are already environment outcomes in the carried application,
+     so this half answers green on the Start module and proves the third
+     bound on every boot the Lab ships - an availability answer spending
+     2.5s on the wire, past the jar's own two-second read-timeout default,
+     lands as a `201` under the deployment's named five (where the jar's
+     own default would have timed the read dead and answered the spent
+     budget's `502`); the connect timeout has no wire slow enough to bite
+     on a localhost boot, so its override is carried by the environment
+     read alone. The drain half holds a borrow across a stop beneath it:
+     the deployment-named window is the one the drain keeps, the row
+     landing inside it. The message names the mechanism the Lab's move
+     rides: the annotation's String variants (`maxRetriesString` and kin)
+     carry `${...}` placeholders, so the geometry binds as configuration
      properties beside `library.availability.base-url` and the jar keeps
      its geometry in the placeholder's default while a deployment names
      another without a rebuild.
@@ -80,7 +92,12 @@ ticket's shape is achievable. The scratch module was deleted; nothing of
 it remains. One correction the prototype taught: the counter read on one
 spent attempt is *two* events (the failed execution plus the exhausted
 mark), not zero - the bounds diagnostic asserts the ceiling of two, and
-its message says where the two come from.
+its message says where the two come from. The client-timeout half's green
+chain was proven on its own temporary validation boot on the Start module
+- the geometry assertion cuts the main diagnostic before that half is
+reached, so it cannot prove the half's green by itself - and the boot was
+removed once the read (a 2.5s availability answer landing `201` under the
+named five seconds) had passed.
 
 Note the diagnostics ride surefire (`*Test`), not failsafe: unlike M12's
 packaged forms, the capstone's evidences are probe states, counters and a
@@ -120,3 +137,22 @@ skipped by its own `<diagnostics.skip>`.
   command form works exactly as spelled - tested both ways on this
   module. Left to the index-doc pass (ticket 68) to say once for all
   labs.
+- **2026-10-24 · agent** — Two review findings applied to the diagnostics
+  after the initial Answer. The bounds diagnostic now holds the third
+  bound the M13 doc's point 3 names - the client timeouts - on the same
+  one-boot-one-command-line shape as the other two:
+  `spring.http.clients.connect-timeout=500ms` (carried, read back off the
+  booted environment; no localhost connect is slow enough to bite) and
+  `spring.http.clients.read-timeout=5s` (with teeth on the wire - an
+  availability answer spending 2.5s on the wire lands its `201` under the
+  named five, where the jar's own two-second default would have timed the
+  read dead and answered the spent budget's `502`; green on the Start
+  module too, because the carried application already binds the client
+  timeouts, proven by a temporary stand-alone validation boot since the
+  geometry assertion cuts the main diagnostic). And the two diagnostics'
+  `countOf` metric readers now answer the missing-metric case the same
+  way - non-200 or no COUNT measurement reads as the zero it is - so a
+  red on a counter read always says what was counted, never renders the
+  guidance as "counted null". No red changed: `-Pdiagnostics` still fails
+  exactly at the geometry read and the readiness publish, both messages
+  unchanged in kind.

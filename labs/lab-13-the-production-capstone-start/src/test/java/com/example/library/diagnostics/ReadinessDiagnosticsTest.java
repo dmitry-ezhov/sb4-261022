@@ -432,9 +432,14 @@ class ReadinessDiagnosticsTest {
 
     /**
      * The count the metric read carries: the metric's COUNT measurement, read
-     * the way a dashboard reads it.
+     * the way a dashboard reads it. An absent counter - a metric no increment
+     * ever registered, answered with whatever status the endpoint answers
+     * missing metrics with - reads as the zero it is.
      */
     private Double countOf(HttpResponse<String> metric) {
+        if (metric.statusCode() != 200) {
+            return 0.0;
+        }
         var measurements = jsonMapper.readTree(metric.body()).path("measurements");
         for (int tried = 0; tried < measurements.size(); tried++) {
             var measurement = measurements.get(tried);
@@ -442,7 +447,7 @@ class ReadinessDiagnosticsTest {
                 return measurement.path("value").asDouble();
             }
         }
-        return null;
+        return 0.0;
     }
 
     private HttpRequest.Builder request(URI uri) {

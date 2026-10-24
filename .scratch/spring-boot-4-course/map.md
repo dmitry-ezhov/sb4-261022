@@ -659,8 +659,13 @@ The implementation map for the feature described in
   counters, a drain - nothing packaged needed) pinning the capstone's
   reds. The readiness diagnostic is one outage story on a real boot;
   the bounds diagnostic applies the deployment's overrides to a real
-  boot's command line and asserts the process keeps them. Two facts the
-  prototype pass earned: the framework's `MethodRetryEvent` counter
+  boot's command line and asserts the process keeps them - all three
+  bounds the doc's point 3 names: the budget, the drain window and the
+  client timeouts, the read timeout with teeth on the wire (a
+  two-and-a-half-second availability answer that only the deployment's
+  named five seconds keeps alive, where the jar's own two would time it
+  dead) and the connect timeout carried by the environment read. Two facts
+  the prototype pass earned: the framework's `MethodRetryEvent` counter
   answers *every exception the retry processing encounters* - a spent
   budget of one attempt publishes two (the failed execution's own and
   the interceptor's exhausted mark), against the three attempts' four -

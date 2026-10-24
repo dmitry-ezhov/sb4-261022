@@ -60,6 +60,15 @@ import com.example.library.LibraryApplication;
  * its {@code 502} with nothing carried; the retry counter the operator
  * reads answers for the one spent attempt and no more, where the compiled
  * geometry of three attempts publishes what it spends;</li>
+ * <li>{@code spring.http.clients.connect-timeout=500ms} and
+ * {@code spring.http.clients.read-timeout=5s}, the timeouts the
+ * deployment names for every client the builder builds: the connect bound
+ * the diagnostics read back carried off the booted environment - no
+ * connect on a localhost wire is slow enough to feel a half second - and
+ * the read bound on its own wire, an availability answer that takes its
+ * time past the jar's own two-second default but inside the named five,
+ * so the borrow it belongs to lands where the jar's own default would
+ * have timed the read dead and answered its {@code 502};</li>
  * <li>{@code spring.lifecycle.timeout-per-shutdown-phase=3s}, the window the
  * drain runs in named by the deployment: a borrow begun across the stop
  * still lands inside it.</li>
@@ -94,6 +103,25 @@ class BoundsDiagnosticsTest {
     private static final String THE_NAMED_BUDGET = "--library.availability.max-retries=0";
 
     /**
+     * The connect timeout the deployment names here: half a second. No
+     * connect on the localhost wire the borrows run over is slow enough to
+     * feel it, so its work in these diagnostics is being carried - read
+     * back off the booted environment, the same read that vouches for the
+     * other command-line values.
+     */
+    private static final String THE_NAMED_CONNECT_TIMEOUT = "--spring.http.clients.connect-timeout=500ms";
+
+    /**
+     * The read timeout the deployment names here: five seconds, longer
+     * than the jar's own two - the bound with teeth on the wire. An
+     * availability answer that spends the time between them on the wire
+     * dies under the jar's own default and lands under the named bound:
+     * the borrow waiting on it is the read that says which of the two
+     * clocks the built client keeps.
+     */
+    private static final String THE_NAMED_READ_TIMEOUT = "--spring.http.clients.read-timeout=5s";
+
+    /**
      * The drain window the deployment names here: three seconds, briefly
      * enough that a stopped process is not held for the half-minute
      * defaults nobody discussed, honestly enough that one in-flight borrow -
@@ -108,6 +136,14 @@ class BoundsDiagnosticsTest {
      * in-flight work.
      */
     private static final long THE_ANSWER_TAKES_MILLIS = 1500;
+
+    /**
+     * How long the lingering availability answer keeps the read on the
+     * wire before it lands: past the two seconds the jar's own
+     * read-timeout default would have let it live, inside the five seconds
+     * the deployment's named bound keeps it under.
+     */
+    private static final long THE_SLOW_LANDING_TAKES_MILLIS = 2500;
 
     private static WireMockServer availabilityService;
 
@@ -159,6 +195,25 @@ class BoundsDiagnosticsTest {
                                     + "The wire reads below are where the bound is actually kept.",
                             THE_NAMED_BUDGET)
                     .isEqualTo("0");
+            assertThat(application.getEnvironment().getProperty("spring.http.clients.connect-timeout"))
+                    .as(
+                            "The booted process does not carry the connect timeout the diagnostics named "
+                                    + "(%s) on its own command line: the process the diagnostics booted is "
+                                    + "the one the bounds were applied to, and the named bound is the one "
+                                    + "the environment carries. No connect on the localhost wire below is "
+                                    + "slow enough to feel a half second, so here the deployment's say is "
+                                    + "the value itself, read back.",
+                            THE_NAMED_CONNECT_TIMEOUT)
+                    .isEqualTo("500ms");
+            assertThat(application.getEnvironment().getProperty("spring.http.clients.read-timeout"))
+                    .as(
+                            "The booted process does not carry the read timeout the diagnostics named "
+                                    + "(%s) on its own command line: the process the diagnostics booted is "
+                                    + "the one the bounds were applied to, and the lingering read below is "
+                                    + "then timed not on the bound the deployment named but on whichever "
+                                    + "clock the environment failed to override.",
+                            THE_NAMED_READ_TIMEOUT)
+                    .isEqualTo("5s");
             assertThat(application.getEnvironment().getProperty("spring.lifecycle.timeout-per-shutdown-phase"))
                     .as(
                             "The booted process does not carry the drain window the diagnostics named "
@@ -225,7 +280,49 @@ class BoundsDiagnosticsTest {
                             borrow.headers().firstValue("Content-Type").orElse(""))
                     .startsWith("application/problem+json");
 
-            // Second half: the window. The availability answer is on the wire
+            // Second half: the client timeouts. One read the deployment's
+            // named bound keeps: the answer takes its time on the wire -
+            // past the jar's own two-second default, inside the named five -
+            // and the borrow waiting on it lands as a Loan, where the jar's
+            // own default would have timed the read dead and answered its
+            // 502 on a budget of one attempt.
+            String lingeringBarcode = writeACopyOnTheShelfAndLetTheAnswerTakeItsTime(jdbcUrl);
+            HttpResponse<String> slowLanding = borrowOnce(apiBase, MEMBER_NAME, MEMBER_PASSWORD, lingeringBarcode);
+            assertThat(slowLanding.statusCode())
+                    .as(
+                            "The borrow whose availability answer spent %d ms on the wire - past the two "
+                                    + "seconds the jar's own read-timeout default keeps an answer under, "
+                                    + "inside the five seconds the deployment named (%s) - answered %s "
+                                    + "instead of landing as a Loan: the built client timed the read on a "
+                                    + "clock the deployment did not name. The timeouts are the "
+                                    + "environment's bounds like the budget and the window - spelled on "
+                                    + "the command line, the property source that outranks the jar's own "
+                                    + "yml - carried by the HttpClientSettings the client "
+                                    + "auto-configuration publishes, and inherited by every client built "
+                                    + "from the injected builder, of which the availability client is "
+                                    + "one. Under the jar's own two seconds this read dies and the "
+                                    + "budget of one attempt (%s) answers it with this same refuser; a "
+                                    + "201 here is only an application whose built client keeps the "
+                                    + "deployment's five seconds - the read that would not land was "
+                                    + "never cut.",
+                            THE_SLOW_LANDING_TAKES_MILLIS,
+                            THE_NAMED_READ_TIMEOUT,
+                            slowLanding.statusCode(),
+                            THE_NAMED_BUDGET)
+                    .isEqualTo(201);
+            assertThat(jsonMapper.readTree(slowLanding.body()).path("memberId").asString())
+                    .as(
+                            "The Loan the lingering read's borrow landed was issued for %s, not for the "
+                                    + "Member the credentials name: the borrow lands as it was issued - "
+                                    + "the Authentication the chain answered - however long the "
+                                    + "availability read it is grounded in took to get there.",
+                            jsonMapper
+                                    .readTree(slowLanding.body())
+                                    .path("memberId")
+                                    .asString())
+                    .isEqualTo(MEMBER_NAME);
+
+            // Third half: the window. The availability answer is on the wire
             // when the stop begins, and the borrow lands inside the window the
             // environment named - the deployment's own 3s, not the jar's
             // default, and not the drain dying early either.
@@ -281,7 +378,7 @@ class BoundsDiagnosticsTest {
     /**
      * The application, booted the way a deployment boots it: servlet over an
      * API socket on port zero, the management surface on its own socket, the
-     * H2 and the availability URL of this run - and the two bounds the
+     * H2 and the availability URL of this run - and the four bounds the
      * deployment names riding the command line, the one property source that
      * outranks the jar's own yml, exactly the overrides without a rebuild a
      * deployment makes. Its migration makes the tables, its connections keep
@@ -298,6 +395,8 @@ class BoundsDiagnosticsTest {
                         "--spring.datasource.url=" + jdbcUrl,
                         "--spring.datasource.username=sa",
                         THE_NAMED_BUDGET,
+                        THE_NAMED_CONNECT_TIMEOUT,
+                        THE_NAMED_READ_TIMEOUT,
                         THE_NAMED_WINDOW);
     }
 
@@ -494,6 +593,25 @@ class BoundsDiagnosticsTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withFixedDelay(Math.toIntExact(THE_ANSWER_TAKES_MILLIS))
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"copyId\":\"" + barcode + "\",\"available\":true}")));
+        return barcode;
+    }
+
+    /**
+     * The lingering means: the Copy on the shelf, and the availability
+     * service answering that it is available, but taking its time on the
+     * wire - past the jar's own read-timeout default, inside the
+     * deployment's named bound. The read that lands anyway is the proof
+     * the built client keeps the clock the deployment named.
+     */
+    private String writeACopyOnTheShelfAndLetTheAnswerTakeItsTime(String jdbcUrl) {
+        String barcode = "bc-" + UUID.randomUUID();
+        writeACopyOnTheShelf(jdbcUrl, barcode);
+        availabilityService.stubFor(get(urlEqualTo("/api/availability/" + barcode))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withFixedDelay(Math.toIntExact(THE_SLOW_LANDING_TAKES_MILLIS))
                         .withHeader("Content-Type", "application/json")
                         .withBody("{\"copyId\":\"" + barcode + "\",\"available\":true}")));
         return barcode;
