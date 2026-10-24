@@ -41,6 +41,7 @@
     <module>lab-08-transactions-solution</module>
     <module>lab-09-observability-start</module>
     <module>lab-09-observability-solution</module>
+    <module>lab-10-security7-start</module>
     <!-- Module entries are added by the task that authors the corresponding
          lab. Do not pre-create module directories. -->
   </modules>

@@ -305,6 +305,23 @@ The implementation map for the feature described in
   gained the conditional its absence in the lab needed.
   [Answer](issues/47-m09-checklist-actuator-and-observability.md)
 
+- **2026-10-24 · ticket 49** — The M10 lab start is the lab-09
+  solution's application carried forward untouched with no security starter
+  in the build, and the security contract is five diagnostics over the real
+  sockets: `401` for the unauthenticated borrow with the catalogue and probe
+  still public, `403` for a principal without the `MEMBER` role, the Loan
+  row's `member_id` equal to the caller's credentials whether the body named
+  somebody else or named nobody at all, the limit counted against the
+  principal (at-limit `409` titled "Loan limit reached", under-limit borrow
+  through), and the management socket's metrics read closed while
+  `/actuator/health/**` stays open. The diagnostics name the principals a
+  solution must define - Members `ada`, `bruno`, `cecil`
+  (`member-password`/`MEMBER`) and `operator` (`operator-password`/
+  `OPERATOR`) - and tests 3 and 4 borrow as different Members so the Active
+  loan counts cannot depend on JUnit's order. Diagnostics red 5/5 on the
+  start, ordinary build green with every gate but the coverage floor.
+  [Answer](issues/49-m10-lab-start-spring-security-7.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
