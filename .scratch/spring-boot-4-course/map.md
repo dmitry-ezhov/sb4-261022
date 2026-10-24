@@ -342,6 +342,33 @@ The implementation map for the feature described in
   the plain build and the diagnostics-solutions profile.
   [Answer](issues/50-m10-lab-solution-spring-security-7.md)
 
+- **2026-10-24 · ticket 51** — The M10 quiz graded against the ticket's
+  three understandings; question 3 was rebuilt, the other four kept. The
+  kept ones: the two-release break a Boot 2 upgrade meets (6.0's
+  `WebSecurityConfigurerAdapter` removal, 7.0's deletions of
+  `authorizeRequests()`, `and()` and the no-arg configurers, the smallest
+  7.1.1 rewrite), the CSRF attribution the colleague's upgrade note gets
+  wrong (Security 6.5 already had the modern defaults, 7.0 only added
+  `csrf.spa()` and the narrowed cookie repository, Boot 4 changed none of
+  it - the `POST` endpoints needed the token before the upgrade), the
+  `{noop}` prefix as the delegating encoder's instruction rather than a
+  comment (Boot's `NOOP_PASSWORD_PREFIX` prepend, the two-line production
+  shape), and the token-versus-session argument (a bearer credential is
+  not ambient, `STATELESS` and `csrf.disable()` stand or fall together).
+  The rebuilt question reviews the solution module itself with two
+  half-true simplifications - drop the `MEMBER` rule ("the expression
+  already refuses a caller who is not the [Member](../GLOSSARY.md) the
+  borrow acts on") or drop the `@PreAuthorize` (the comparison is true by
+  construction) - and the reader must name what each loss costs: the
+  rule's `403` before the use case runs, which method security cannot
+  answer because it reads arguments, not authorities; and the second lock
+  for the path that ever supplies a different id, whose absence today is
+  invisible on the happy path. The annotation turn carries the two
+  defaults: `@EnableMethodSecurity`'s `prePostEnabled = true` and the
+  still-compiling `@EnableGlobalMethodSecurity`'s default of **false**,
+  the quietest upgrade defect in the Module.
+  [Answer](issues/51-m10-quiz-spring-security-7.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a

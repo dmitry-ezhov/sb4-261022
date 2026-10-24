@@ -41,7 +41,8 @@ its criteria and rebuilt the one question that failed the grade.
   half-true and the reader must find what each loss costs. A colleague
   proposes dropping the `hasRole("MEMBER")` rule for `/api/loans/**` ("the
   expression already refuses a caller who is not the
-  [Member](../../../GLOSSARY.md)") and dropping `@PreAuthorize` ("the
+  [Member](../../../GLOSSARY.md) the borrow acts on") and dropping
+  `@PreAuthorize` ("the
   controller passes `authentication.getName()`, so the expression compares
   the argument with itself - it checks nothing"). One defensible answer, two
   mechanisms, all the code's own claims: the rule's `403` is answered before
@@ -76,3 +77,9 @@ its criteria and rebuilt the one question that failed the grade.
   split untested, and the question stated the verdict it asked the reader to
   judge) and was rebuilt with claims checked off the resolved lab-10
   solution. Doc edit is the resolution; no code changed.
+- **2026-10-24 · agent** — Review fix: the colleague's first proposition
+  claimed the expression refuses "a caller who is not the Member named in
+  the request", but the reviewed solution's `LoanRequest` deliberately
+  names no Member - the premise described the pre-upgrade request shape,
+  not the module under review; reworded to "the Member the borrow acts
+  on", and the resolve pointer landed in `map.md`.

@@ -654,8 +654,8 @@ equips you to review. Answer first; the answers say why, not just what.
    the Lab stacks on one borrow: a colleague reviews
    `lab-10-security7-solution` and proposes two simplifications. "The URL rule
    is redundant: `@PreAuthorize("#memberId == authentication.name")` already
-   refuses a caller who is not the [Member](../GLOSSARY.md) named in the
-   request - drop the `hasRole("MEMBER")` rule for `/api/loans/**` and let
+   refuses a caller who is not the [Member](../GLOSSARY.md) the borrow acts
+   on - drop the `hasRole("MEMBER")` rule for `/api/loans/**` and let
    `anyRequest().authenticated()` carry the surface." And: "The expression is
    redundant: the controller passes `authentication.getName()`, so the
    expression compares the argument with itself - it checks nothing - and the
