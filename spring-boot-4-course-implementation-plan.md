@@ -1,5 +1,12 @@
 # Spring Boot 4 Course — Implementation Plan
 
+> As delivered, the platform phase is M09–M13, not M09–M12: the native images
+> and packaging subject this plan drafted as a single M12 arrives as M12
+> (native images and packaging) and M13 (the production capstone). See
+> [`docs/adr/0006-thirteen-modules-not-twelve.md`](docs/adr/0006-thirteen-modules-not-twelve.md).
+> The doc paths and estimates below are the plan's, predating the authored
+> modules; the authoritative index is the README's module table.
+
 ## Phase 0 — Environment and scaffold (done)
 
 | Task | Deliverable | Status |

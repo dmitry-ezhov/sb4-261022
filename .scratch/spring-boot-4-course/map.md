@@ -300,7 +300,7 @@ The implementation map for the feature described in
   question beside liveness (the outage moves readiness, not the restart
   decision), a new item asking the metric's question - who reads the
   answer - against the counter's stated purpose, and a new item reading
-  the metrics as a stranger would (no [Member](../GLOSSARY.md) tag, the
+  the metrics as a stranger would (no [Member](../../GLOSSARY.md) tag, the
   global-tag leak the diff can hide nowhere). The custom-indicator item
   gained the conditional its absence in the lab needed.
   [Answer](issues/47-m09-checklist-actuator-and-observability.md)
@@ -372,7 +372,7 @@ The implementation map for the feature described in
   not ambient, `STATELESS` and `csrf.disable()` stand or fall together).
   The rebuilt question reviews the solution module itself with two
   half-true simplifications - drop the `MEMBER` rule ("the expression
-  already refuses a caller who is not the [Member](../GLOSSARY.md) the
+  already refuses a caller who is not the [Member](../../GLOSSARY.md) the
   borrow acts on") or drop the `@PreAuthorize` (the comparison is true by
   construction) - and the reader must name what each loss costs: the
   rule's `403` before the use case runs, which method security cannot
@@ -736,3 +736,17 @@ The implementation map for the feature described in
   its commands - both asymmetry runs reported, `-Pquality-lenient`
   never the acceptance's run.
   [Answer](issues/67-m13-checklist-the-production-capstone.md)
+
+- **2026-10-25 · ticket 68** — The course index pass closed the ticket's one
+  remaining criterion and settled its naming question: the specification is
+  amended from twelve to thirteen Modules, Track C is M09-M13 (M12 native
+  images and packaging, M13 the production capstone - both fully authored by
+  tickets 58-67, so it was the spec that gave, not the content), recorded in
+  ADR 0006 and a dated note in the spec's Further Notes. The README's module
+  table now matches what is built: M01-M13, every doc path as authored and
+  linked, row 12's stale `lab-12-capstone-*` replaced with
+  `lab-12-native-images-and-packaging-*`, M12 infra GraalVM (opt.), the
+  hybrid twelve-row title split into the two real ones, and the total re-run
+  to ~38h; the welcome doc's pacing table and the glossary's *Module*
+  definition agree. All relative links re-checked resolving.
+  [Answer](issues/68-course-index-and-documentation-pass.md)

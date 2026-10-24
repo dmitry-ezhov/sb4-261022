@@ -29,31 +29,30 @@ implementation.
 |---|---|---|
 | **A** | M01–M04 | The bridge: what changed between Boot 2, Boot 3 and Boot 4 |
 | **B** | M05–M08 | Data, validation, testing and transactions |
-| **C** | M09–M12 | The platform: observability, security, resilience, production |
+| **C** | M09–M13 | The platform: observability, security, resilience, native images and production |
 
 Work through them in order; later modules build on the same library application
 that the earlier ones extend.
 
 ## Module table
 
-Doc paths are shown unlinked until the module doc is authored.
-
 | Module | Title | Doc | Lab (start / solution) | Time | Infra |
 |---|---|---|---|---|---|
-| M01 | Boot 2 → Boot 4: what changed | `modules/01-boot2-to-boot4.md` | `labs/lab-01-boot2-to-boot4-start` / `-solution` | ~2.5h | none |
-| M02 | The Boot 4 module map & multi-module build | `modules/02-module-map-and-build.md` | `labs/lab-02-module-map-and-build-*` | ~2h | none |
-| M03 | Typed configuration & validation | `modules/03-typed-configuration.md` | `labs/lab-03-typed-configuration-*` | ~2.5h | none |
-| M04 | The web stack: MVC, Jackson 3, ProblemDetail | `modules/04-web-stack-jackson3.md` | `labs/lab-04-web-stack-jackson3-*` | ~3h | none |
-| M05 | Persistence: JDBC, JPA, Flyway | `modules/05-persistence.md` | `labs/lab-05-persistence-*` | ~3.5h | Postgres (opt.) |
-| M06 | Validation & error handling | `modules/06-validation-and-errors.md` | `labs/lab-06-validation-and-errors-*` | ~2.5h | none |
-| M07 | Testing: slices, Testcontainers, REST Assured | `modules/07-testing.md` | `labs/lab-07-testing-*` | ~3h | Postgres (opt.) |
-| M08 | Transactions & consistency | `modules/08-transactions.md` | `labs/lab-08-transactions-*` | ~3.5h | Postgres (opt.) |
-| M09 | Actuator & observability | `modules/09-observability.md` | `labs/lab-09-observability-*` | ~2.5h | none |
-| M10 | Spring Security 7 | `modules/10-security7.md` | `labs/lab-10-security7-*` | ~3.5h | none |
-| M11 | Resilience & virtual threads | `modules/11-resilience-and-concurrency.md` | `labs/lab-11-resilience-and-concurrency-*` | ~3h | none |
-| M12 | Native images & the production capstone | `modules/12-native-and-production.md` | `labs/lab-12-capstone-*` | ~4h | Docker |
+| M01 | Boot 2 to Boot 4: what changed | [`modules/01-boot2-to-boot4.md`](modules/01-boot2-to-boot4.md) | `labs/lab-01-boot2-to-boot4-start` / `-solution` | ~2.5h | none |
+| M02 | The module map and a multi-module build | [`modules/02-module-map-and-build.md`](modules/02-module-map-and-build.md) | `labs/lab-02-module-map-and-build-*` | ~2h | none |
+| M03 | Typed configuration and validation | [`modules/03-typed-configuration.md`](modules/03-typed-configuration.md) | `labs/lab-03-typed-configuration-*` | ~2.5h | none |
+| M04 | The web stack: MVC, Jackson 3 and problem details | [`modules/04-web-stack-jackson3.md`](modules/04-web-stack-jackson3.md) | `labs/lab-04-web-stack-jackson3-*` | ~3h | none |
+| M05 | Persistence: JDBC, JPA and migrations | [`modules/05-persistence.md`](modules/05-persistence.md) | `labs/lab-05-persistence-*` | ~3.5h | Postgres (opt.) |
+| M06 | Validation and error handling | [`modules/06-validation-and-errors.md`](modules/06-validation-and-errors.md) | `labs/lab-06-validation-and-errors-*` | ~2.5h | none |
+| M07 | The testing strategy: slices, containers and what survives refactoring | [`modules/07-testing-strategy.md`](modules/07-testing-strategy.md) | `labs/lab-07-testing-*` | ~3h | Postgres (opt.) |
+| M08 | Transactions and consistency | [`modules/08-transactions-and-consistency.md`](modules/08-transactions-and-consistency.md) | `labs/lab-08-transactions-*` | ~3.5h | Postgres (opt.) |
+| M09 | Actuator and observability | [`modules/09-actuator-and-observability.md`](modules/09-actuator-and-observability.md) | `labs/lab-09-observability-*` | ~2.5h | none |
+| M10 | Spring Security 7 | [`modules/10-security7.md`](modules/10-security7.md) | `labs/lab-10-security7-*` | ~3.5h | none |
+| M11 | Resilience and virtual threads | [`modules/11-resilience-and-virtual-threads.md`](modules/11-resilience-and-virtual-threads.md) | `labs/lab-11-resilience-and-concurrency-*` | ~3h | none |
+| M12 | Native images and packaging | [`modules/12-native-images-and-packaging.md`](modules/12-native-images-and-packaging.md) | `labs/lab-12-native-images-and-packaging-*` | ~4h | GraalVM (opt.) |
+| M13 | The production capstone | [`modules/13-the-production-capstone.md`](modules/13-the-production-capstone.md) | `labs/lab-13-the-production-capstone-*` | ~3h | none |
 
-Total: roughly 35 hours of learner time.
+Total: roughly 38 hours of learner time.
 
 ## The build
 

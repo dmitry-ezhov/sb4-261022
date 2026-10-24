@@ -35,7 +35,7 @@ A self-paced text course with code labs, delivered as one Maven multi-module
 repository, taught through a single sample application: a library that lends
 physical items to members.
 
-The course has twelve Modules in three Tracks. Track A is the bridge - what
+The course has thirteen Modules in three Tracks. Track A is the bridge - what
 changed between Boot 2, Boot 3 and Boot 4, the module map, typed configuration,
 the web stack with Jackson 3 and RFC 9457 problem details. Track B is data and
 testing - persistence, validation, the testing strategy, transactions and
@@ -147,7 +147,7 @@ in the docs and in the commits.
 
 **Course shape**
 
-- Twelve Modules in three Tracks: the bridge (M01 to M04), data and testing (M05 to M08), the platform (M09 to M12).
+- Thirteen Modules in three Tracks: the bridge (M01 to M04), data and testing (M05 to M08), the platform (M09 to M13). M12 covers native images and packaging; M13 is the production capstone.
 - Each Module delivers a doc, a Lab, a quiz and a checklist. The doc states what the reader knew, what changed, and how it works now.
 - Each Lab is a pair of Maven Modules: a Start module and a Solution module.
 - A Start module is green: it compiles, is formatted, passes every gate except the coverage floor, and passes its own tests. Its defects are behavioural.
@@ -258,3 +258,12 @@ the profile that runs only those tests, are established there.
   support floor, a language level - rather than by taking whatever was newest.
   Where a newer version was available but not needed, the older verified one
   was kept.
+- Amended 2026-10-25 (ticket 68): the course is delivered as thirteen Modules,
+  not twelve. The native-images/packaging/production subject this
+  specification drafted as one platform Module arrives authored as two - M12
+  (native images and packaging, a build-time subject) and M13 (the production
+  capstone, an operations subject) - because packaging is a build decision and
+  the operational contract is a read of the assembled application, and each
+  is more than an evening of work alone. Track C is M09 to M13. The decision
+  and its alternatives are recorded in `docs/adr/0006-thirteen-modules-not-twelve.md`; the
+  is-the-specification-faithful audit is ticket 69.

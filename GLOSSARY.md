@@ -57,7 +57,7 @@ _Avoid_: Free copy, Free book
 ## Course delivery
 
 **Module**:
-One of the twelve units of the course, each with a doc, a lab, a quiz and a
+One of the thirteen units of the course, each with a doc, a lab, a quiz and a
 checklist.
 _Avoid_: Lesson, Chapter, Section
 

@@ -52,7 +52,7 @@ against its criteria and closed the three that were open.
   solution before it was written: `LoanService.borrow`'s comment already
   states the fact the counter exists for and no other, and
   `library.loans.issued` answers the question the Module's intro named -
-  "how many [Loan](../GLOSSARY.md)s did it issue this morning" - so the
+  "how many [Loan](../../../GLOSSARY.md)s did it issue this morning" - so the
   item takes that shape as its passing case: name the question and who
   reads the answer, one sentence where the change justifies each
   increment; a counter whose question nobody can state (a vanity number,

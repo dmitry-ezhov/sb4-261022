@@ -15,7 +15,7 @@
 
 ## Answer
 
-Built in this ticket's commit. The doc is [`modules/06-validation-and-errors.md`](../../modules/06-validation-and-errors.md).
+Built in this ticket's commit. The doc is [`modules/06-validation-and-errors.md`](../../../modules/06-validation-and-errors.md).
 
 **The delta table** has five rows - the starter's home, the validation
 implementation, a constraint on a method parameter, Spring's standard
