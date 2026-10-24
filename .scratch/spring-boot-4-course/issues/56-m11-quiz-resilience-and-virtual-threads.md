@@ -89,3 +89,19 @@ of the five questions.
   kept question 3. Claims checked against the resolved lab-11 solution
   and re-verified jar facts on the 7.0.9 and 4.1.1 artifacts. Doc edit is
   the resolution; no code changed.
+- **2026-10-24 · agent** — The map pointer for ticket 56 landed in
+  `map.md`, and ticket 55's missing pointer was backfilled beside it
+  (the entry had not landed with that ticket's resolution, which ticket
+  55's own record does not mention; the backfill says so in the map).
+- **2026-10-24 · agent** — Review (code-review, two axes, HEAD~1 base):
+  both axes green; three judgement-call notes applied. Question 4's stem
+  carried the debug-line element the answer judged but never asked for,
+  so the ask now names it; the answer's BLOCK paragraph retold question
+  1's starvation promise nearly verbatim, crossed to point at that
+  promise; question 5's rebuilt stem gave a guesser the release's
+  involvement, so the ask is "name the release that actually flipped the
+  default" again - the reader must still find that the sentence is wrong
+  and which release. The spec axis found no factual inconsistencies
+  (quiz claims cross-checked against the doc's table, the lab-11
+  solution's `RetryMeter`/`AvailabilityChecker`, and the solution
+  `application.yml`).

@@ -746,11 +746,11 @@ equips you to review. Answer first; the answers say why, not just what.
 4. **About the bulkhead row: a `@ConcurrencyLimit(limit = 2,
    policy = REJECT)` on the availability check starts refusing a burst of
    concurrent borrows. The operator asks for a saturation gauge and is
-   handed the Boot 2 dashboard's busy-worker count; a colleague proposes
-   logging the refusals at debug as noise. With which type does the cap
-   refuse, why does that type's *parentage* matter, what does the
-   busy-worker gauge read on this boot, and where does the saturation
-   actually surface?**
+   handed the Boot 2 dashboard's busy-worker count, and a colleague
+   proposes logging the refusals at debug as noise. With which type does
+   the cap refuse, why does that type's *parentage* matter, what does the
+   busy-worker gauge read on this boot, and - the colleague's log line
+   held against it - where does the saturation actually surface?**
 
    The refusal is `org.springframework.resilience.InvocationRejectedException`,
    read off the 7.0.9 class file, and what matters is what it extends:
@@ -789,11 +789,10 @@ equips you to review. Answer first; the answers say why, not just what.
    `{BLOCK, REJECT}` the whole enum the 7.0.9 constant pool carries -
    trades *latency for service*: the waiting caller holds its request,
    and the borrow answers late rather than not at all. Under a Boot 2
-   pool that wait was expensive - the request held one of 200 scarce
-   platform threads, and a stampede that blocked on a slow availability
-   service could starve the pool and kill unrelated calls; the Module's
-   virtual-thread row changes the price of the wait to a cheap thread,
-   which is what makes BLOCK vs REJECT the considered choice this Module
+   pool that wait was the starvation promise 1's question judged - the
+   request held one of 200 scarce platform threads and a slow upstream
+   emptied them - while under the flag the wait is a cheap thread, which
+   is what makes BLOCK vs REJECT the considered choice this Module
    presents rather than a reflex. The executor analogue -
    `spring.task.execution.simple.concurrency-limit` with
    `reject-tasks-when-limit-reached` - caps work that runs *through* the
@@ -802,8 +801,8 @@ equips you to review. Answer first; the answers say why, not just what.
 
 5. **About the graceful-shutdown row: in a post-mortem, a colleague writes
    "Boot 4 finally turned graceful shutdown on for us." State what the
-   sentence gets right and where it goes wrong (the release is part of
-   the answer), how this course checked that attribution, and what Boot 4
+   sentence gets right, name the release that actually flipped the
+   default and how this course checked that attribution, and what Boot 4
    *itself* changed in the area.**
 
    Right: the 4.1.1 application *does* drain without anyone having set
