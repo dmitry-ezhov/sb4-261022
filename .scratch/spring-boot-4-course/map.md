@@ -295,6 +295,16 @@ The implementation map for the feature described in
   tickets 26 and 41 made.
   [Answer](issues/46-m09-quiz-actuator-and-observability.md)
 
+- **2026-10-24 · ticket 47** — The M09 checklist graded against its
+  criteria and the three open ones closed: readiness verified as its own
+  question beside liveness (the outage moves readiness, not the restart
+  decision), a new item asking the metric's question - who reads the
+  answer - against the counter's stated purpose, and a new item reading
+  the metrics as a stranger would (no [Member](../GLOSSARY.md) tag, the
+  global-tag leak the diff can hide nowhere). The custom-indicator item
+  gained the conditional its absence in the lab needed.
+  [Answer](issues/47-m09-checklist-actuator-and-observability.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a

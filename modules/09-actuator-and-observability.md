@@ -705,18 +705,50 @@ production-shaped rather than merely working. Every item is observable -
 checkable by reading the change or running a command - and none of them
 repeats a gate the build already enforces.
 
-- **The probes answer, and liveness answers about the process.** Boot the
+- **Each probe answers the question it is named for.** Boot the
   application and read `/actuator/health/liveness` and
   `/actuator/health/readiness` - both `200` and state-named, with no probe
   property written anywhere in the change (4.1.1's default, which the
-  delta table verified). The liveness path contains no database check, no
-  availability client, and no network call; a search of the diff answers
-  in seconds.
+  delta table verified). The probes are not one check but two questions,
+  and each is verified against its own: liveness answers "restart me?"
+  about the process, so its path contains no database check, no
+  availability client, and no network call - a search of the diff answers
+  in seconds. Readiness answers "route me?", so the dependency that can
+  be temporarily unreachable - the availability service above all -
+  appears in no liveness group: what its outage moves is readiness,
+  answered `OUT_OF_SERVICE`, never a liveness decision a restart cannot
+  remedy.
 - **Readiness is published, not toggled.** The code that stops or admits
   traffic goes through `AvailabilityChangeEvent.publish(context, state)` -
   one line, one event bus - and never through a boolean a handler reads;
   the `OUT_OF_SERVICE` answer a `REFUSING_TRAFFIC` publish produces is
   verified in the diagnostics.
+- **The metric is worth having - it answers a question someone asks.**
+  Every counter the change adds earns its place by one test the review
+  applies in prose: name the question it answers and who reads the
+  answer. The Loan counter is the shape a passing answer takes -
+  `library.loans.issued` answers the question the Module's opening named,
+  "how many [Loan](../GLOSSARY.md)s did it issue this morning", in the
+  cheapest form the registry offers, and each increment in the diff is
+  justified by exactly a sentence where the change says so (the borrow
+  use case's comment states the fact the counter exists for and no
+  other). A counter whose question nobody can state - a vanity number
+  published because dashboards expect numbers, a second count of the
+  `http.server.requests` the starter already carries - is deleted from
+  the change rather than kept, tagged and tuned.
+- **No sensitive data reaches the metrics.** The metrics are readable by
+  everyone the management port reaches, and the review reads them as a
+  stranger would: no tag name and no tag value identifies a
+  [Member](../GLOSSARY.md) - the identity would be the privacy defect and,
+  being unbounded, the cardinality defect in the same line, which is why
+  the diagnostics' message names `a Member id` beside `a Copy identifier`
+  among the tags never to write. The one tag the Lab's counter carries is
+  the [Title](../GLOSSARY.md) id, an inventory word - the detail a custom
+  indicator publishes stays with that item's criterion. No
+  `management.metrics.tags.*` global tag arrives with the change - a
+  global tag is applied to every metric, so a careless key there is a
+  leak the diff can hide nowhere. Verified by reading the increment line
+  and every `management.metrics` entry in the change.
 - **The metric is published where it happens, tagged in the domain's
   words.** `library.loans.*` is the metric's name-space, the increment
   line lives in the use case (not the controller, not a consumer), and the
@@ -724,7 +756,8 @@ repeats a gate the build already enforces.
   never a per-request id and never a [Copy](../GLOSSARY.md) identifier.
   Verified by one GET: `/actuator/metrics/library.loans.issued` (after
   exposing `metrics`, only if the Lab asks) names the tag and the `COUNT`.
-- **The custom indicator is in the Boot 4 package.** The imports are
+- **A custom indicator, where the change adds one, is in the Boot 4
+  package.** The imports are
   `org.springframework.boot.health.contributor.*` - and the change contains
   no `org.springframework.boot.actuate.health` anywhere, which the diff
   search confirms. The bean's domain name (`LoanHealthIndicator` reading
