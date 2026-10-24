@@ -834,65 +834,121 @@ production-shaped rather than merely working. Every item is observable -
 checkable by reading the change or running a command - and none of them
 repeats a gate the build already enforces.
 
-- **The switch is one line, and what it switched is observed.** The change
-  carries `spring.threads.virtual.enabled: true` in `application.yml` and
-  nothing else turns the threading on: no `Executors.newVirtual...` in
-  Java, no thread factory, no pool re-built by hand. The observation that
-  proves what it reached is a runtime one, taken on the M09 socket the
-  course already authenticates: `/actuator/threaddump` with the flag on
-  lists no idle `tomcat-handler-` workers, because the guard pool Boot 2
-  taught is gone and a virtual handler exists only for the length of its
-  request - while the connector caps (`max-connections`, `accept-count`)
-  remain the bounds the connector always held. Verified by reading the
-  property and by the runtime claim the dump carries.
-- **The availability call is bounded, in the 4.1 spellings, and the bound
-  is proven, not configured.** The timeouts are values on
-  `spring.http.clients.connect-timeout` / `read-timeout` - the plural
-  spellings; the singular is deprecated-since-4.0 - reachable through the
-  injected `RestClient.Builder`'s configurer (the `HttpClientSettings`
-  bean), so the review searches for a `RestClient` built *around* that
-  builder: a hand-`new`ed client or a configurer-bypassing builder is the
-  call base that waits forever while the property applies to everything
-  around it. The boundedness is observable, not plausible: the diagnostics
-  go at an upstream that does not answer and the failure surfaces the way
-  M04's failure model says wire failures surface - a problem detail, not
-  a `500` stack dump, and never a hang.
-- **The retry is on the method whose bean the caller holds, and its
-  geometry is stated, not left.** `@EnableResilientMethods` appears once on
-  a configuration; `@Retryable` sits on the bean method *the borrow calls*
-  - no self-invocation, the proxy trap (`this.availability(...)` never
-  crosses the interceptor) - and `includes` names the wire failure
-  (`ResourceAccessException`, M04's own contract), with `maxRetries`,
-  `delay`, `jitter`, `multiplier` and `maxDelay` set to values a sentence
-  in the change can justify ("the service blips: three attempts, 100ms,
-  200ms"), not the annotation's defaults. The arithmetic is checkable:
-  1 + `maxRetries` attempts, growth bounded by `maxDelay`, slack per
-  attempt by `jitter` - the delta table's retry row read against the
-  change. The budget exhaustion carries its record (`getRetryCount()` /
-  `getLastException()`) to the boundary, where M08's problem-detail
-  handler takes over. Verified by reading the annotation, its caller and
-  the diagnostics.
-- **The retry's repetitions are observable, not folk memory.** A
-  `MethodRetryEvent` listener (the event extends `MethodFailureEvent`,
-  which extends `ApplicationEvent`) need not exist for the retry to work,
-  but the production-shaped change says *how many*: a counter the operator
-  can read beside M09's `library.loans.issued` - like the
-  `library.availability.retried` shape, labelled at least by method name,
-  so one listener serves every resilient method in the application. An
-  unobserved retry is an outage nobody owns: the count is what turns "the
-  service was down for a moment" into a closed observation. Verified by
-  reading the listener and by running the diagnostics, which go at exactly
-  the failure the event fires on.
-- **Shutdown drains in flight, and the window is a decision.** The drain
-  diagnostic (a [Loan](../GLOSSARY.md) begun across the stop completes; a
-  request refused at the accept-refusal point is refused) rides a default
-  that is a fact of the jar and not of the change - 4.1.1 answers
-  `graceful` - so the *change's* shape is around the window the default
-  implies: `spring.lifecycle.timeout-per-shutdown-phase` named to what the
-  application's in-flight work can actually promise, so the review reads a
-  number someone chose rather than thirty seconds nobody discussed.
-  Verified by reading the property and by running the drain diagnostic,
-  which holds the in-flight borrow case in both directions.
+- **The switch is the property, and what it switched is observed, not
+  configured.** The change carries `spring.threads.virtual.enabled:
+  true` in the application's own `application.yml` - where a
+  reviewer's first read finds it - and nothing else turns the threading
+  on: no `Executors.newVirtual...` in Java, no thread factory, no
+  executor re-built by hand, three states a grep of the diff refuses.
+  The observation is on the management socket the M10 chain commands,
+  and it begins with the surface being reachable: the exposure line
+  names `threaddump` beside `health, metrics`. With the flag on, the
+  dump lists no idle platform worker of either spelling - not one
+  `http-nio-...-exec-` guard (the pool Boot 2 taught) and not one
+  platform thread wearing the `tomcat-handler-` prefix (a virtual
+  name on a platform spelling is a hand-built executor) - because a
+  virtual handler exists only for the length of its request. What
+  *arriving* work stays bounded by is unchanged and worth the read:
+  the connector caps (`max-connections`, `accept-count`), which is why
+  the deliberate bounds the change writes are policy, not decoration. Verified by
+  reading the property, the exposure line and the diff, and by running
+  the diagnostics, whose first read is the dump.
+- **No blocking call in the change is left mounted on its carrier.**
+  The cheapness of a held request survives on exactly one boundary,
+  and on JDK 25 exactly one shape still breaks it: a wait whose stack
+  bottoms out in a native frame - JEP 491, shipped in JDK 24, released
+  the carrier at every `synchronized` wait, so the
+  `synchronized`-avoidance reflex the Boot 3 era audited its blocking
+  paths for is retired. The review's read is therefore the change's
+  blocking surfaces, named and short: the availability wait and the
+  transaction's JDBC work both wait on JDK socket reads, pure Java to
+  the bottom, and the change adds nothing of its own that executes
+  native code under a blocked call - no JNI-only client, no native
+  driver, no file lock held across a request. The finding the read
+  looks for is the call that pins; the production-shaped answer is
+  "none, and here is each blocking surface". Verified by reading the
+  change's blocking call surfaces, with the JEP's claim itself read
+  off OpenJDK's documentation - the same doc-read the M11 doc marks.
+- **Every outbound call the change can make is bounded, and the
+  bound's reach is searched, not assumed.** The values are the 4.1
+  spellings - `spring.http.clients.connect-timeout` /
+  `spring.http.clients.read-timeout`, the plural, the singular
+  deprecated since 4.0 with its replacement named - riding the
+  `HttpClientSettings` bean into the injected `RestClient.Builder`'s
+  configurer, so the availability client the builder builds inherits
+  them with no factory wired anywhere (the lines ride along from
+  M04's property migration; the review is that they survive the
+  change intact). The reach is also the fence, and the search is the
+  item: a `RestClient` built *around* that builder - hand-`new`ed, or
+  a builder whose configurer was replaced - carries none of the
+  settings and waits forever, so the diff is searched for the
+  provenance a bounded call base must not show (`RestTemplate`,
+  `RestClient.create`, a second `RestClient.Builder` on the side).
+  And the bound is proven where it expires: an upstream that drops
+  instead of answering is answered a problem detail on the M08
+  surface - a status in the boundary's own words, never the
+  container's error page and never the hang the bound exists to
+  prevent (the diagnostics fail on an unanswered socket, so a hang is
+  a red run, not a silent wait). Verified by reading the property,
+  the builder's single provenance and the grep, and by running the
+  diagnostics' exhaustion read.
+- **A wire blip is replayed through the framework's own policy, and
+  the geometry is arithmetic a reviewer checks on paper.** The
+  diagnostics hold the property: one connection reset answered `201`,
+  the [Loan](../GLOSSARY.md) issued to the Member the wire carried.
+  The policy is Framework 7's, in exactly two declarations -
+  `@EnableResilientMethods` once on a configuration, `@Retryable` on
+  the availability method *the borrow calls* - and the call path is
+  where the read bites: the ask must cross the proxy the
+  `RetryAnnotationBeanPostProcessor` installed, and a `this.`-side
+  call is the dead-source state the annotation hides, so the
+  diagnostic's own pass is the proof that the crossing happens; no
+  other read can show it. `includes` names `ResourceAccessException`,
+  M04's wire-failure type, matched also through the thrown
+  exception's nested causes; and the geometry - `maxRetries`,
+  `delay`, `jitter`, `multiplier`, `maxDelay` - is set by
+  deliberation, not left defaults, each value carrying a sentence the
+  change can state ("the service blips: three attempts, 100ms, then
+  200ms"), with the arithmetic checkable: 1 + `maxRetries` total
+  attempts, growth bounded by `maxDelay`, per-attempt slack by
+  `jitter`. Verified by reading the annotation, its caller and its
+  geometry, and by running the diagnostics' blip read.
+- **Saturation is read off a metric, not off the gauge the flag
+  emptied.** The busy-worker dashboard the Boot 2 model fed is dead
+  on this boot: the executor is a spawner with no stable thread count,
+  and the dump lists no idle worker to graph - a dashboard that reads
+  the executor as a queue measures a queue that no longer exists. The
+  change names what the operator watches instead:
+  `library.availability.retried`, published by a listener of the
+  `MethodRetryEvent` (which extends `MethodFailureEvent`, which
+  extends `ApplicationEvent` - the M09 listening shape is all it
+  takes), labelled at least by the annotated method's name so one
+  listener serves every resilient method, and readable on
+  `/actuator/metrics` beside M09's `library.loans.issued`: a spike in
+  asked-again *is* the upstream outage, seen from the
+  [Member](../GLOSSARY.md)'s side, and the budget's end is the same
+  condition answered to the caller - a `502` problem detail, not a
+  stack trace. An unobserved retry is an outage nobody owns. Verified
+  by reading the listener and the metrics exposure, and by running
+  the diagnostics, whose second read is the counter moving on a
+  borrow that was retried through.
+- **Shutdown drains in flight, and the window is a number the change
+  chose.** The drain diagnostic holds the property in both halves: a
+  [Loan](../GLOSSARY.md) begun across the stop lands - the borrow
+  whose availability answer is still on the wire writes its row under
+  the drain, issued to the Member the wire carried - and a request
+  arriving after is refused, because the server stopped accepting
+  before the drain let the last request go. The mechanism is the
+  jar's default - 4.1.1 answers `graceful`, the flip Boot 3.4 made,
+  not Boot 4 - so what the change adds is the window as a decision:
+  `spring.lifecycle.timeout-per-shutdown-phase` in `application.yml`,
+  set to what the in-flight work can actually promise (one bounded
+  availability read plus one transaction: seconds, not the thirty
+  nobody discussed), a number the diagnostic itself first asserts
+  non-blank. The fail-state the run names is the read's own: a
+  `server.shutdown=immediate` reintroduced, or a window the in-flight
+  work outlives. Verified by reading the property and by running the
+  drain diagnostic.
 - **The vocabulary is the glossary's in the names, not just in the prose.**
   The person who borrows is a [Member](../GLOSSARY.md), the thing on the
   shelf is a [Copy](../GLOSSARY.md), the row is a
