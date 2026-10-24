@@ -281,6 +281,7 @@ The implementation map for the feature described in
   the start, green 3/3 on the solution, CI's single diagnostics command
   green across the whole 20-module reactor.
   [Answer](issues/45-m09-lab-solution-actuator-and-observability.md)
+
 - **2026-10-24 · ticket 46** — The M09 quiz graded against its criteria
   and two questions rebuilt: the ticket named three understandings -
   liveness against readiness, metric rather than log, management surface
