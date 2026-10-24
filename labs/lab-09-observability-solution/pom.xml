@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.example</groupId>
+    <artifactId>labs</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>lab-09-observability-solution</artifactId>
+
+  <name>lab-09-observability-solution</name>
+  <description>
+    M09 lab (solution): the reference implementation of the observability lab.
+    The actuator starter is in the build, so on 4.1.1 the liveness and
+    readiness probes answer with no probe property written; the management
+    server rides its own port (the public API's socket serves no actuator
+    path), the metrics endpoint is exposed next to the default health
+    exposure, and a library.loans.issued counter is incremented where the
+    Loan is issued - in the loan use case, tagged with the Title the Loan was
+    issued against. The diagnostics state the requirement; this module passes
+    them.
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The observability surface: pulls spring-boot-health (the health
+           endpoint and the availability-state indicators the probes answer
+           with), spring-boot-starter-micrometer-metrics (the MeterRegistry
+           wiring and the /actuator/metrics endpoint) and the endpoint
+           machinery - all as the starter's own 4.1.1 contents. Nothing the
+           probes need is configured by hand: management.endpoint.health.
+           probes.enabled defaults to true on 4.1.1
+           (@ConditionalOnBooleanProperty, matchIfMissing = true), so no
+           probe property is written anywhere in this module. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The Jakarta Bean Validation implementation: the constraints on the
+           request bodies are read, so the boundary's answers are real ones. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The declarative HTTP Service client: the @HttpExchange interfaces
+           and the proxy that implements them. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-restclient</artifactId>
+    </dependency>
+    <dependency>
+      <!-- JPA over Hibernate, over the JDBC half it transitively brings:
+           the Copy reads are derived from the method name, and the loan
+           store's statements over the copy and loan tables run on the engine
+           the migrations created - the @Transactional boundary's manager
+           arrives with the starter, hand-built transaction infrastructure is
+           deliberately absent. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <!-- The module that makes Flyway's migration run under Boot 4's
+           auto-configuration. A bare flyway-core configures nothing. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway</artifactId>
+    </dependency>
+    <dependency>
+      <!-- Flyway 12 modularised its database support out of flyway-core:
+           without this module, booting against PostgreSQL fails with
+           "Unsupported Database: PostgreSQL", while H2 runs. -->
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The second engine's driver. The migration still runs as written. -->
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The lab rig's engine, the application.yml's default. -->
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <!-- The webmvc test slice has its own starter in Boot 4; the slices
+           reach @WebMvcTest and @AutoConfigureMockMvc through it. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webmvc-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The shared test fixtures: a deterministic clock. -->
+      <groupId>com.example</groupId>
+      <artifactId>labs-support</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- The availability service, stubbed for the wiring home. -->
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- @Container and @EnabledIfDockerAvailable: the repository tests on
+           the second engine and the diagnostics' race against it. -->
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- PostgreSQLContainer 2, at its new coordinates and its new package. -->
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers-postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- @ServiceConnection: the container test hands the application the
+           container's address without a line of configuration. -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

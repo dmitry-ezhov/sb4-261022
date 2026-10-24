@@ -266,6 +266,22 @@ The implementation map for the feature described in
   about ports, not payloads.
   [Answer](issues/44-m09-lab-start-actuator-and-observability.md)
 
+- **2026-10-24 · ticket 45** — The M09 lab solution is the starter, two
+  configuration lines and one increment: `spring-boot-starter-actuator`
+  puts the probes on the classpath (4.1.1's `matchIfMissing = true` default
+  means no probe property exists in the change),
+  `management.server.port: 0` plus `exposure.include: "health,metrics"`
+  keep the management surface on its own socket with one step past the
+  default exposure, and `LoanService.borrow` counts
+  `library.loans.issued` where the Loan row is written, tagged with the
+  Title the M08 `Copy` payload already carries. The suite's one new
+  assertion reads the registry (one borrow of one fresh Title leaves exactly
+  1.0), the suite's read being registry-level because MockMvc cannot ask the
+  management socket - the diagnostics own that half. Diagnostics red 3/3 on
+  the start, green 3/3 on the solution, CI's single diagnostics command
+  green across the whole 20-module reactor.
+  [Answer](issues/45-m09-lab-solution-actuator-and-observability.md)
+
 ## Fog
 
 - Whether the M08 lab's due-date tests will want a mutable clock rather than a
