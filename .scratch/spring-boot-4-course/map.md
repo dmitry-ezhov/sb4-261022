@@ -418,6 +418,33 @@ The implementation map for the feature described in
   and the `-Pdiagnostics` command.
   [Answer](issues/53-m11-doc-resilience-and-virtual-threads.md)
 
+- **2026-10-24 · ticket 54** — The M11 lab start is the lab-10 solution's
+  application carried forward byte for byte with the M10 chain, the Member
+  principal and the probes all kept, and the resilience contract is four
+  diagnostics over the real sockets: a thread dump with no idle platform
+  worker (the boot's own naming calibrated - platform pool lists
+  `http-nio-<port>-exec-` workers, never `tomcat-handler-`, so both
+  spellings are asserted absent next to the
+  `spring.threads.virtual.enabled` property read), the availability
+  blip `CONNECTION_RESET_BY_PEER` then recovered replaying through to a
+  `201` with a `MethodRetryEvent`-driven `library.availability.retried`
+  count the Operator reads on the management socket, the cut-wire
+  exhaustion answered `502` `application/problem+json` with a titled
+  problem detail instead of the error page, and the drain test booting its
+  own `LibraryApplication` - a `@SpringBootTest` context the test itself
+  stops cannot be closed without the framework reaching for it again - to
+  prove a borrow begun across the stop lands while a request after it is
+  refused and `spring.lifecycle.timeout-per-shutdown-phase` is read back
+  named. Two facts harvested along the way: the 7.0.9 retry interceptor
+  rethrows the spent call's last failure (`ResourceAccessException`) not
+  the `RetryException`, so the diagnostics assert wire observables only;
+  `SpringApplicationBuilder.properties(...)` lands in `defaultProperties`
+  - lowest precedence - so the drain boot passes its overrides as
+  command-line args. Diagnostics red 4/4 on the start, green 4/4 against a
+  validated solution, ordinary build green with every gate but the
+  coverage floor.
+  [Answer](issues/54-m11-lab-start-resilience-and-virtual-threads.md)
+
 ## Fog
 
 - Whether the sibling checklists' diagnostics commands (M08, M09: `-pl
