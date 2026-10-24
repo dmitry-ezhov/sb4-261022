@@ -305,6 +305,21 @@ The implementation map for the feature described in
   gained the conditional its absence in the lab needed.
   [Answer](issues/47-m09-checklist-actuator-and-observability.md)
 
+- **2026-10-24 · ticket 48** — The M10 doc is `modules/10-security7.md`:
+  the delta table splits the three releases whose break the reader meets
+  (6.0 removes `WebSecurityConfigurerAdapter`, 7.0 deletes the deprecated
+  DSL and adds `csrf.spa()`, Boot 4.1.1 moves the auto-configuration and
+  renames the resource-server starter) with every row read off the 7.1.1
+  jars and one booted 4.1.1 app - the CSRF `403` before the authentication
+  `401` included - not remembered. Every "how it works now" snippet
+  compiles against the Solution module's classpath. Review closed two
+  doc-versus-lab divergences: the chain carries no `throws Exception`
+  (`build()` lost its checked exception in 7.0, and PMD's
+  `SignatureDeclareThrowsException` would flag the declaration), and the
+  API chain carries no `/actuator/health/**` rule because the management
+  chain owns `/actuator/**`.
+  [Answer](issues/48-m10-doc-spring-security-7.md)
+
 - **2026-10-24 · ticket 49** — The M10 lab start is the lab-09
   solution's application carried forward untouched with no security starter
   in the build, and the security contract is five diagnostics over the real

@@ -166,11 +166,9 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(2)
-    SecurityFilterChain libraryApi(HttpSecurity http) throws Exception {
+    SecurityFilterChain libraryApi(HttpSecurity http) {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/titles/**")
-                        .permitAll()
-                        .requestMatchers("/actuator/health/**")
                         .permitAll()
                         .requestMatchers("/api/loans/**")
                         .hasRole("MEMBER")
@@ -201,7 +199,7 @@ Every line is a 7.1.1 fact:
   ```java
   @Bean
   @Order(1)
-  SecurityFilterChain actuatorApi(HttpSecurity http) throws Exception {
+  SecurityFilterChain managementSurface(HttpSecurity http) {
       http.securityMatcher(PathPatternRequestMatcher.withDefaults().matcher("/actuator/**"))
               .authorizeHttpRequests(auth -> auth
                       .requestMatchers("/actuator/health/**")
@@ -214,18 +212,20 @@ Every line is a 7.1.1 fact:
 
 - `httpBasic(Customizer.withDefaults())` is the Boot 2 `httpBasic()` in its
   surviving spelling; `csrf(csrf -> csrf.disable())` is the stateless API's
-  decision, explained below. The `throws Exception` is optional from 7.0
-  onward - `build()` lost its checked exception in that release, having
-  declared one through 6.5 - but keeping it costs nothing and matches the
-  `build()` call's history.
-- The rules are ordered, and order is the whole review: the two `permitAll`
-  rules come first, then `hasRole("MEMBER")` on the lending endpoints, then
-  `anyRequest().authenticated()`. The [Title](../GLOSSARY.md) catalogue and the
-  health probe are public, a Loan needs an authenticated Member, and
-  *everything else* - including every other actuator endpoint - needs an
-  authenticated principal. `/actuator/health/**` is the M09 probe path;
-  exposing the rest of the management surface is a separate decision M09's
-  never-list already made.
+  decision, explained below. No `throws Exception`: `build()` lost its checked
+  exception in 7.0, having declared one through 6.5, so the signature needs
+  none - and the course's PMD ruleset enables `SignatureDeclareThrowsException`
+  (`config/pmd/ruleset.xml` inherits PMD's design category), which flags a
+  declaration that no longer throws. That is why the Lab's chains ship without
+  one.
+- The rules are ordered, and order is the whole review: the catalogue's
+  `permitAll` comes first, then `hasRole("MEMBER")` on the lending endpoints,
+  then `anyRequest().authenticated()`. The [Title](../GLOSSARY.md) catalogue is
+  public, a Loan needs an authenticated Member, and *everything else* - the
+  [Reservation](../GLOSSARY.md) surface and every path the rules do not name
+  among them - needs an authenticated principal. The management surface is not
+  in this chain at all: the chain below claims `/actuator/**` first and owns
+  it, health probe included.
 - `hasRole("MEMBER")` and the use case's `@PreAuthorize` answer two different
   questions, and the Lab needs both. The URL rule answers *may this principal
   call the lending API at all* - a principal without the role gets `403`
@@ -247,8 +247,9 @@ Without the ordering the no-matcher chain wins and the management chain is
 dead code - the ordering is the difference between "two chains" and "one chain
 and a bean nobody reads". The management chain above keeps the M09 probe
 public and gates every other actuator endpoint behind `OPERATOR`; once it
-exists it owns `/actuator/**`, so the API chain's own health rule never fires -
-harmless, and worth deleting for the reader who wants one rule per path.
+exists it owns `/actuator/**`, so the API chain above carries no health rule of
+its own - a second rule for the same paths would be one nobody could tell
+apart.
 
 ### Method security: the caller is the argument
 
@@ -379,7 +380,7 @@ A browser application on 7.1.1 keeps the defaults and adds the SPA switch:
 
 ```java
 @Bean
-SecurityFilterChain browserApp(HttpSecurity http) throws Exception {
+SecurityFilterChain browserApp(HttpSecurity http) {
     http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
             .formLogin(Customizer.withDefaults())
             .csrf(csrf -> csrf.spa());
@@ -471,7 +472,7 @@ one configurer away:
 
 ```java
 @Bean
-SecurityFilterChain resourceServer(HttpSecurity http) throws Exception {
+SecurityFilterChain resourceServer(HttpSecurity http) {
     http.authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/**")
                     .hasAuthority("SCOPE_library.read")

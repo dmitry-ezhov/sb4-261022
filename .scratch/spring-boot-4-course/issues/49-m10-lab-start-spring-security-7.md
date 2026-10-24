@@ -12,9 +12,7 @@
 - [x] the default build stays green; the diagnostics run is red
 - [x] the application is the one the previous Module left, extended rather than rewritten
 
-## Comments
-
-### 2026-10-24 — implemented
+## Answer
 
 `labs/lab-10-security7-start` is `lab-09-observability-solution`'s application
 carried forward untouched - the probes, the metric and the separate management
